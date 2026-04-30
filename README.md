@@ -138,7 +138,7 @@ eventsphere/
 
 ### 1. Clone the repository
 ```bash
-git clone https://github.com/FouzanDev/eventsphere.git
+git clone https://github.com/Fouzan980/eventsphere.git
 cd eventsphere
 ```
 
