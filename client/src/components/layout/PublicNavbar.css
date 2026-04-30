@@ -1,0 +1,102 @@
+@media (max-width: 900px) {
+  .public-nav-links {
+    display: none !important;
+  }
+  .hamburger-btn {
+    display: flex !important;
+  }
+}
+
+@media (min-width: 901px) {
+  .public-nav-links {
+    display: flex !important;
+  }
+  .hamburger-btn {
+    display: none !important;
+  }
+  .mobile-menu-overlay {
+    display: none !important;
+  }
+}
+
+.mobile-menu-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background-color: rgba(15, 23, 42, 0.97);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  z-index: 1050;
+  display: flex;
+  flex-direction: column;
+  padding: 5rem 2rem 2rem;
+  align-items: center;
+  justify-content: flex-start;
+  overflow-y: auto;
+  /* NO gap here — spacing is controlled by child elements */
+}
+
+.mobile-link {
+  color: #fff;
+  text-decoration: none;
+  font-size: 1.4rem;
+  font-weight: 600;
+  transition: color 0.2s, transform 0.2s;
+  text-align: center;
+  width: 100%;
+  display: block;
+  line-height: 1;
+}
+
+.mobile-link:hover {
+  color: #FF2A5F;
+  transform: translateX(4px);
+}
+
+.close-btn {
+  position: absolute;
+  top: 1.25rem;
+  right: 1.25rem;
+  background: transparent;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  border-radius: 8px;
+  padding: 6px;
+  transition: color 0.2s, transform 0.2s, background 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.close-btn:hover {
+  color: #FF2A5F;
+  transform: rotate(90deg) scale(1.15);
+  background: rgba(255, 42, 95, 0.12);
+}
+
+/* Hamburger button hover animation */
+.hamburger-btn {
+  transition: transform 0.2s ease, color 0.2s ease, background 0.2s ease;
+  border-radius: 8px;
+  padding: 6px;
+  display: none;
+}
+
+.hamburger-btn:hover {
+  transform: scale(1.15);
+  color: #FF2A5F !important;
+  background: rgba(255, 42, 95, 0.1);
+}
+
+/* Mobile menu nav link grid */
+.mobile-menu-links {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  width: 100%;
+  max-width: 300px;
+  align-items: center;
+}
