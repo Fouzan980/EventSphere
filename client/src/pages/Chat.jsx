@@ -95,6 +95,7 @@ export default function Chat() {
       .finally(() => setLoadC(false));
       
     api.get('/chat/unread').then(r => setUnread(r.data)).catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   // ── Socket ────────────────────────────────────────────────────────────────
@@ -149,6 +150,7 @@ export default function Chat() {
     sock.on('presence', ({ userId, isOnline: ol }) => setOnlineUsers(p => ({ ...p, [userId]: ol })));
 
     return () => sock.disconnect();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.token, user?._id]); // Removed 'contacts' dependency to prevent socket restart
 
   // ── Load history ─────────────────────────────────────────────────────────────
