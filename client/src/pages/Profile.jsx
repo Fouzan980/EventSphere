@@ -8,7 +8,7 @@ import {
 import { PageSkeleton } from '../components/Skeleton';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
-const API = '/api';
+const API = '/projects/eventsphere/api';
 const roleColors = { Organizer: '#f59e0b', Exhibitor: '#06b6d4', Attendee: '#a855f7' };
 const roleEmojis = { Organizer: '🎯', Exhibitor: '🏢', Attendee: '🎟️' };
 

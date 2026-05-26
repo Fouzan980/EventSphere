@@ -40,3 +40,4 @@ logs/
 # ── Uploads / local files ─────────────────────────────────────────────────────
 uploads/
 *.local
+*.pem

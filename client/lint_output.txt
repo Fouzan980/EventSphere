@@ -1,0 +1,22 @@
+
+> client@0.0.0 lint
+> eslint .
+
+
+/data/Projects/PROJECT/client/src/pages/Chat.jsx
+   88:77  error    'setOnlineUsers' is not defined                                                                                  no-undef
+   95:6   warning  React Hook useEffect has a missing dependency: 'searchParams'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  117:66  error    'setOnlineUsers' is not defined                                                                                  no-undef
+  146:55  error    'setOnlineUsers' is not defined                                                                                  no-undef
+  149:6   warning  React Hook useEffect has a missing dependency: 'contacts'. Either include it or remove the dependency array      react-hooks/exhaustive-deps
+  161:59  error    'setOnlineUsers' is not defined                                                                                  no-undef
+  274:31  error    'onlineUsers' is not defined                                                                                     no-undef
+  286:8   error    'modalImg' is not defined                                                                                        no-undef
+  288:26  error    'setModalImg' is not defined                                                                                     no-undef
+  292:23  error    'modalImg' is not defined                                                                                        no-undef
+  296:24  error    'modalImg' is not defined                                                                                        no-undef
+  301:36  error    'setModalImg' is not defined                                                                                     no-undef
+  431:46  error    'setModalImg' is not defined                                                                                     no-undef
+
+✖ 13 problems (11 errors, 2 warnings)
+

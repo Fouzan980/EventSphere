@@ -5,7 +5,7 @@ import { AuthContext } from '../context/AuthContext';
 import { useSearchParams } from 'react-router-dom';
 import { MessageSquare, Send, Search, Check, CheckCheck, Wifi, WifiOff, Shield, ShieldCheck, ArrowLeft, Image, X, Lock, Smile, Trash2, PanelLeft } from 'lucide-react';
 
-const api = axios.create({ baseURL: '/api' });
+const api = axios.create({ baseURL: '/projects/eventsphere/api' });
 api.interceptors.request.use(c => {
   const u = JSON.parse(localStorage.getItem('userInfo') || '{}');
   if (u.token) c.headers.Authorization = `Bearer ${u.token}`;
@@ -102,6 +102,7 @@ export default function Chat() {
   useEffect(() => {
     if (!user?.token) return;
     const sock = io(window.location.origin, {
+      path: '/projects/eventsphere/socket.io',
       auth: { token: user.token },
       transports: ['websocket','polling'],
       reconnection: true,

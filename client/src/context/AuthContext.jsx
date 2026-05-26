@@ -18,14 +18,14 @@ export const AuthProvider = ({ children }) => {
   });
 
   const login = async (email, password) => {
-    const { data } = await axios.post('/api/auth/login', { email, password });
+    const { data } = await axios.post('/projects/eventsphere/api/auth/login', { email, password });
     setUser(data);
     localStorage.setItem('userInfo', JSON.stringify(data));
     return data;
   };
 
   const register = async (userData) => {
-    const { data } = await axios.post('/api/auth/register', userData);
+    const { data } = await axios.post('/projects/eventsphere/api/auth/register', userData);
     // Removed auto-login logic to increase security as per user request
     return data;
   };

@@ -23,7 +23,7 @@ import Chat from './pages/Chat';
 
 function App() {
   return (
-    <Router>
+    <Router basename="/projects/eventsphere">
       <ToastContainer 
         position="top-right" 
         autoClose={4000} 
