@@ -168,8 +168,8 @@ const PublicNavbar = () => {
         {/* Desktop Links */}
         <div className="public-nav-links" style={styles.navLinks}>
           <Link to="/" style={styles.link}>Home</Link>
-          <a href="/#events" style={styles.link}>Events</a>
-          <a href="/#categories" style={styles.link}>Categories</a>
+          <a href={`${import.meta.env.BASE_URL}#events`} style={styles.link}>Events</a>
+          <a href={`${import.meta.env.BASE_URL}#categories`} style={styles.link}>Categories</a>
           <Link to="/exhibitors" style={styles.link}>Exhibitors</Link>
           <div style={styles.navDivider}></div>
           {user ? (
@@ -260,16 +260,23 @@ const PublicNavbar = () => {
             <div style={{ height: '1px', width: '100%', maxWidth: 300, background: 'linear-gradient(to right, transparent, #334155, transparent)', marginBottom: '1rem' }} />
 
             <div className="mobile-menu-links" style={{ marginBottom: '0.75rem' }}>
-              {[['Home', '/'], ['Events', '/#events'], ['Categories', '/#categories'], ['Exhibitors', '/exhibitors']].map(([label, href], i) => (
-                <motion.a key={label} href={href}
-                  className="mobile-link"
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.08 + i * 0.05 }}
-                  onClick={() => setIsMenuOpen(false)}
-                  style={{ textDecoration: 'none' }}
-                >{label}</motion.a>
-              ))}
+              {[['Home', '/'], ['Events', '#events'], ['Categories', '#categories'], ['Exhibitors', '/exhibitors']].map(([label, path], i) => {
+                const isHash = path.startsWith('#');
+                return (
+                  <motion.div key={label}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.08 + i * 0.05 }}
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    {isHash ? (
+                      <a href={`${import.meta.env.BASE_URL}${path}`} className="mobile-link" style={{ textDecoration: 'none', display: 'block' }}>{label}</a>
+                    ) : (
+                      <Link to={path} className="mobile-link" style={{ textDecoration: 'none', display: 'block' }}>{label}</Link>
+                    )}
+                  </motion.div>
+                );
+              })}
             </div>
 
             <div style={{ height: '1px', width: '100%', maxWidth: 300, background: 'linear-gradient(to right, transparent, #334155, transparent)', marginBottom: '0.75rem' }} />
