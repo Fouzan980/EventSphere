@@ -19,6 +19,7 @@ import FloorPlan from './pages/FloorPlan';
 import UserManagement from './pages/UserManagement';
 import Profile from './pages/Profile';
 import Orders from './pages/Orders';
+import Chat from './pages/Chat';
 
 function App() {
   return (
@@ -65,6 +66,7 @@ function App() {
           <Route path="users" element={<UserManagement />} />
           <Route path="profile" element={<Profile />} />
           <Route path="orders" element={<Orders />} />
+          <Route path="chat" element={<Chat />} />
         </Route>
       </Routes>
     </Router>

@@ -21,7 +21,9 @@
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.4.1",
     "node-cron": "^4.2.1",
-    "nodemailer": "^8.0.5"
+    "nodemailer": "^8.0.5",
+    "socket.io": "^4.8.3",
+    "stripe": "^22.1.1"
   },
   "devDependencies": {
     "concurrently": "^9.2.1",

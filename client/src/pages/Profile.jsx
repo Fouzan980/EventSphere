@@ -2,13 +2,13 @@ import React, { useContext, useState, useEffect, useRef } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import axios from 'axios';
 import {
-  User, Mail, Phone, Globe, Building2, Shield, BadgeCheck, FileText,
+  User, Mail, Building2, Shield, BadgeCheck, FileText,
   Camera, Save, Lock, CheckCircle, AlertCircle, Loader2,
 } from 'lucide-react';
 import { PageSkeleton } from '../components/Skeleton';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
-const API = 'http://localhost:5000/api';
+const API = '/api';
 const roleColors = { Organizer: '#f59e0b', Exhibitor: '#06b6d4', Attendee: '#a855f7' };
 const roleEmojis = { Organizer: '🎯', Exhibitor: '🏢', Attendee: '🎟️' };
 

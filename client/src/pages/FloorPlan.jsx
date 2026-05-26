@@ -6,19 +6,30 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Trash2, X, Grid, Loader2, ChevronDown, ZoomIn } from 'lucide-react';
 import { toast } from 'react-toastify';
 
-const GRID_COLS = 20; // columns
-const GRID_ROWS = 15; // rows
-const CELL_SIZE = 38; // px per cell
+const GRID_COLS = 20;
+const GRID_ROWS = 15;
+const CELL_SIZE = 38;
 
-// colour palette per status
 const statusColors = {
   Available: { bg: '#dbeafe', border: '#93c5fd', text: '#1d4ed8' },
   Assigned:  { bg: '#dcfce7', border: '#86efac', text: '#15803d' },
   pending:   { bg: '#fef3c7', border: '#fcd34d', text: '#b45309' },
 };
 
+// Simple hook to detect mobile
+const useIsMobile = () => {
+  const [m, setM] = useState(window.innerWidth < 768);
+  useEffect(() => {
+    const h = () => setM(window.innerWidth < 768);
+    window.addEventListener('resize', h);
+    return () => window.removeEventListener('resize', h);
+  }, []);
+  return m;
+};
+
 const FloorPlan = () => {
   const { user } = useContext(AuthContext);
+  const isMobile = useIsMobile();
   const [events, setEvents] = useState([]);
   const [selectedEventId, setSelectedEventId] = useState('');
   const [booths, setBooths] = useState([]);
@@ -216,7 +227,7 @@ const FloorPlan = () => {
           <Loader2 size={32} style={{ animation: 'spin 1s linear infinite' }} />
         </div>
       ) : (
-        <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap', alignItems: 'flex-start' }}>
+        <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap', alignItems: 'flex-start' }}>
 
           {/* Grid Area */}
           <div style={{ overflowX: 'auto', flex: 1 }}>
@@ -305,7 +316,7 @@ const FloorPlan = () => {
           </div>
 
           {/* Right Panel: Booth List */}
-          <div style={styles.boothList}>
+          <div style={{ ...styles.boothList, width: isMobile ? '100%' : '260px' }}>
             <h3 style={styles.panelTitle}>Placed Booths ({booths.length})</h3>
             {booths.length === 0 ? (
               <div style={styles.emptyPanel}>
@@ -499,7 +510,7 @@ const styles = {
     display: 'flex', alignItems: 'stretch', pointerEvents: 'none'
   },
   formPanel: {
-    width: '380px', backgroundColor: 'var(--bg-surface)',
+    width: '380px', maxWidth: '95vw', backgroundColor: 'var(--bg-surface)',
     borderLeft: '1px solid var(--border-color)',
     boxShadow: '-10px 0 40px rgba(0,0,0,0.1)',
     display: 'flex', flexDirection: 'column', pointerEvents: 'all',

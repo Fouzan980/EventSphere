@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import api from '../utils/api';
-import { Activity, BarChart2, TrendingUp, Users, Clock, Info, ChevronRight } from 'lucide-react';
+import { Activity, BarChart2, TrendingUp, Users, Clock, Info } from 'lucide-react';
 
 const Dashboard = () => {
   const { user } = useContext(AuthContext);

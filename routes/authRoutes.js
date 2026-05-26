@@ -32,7 +32,7 @@ router.post('/register', async (req, res) => {
     const hasUpper = /[A-Z]/.test(password);
     const hasLower = /[a-z]/.test(password);
     const hasNumber = /[0-9]/.test(password);
-    const hasSpecial = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password);
+    const hasSpecial = /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password);
     const strength = [hasUpper, hasLower, hasNumber, hasSpecial].filter(Boolean).length;
     if (strength < 2) {
       return res.status(400).json({ message: 'Password is too weak. Include uppercase, lowercase, numbers, or special characters.' });
@@ -82,7 +82,6 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ message: 'Invalid email or password.' });
     }
 
-    // Check lockout
     // Check lockout
     const now = new Date();
     if (user.lockUntil && user.lockUntil > now) {

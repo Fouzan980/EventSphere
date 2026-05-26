@@ -2,11 +2,11 @@ import React, { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ThemeContext } from '../../context/ThemeContext';
 import { AuthContext } from '../../context/AuthContext';
-import { Sun, Moon, Menu } from 'lucide-react';
+import { Sun, Moon, Menu, LogOut, X } from 'lucide-react';
 
-const Topbar = ({ isMobile, toggleMenu }) => {
+const Topbar = ({ isMobile, toggleMenu, menuOpen }) => {
   const { theme, toggleTheme } = useContext(ThemeContext);
-  const { user } = useContext(AuthContext);
+  const { user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const initials = user?.name
@@ -14,85 +14,159 @@ const Topbar = ({ isMobile, toggleMenu }) => {
     : 'U';
 
   return (
-    <header style={styles.topbar}>
+    <header style={styles.bar}>
+      {/* Left: hamburger + title */}
       <div style={styles.left}>
-        {isMobile && (
-          <button onClick={toggleMenu} style={{ ...styles.iconBtn, border: 'none', marginRight: '1rem' }}>
-            <Menu size={24} />
-          </button>
-        )}
-        <h2 style={{ margin: 0, fontWeight: 600, color: 'var(--text-primary)', fontSize: isMobile ? '1.2rem' : '1.5rem' }}>
-          {user?.role || 'Guest'} Portal
-        </h2>
-      </div>
-
-      <div style={styles.right}>
-        <button onClick={toggleTheme} style={styles.iconBtn} aria-label="Toggle Theme">
-          {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
+        <button
+          onClick={toggleMenu}
+          aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+          style={styles.iconBtn}
+        >
+          {menuOpen && !isMobile ? <X size={20} /> : <Menu size={20} />}
         </button>
 
-        {/* Clickable profile — goes to /dashboard/profile */}
+        <h1 style={styles.title}>
+          <span style={styles.brandDot}>●</span>
+          {user?.role || 'Guest'} Portal
+        </h1>
+      </div>
+
+      {/* Right: theme + profile + logout */}
+      <div style={styles.right}>
+        <button onClick={toggleTheme} style={styles.iconBtn} aria-label="Toggle theme">
+          {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
+        </button>
+
         <button
-          id="topbar-profile-btn"
           onClick={() => navigate('/dashboard/profile')}
-          title="My Profile"
-          aria-label="Go to profile"
           style={styles.profileBtn}
+          title="My Profile"
         >
-        <div style={styles.avatar}>
+          <div style={styles.avatar}>
             {user?.avatar
               ? <img src={user.avatar} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
               : initials
             }
           </div>
           {!isMobile && (
-            <div style={styles.userInfo}>
-              <span style={styles.userName}>{user ? user.name : 'Guest'}</span>
-              <span style={styles.userRole}>{user ? user.role : 'Visitor'}</span>
+            <div style={{ textAlign: 'left', lineHeight: 1.25 }}>
+              <div style={styles.userName}>{user?.name || 'Guest'}</div>
+              <div style={styles.userRole}>{user?.role || 'User'}</div>
             </div>
           )}
         </button>
+
+        {isMobile && (
+          <button onClick={logout} style={styles.logoutBtn} aria-label="Logout">
+            <LogOut size={18} />
+          </button>
+        )}
       </div>
     </header>
   );
 };
 
 const styles = {
-  topbar: {
-    height: '70px',
-    backgroundColor: 'var(--bg-surface)',
+  bar: {
+    height: 60,
+    background: 'var(--bg-surface)',
     borderBottom: '1px solid var(--border-color)',
-    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-    padding: '0 2rem',
-    position: 'sticky', top: 0, zIndex: 10,
-    transition: 'var(--transition-speed)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: '0 1.25rem',
+    flexShrink: 0,
+    position: 'sticky',
+    top: 0,
+    zIndex: 50,
+    boxShadow: '0 1px 0 var(--border-color)',
   },
-  left: { display: 'flex', alignItems: 'center' },
-  right: { display: 'flex', alignItems: 'center', gap: '1rem' },
+  left: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.75rem',
+    minWidth: 0,
+  },
+  title: {
+    margin: 0,
+    fontSize: '1rem',
+    fontWeight: 700,
+    color: 'var(--text-primary)',
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.4rem',
+  },
+  brandDot: {
+    color: '#7c3aed',
+    fontSize: '0.55rem',
+    lineHeight: 1,
+  },
+  right: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.6rem',
+    flexShrink: 0,
+  },
   iconBtn: {
     background: 'transparent',
     color: 'var(--text-primary)',
-    display: 'flex', alignItems: 'center', justifyContent: 'center',
-    padding: '0.5rem', borderRadius: '50%', transition: '0.2s',
-    border: '1px solid var(--border-color)', cursor: 'pointer',
+    border: '1px solid var(--border-color)',
+    borderRadius: 8,
+    padding: '6px 8px',
+    cursor: 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    transition: 'background 0.15s',
   },
   profileBtn: {
-    display: 'flex', alignItems: 'center', gap: '10px',
-    background: 'transparent', border: '1px solid var(--border-color)',
-    borderRadius: '40px', padding: '5px 14px 5px 5px',
-    cursor: 'pointer', transition: '0.2s',
+    display: 'flex',
+    alignItems: 'center',
+    gap: 8,
+    background: 'transparent',
+    border: '1px solid var(--border-color)',
+    borderRadius: 24,
+    padding: '4px 10px 4px 4px',
+    cursor: 'pointer',
     color: 'var(--text-primary)',
+    transition: 'background 0.15s',
   },
   avatar: {
-    width: '34px', height: '34px', borderRadius: '50%',
+    width: 30,
+    height: 30,
+    borderRadius: '50%',
     background: 'linear-gradient(135deg,#7c3aed,#a855f7)',
-    color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center',
-    fontWeight: 700, fontSize: '0.75rem',
-    boxShadow: '0 0 10px rgba(139,92,246,0.4)',
+    color: '#fff',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontWeight: 700,
+    fontSize: '0.7rem',
+    flexShrink: 0,
   },
-  userInfo: { display: 'flex', flexDirection: 'column', textAlign: 'left' },
-  userName: { fontWeight: 600, fontSize: '0.85rem', color: 'var(--text-primary)' },
-  userRole:  { fontSize: '0.72rem', color: 'var(--text-secondary)' },
+  userName: {
+    fontWeight: 600,
+    fontSize: '0.8rem',
+    color: 'var(--text-primary)',
+  },
+  userRole: {
+    fontSize: '0.68rem',
+    color: 'var(--text-secondary)',
+  },
+  logoutBtn: {
+    background: 'rgba(239,68,68,0.08)',
+    color: '#ef4444',
+    border: '1px solid rgba(239,68,68,0.2)',
+    borderRadius: 8,
+    padding: '6px 8px',
+    cursor: 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    transition: 'background 0.15s',
+  },
 };
 
 export default Topbar;

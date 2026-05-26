@@ -153,7 +153,48 @@ const UserManagement = () => {
       </div>
 
       {/* Tabs */}
-      <div style={styles.tabBar}>
+      <style>{`
+        .um-mobile-select {
+          display: none;
+          width: 100%;
+          padding: 0.8rem 1rem;
+          border-radius: 10px;
+          border: 1px solid var(--border-color);
+          background-color: var(--bg-surface);
+          color: var(--text-primary);
+          font-size: 1rem;
+          margin-bottom: 1.5rem;
+          font-weight: 600;
+          outline: none;
+          appearance: none;
+          background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2364748b' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+          background-repeat: no-repeat;
+          background-position: right 1rem center;
+          background-size: 1em;
+        }
+        .um-desktop-tabs {
+          display: flex;
+          gap: 0.5rem;
+          margin-bottom: 1.5rem;
+          border-bottom: 2px solid var(--border-color);
+          padding-bottom: 0;
+          overflow-x: auto;
+        }
+        @media (max-width: 768px) {
+          .um-mobile-select { display: block; }
+          .um-desktop-tabs { display: none !important; }
+        }
+      `}</style>
+      <select 
+        className="um-mobile-select" 
+        value={activeTab} 
+        onChange={(e) => setActiveTab(e.target.value)}
+      >
+        {TABS.map(tab => (
+          <option key={tab} value={tab}>{tab}</option>
+        ))}
+      </select>
+      <div className="um-desktop-tabs">
         {TABS.map(tab => (
           <button
             key={tab}

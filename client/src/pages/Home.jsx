@@ -2,13 +2,13 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../utils/api';
 import { AuthContext } from '../context/AuthContext';
-import { ThemeContext } from '../context/ThemeContext';
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Calendar, MapPin, Ticket, Globe, Mail, Phone, X, Star, Music, Mic2, Target, ChevronLeft, ChevronRight, Mic, Users, Award } from 'lucide-react';
+import { Search, Calendar, MapPin, Ticket, X, ChevronLeft, ChevronRight, Mic } from 'lucide-react';
 import { toast } from 'react-toastify';
 import PublicNavbar from '../components/layout/PublicNavbar';
 import { PageSkeleton } from '../components/Skeleton';
+import PaymentCheckout from '../components/PaymentCheckout';
 const getBrandLogo = (domain) => `https://cdn.brandfetch.io/domain/${domain}/w/140/h/140/logo?c=1idWm8TWPtdWnIGpbBE`;
 
 const PARTNERS = [
@@ -138,13 +138,15 @@ const Home = () => {
   const [ticketType, setTicketType] = useState('Standard');
   const [selectedArtist, setSelectedArtist] = useState(null);
 
+  // Payment flow state
+  const [paymentModal, setPaymentModal] = useState(null); // { event, ticketType, price }
+
   const [bannerIndex, setBannerIndex] = useState(0);
 
   useEffect(() => {
     api.get('/events').then(r => setEvents(r.data)).catch(console.error).finally(() => setLoading(false));
   }, []);
 
-  const featuredEvents = events.filter(e => e.isFeatured);
   const bannerEvents = events.length > 0 ? events : [];
 
   useEffect(() => {
@@ -153,19 +155,39 @@ const Home = () => {
     return () => clearInterval(t);
   }, [bannerEvents.length]);
 
-  const handleBookTicket = async (event, type = 'Standard') => {
+  const openPaymentModal = (event, type) => {
+    if (!user) { navigate('/login'); return; }
+    let price = 0;
+    if (event.hasMultipleTickets && event.tickets?.length > 0) {
+      const t = event.tickets.find(tk => tk.name === type);
+      price = t ? t.price : 0;
+    } else {
+      // Single tier — use the event's base price directly
+      price = event.price || 0;
+    }
+    setPaymentModal({ event, ticketType: type, price });
+  };
+
+  // Called by PaymentCheckout after any payment method succeeds
+  const onBookingSuccess = async (event, type, paymentInfo) => {
+    await handleBookTicket(event, type, paymentInfo);
+  };
+
+  const handleBookTicket = async (event, type = 'Standard', paymentInfo = {}) => {
     if (!user) { navigate('/login'); return; }
     setBookingState(prev => ({ ...prev, [event._id]: 'loading' }));
     try {
-      await api.post(`/tickets/book/${event._id}`, { ticketType: type });
+      await api.post(`/tickets/book/${event._id}`, {
+        ticketType: type,
+        paymentMethod: paymentInfo.provider,
+        paymentIntentId: paymentInfo.paymentIntentId,
+      });
       setBookingState(prev => ({ ...prev, [event._id]: 'booked' }));
-      
-      let bookedPrice = event.price;
+
+      let bookedPrice = event.price || 0;
       if (event.hasMultipleTickets && event.tickets?.length > 0) {
         const matchedTicket = event.tickets.find(t => t.name === type);
         bookedPrice = matchedTicket ? matchedTicket.price : 0;
-      } else {
-        bookedPrice = event.price * (type === 'VIP' ? 2 : type === 'Meet & Greet' ? 4 : 1);
       }
 
       setSuccessMsg({ title: event.title, date: event.date, location: event.location, price: bookedPrice, email: user.email });
@@ -645,11 +667,7 @@ const Home = () => {
                 <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
                   {(selectedEventModal.hasMultipleTickets && selectedEventModal.tickets?.length > 0 
                     ? selectedEventModal.tickets.map(t => ({ tier: t.name, price: t.price, soldOut: t.soldOut || false }))
-                    : ['Standard', ...(selectedEventModal.category === 'Concert' ? ['VIP', 'Meet & Greet'] : [])].map(tier => ({
-                        tier,
-                        price: selectedEventModal.price * (tier === 'VIP' ? 2 : tier === 'Meet & Greet' ? 4 : 1),
-                        soldOut: false,
-                      }))
+                    : [{ tier: 'Standard', price: selectedEventModal.price || 0, soldOut: false }]
                   ).map(({tier, price, soldOut}) => (
                     <div
                       key={tier}
@@ -682,15 +700,15 @@ const Home = () => {
                   <button
                     style={{ ...S.btnBook, width: '100%', justifyContent: 'center', padding: '14px', fontSize: '1rem', marginTop: '1.25rem', borderRadius: '12px', opacity: isSelectedSoldOut ? 0.5 : 1, cursor: isSelectedSoldOut ? 'not-allowed' : 'pointer' }}
                     disabled={!!isSelectedSoldOut}
-                    onClick={() => { if (!isSelectedSoldOut) { handleBookTicket(selectedEventModal, ticketType); setSelectedEventModal(null); setTicketType('Standard'); } }}
+                    onClick={() => { if (!isSelectedSoldOut) { openPaymentModal(selectedEventModal, ticketType); setSelectedEventModal(null); setTicketType('Standard'); } }}
                   >
-                    {isSelectedSoldOut ? '🚫 This Tier is Sold Out' : `Confirm Booking — ${(() => {
+                    {isSelectedSoldOut ? '🚫 This Tier is Sold Out' : `Proceed to Payment — ${(() => {
                       if (selectedEventModal.hasMultipleTickets && selectedEventModal.tickets?.length > 0) {
                         const matchedTicket = selectedEventModal.tickets.find(t => t.name === ticketType);
                         const price = matchedTicket ? matchedTicket.price : 0;
                         return price === 0 ? 'FREE' : `Rs. ${price}`;
                       } else {
-                        const price = selectedEventModal.price * (ticketType === 'VIP' ? 2 : ticketType === 'Meet & Greet' ? 4 : 1);
+                        const price = selectedEventModal.price || 0;
                         return price === 0 ? 'FREE' : `Rs. ${price}`;
                       }
                     })()}`}
@@ -701,6 +719,13 @@ const Home = () => {
           </motion.div>
         </div>
       )}
+
+      {/* ─── Real Payment Checkout ──────────────────────────────────────────── */}
+      <PaymentCheckout
+        paymentModal={paymentModal}
+        setPaymentModal={setPaymentModal}
+        onBookingSuccess={onBookingSuccess}
+      />
 
       {/* ─── Success Modal ─────────────────────────────────────────────────── */}
       {successMsg && (
@@ -972,3 +997,4 @@ const S = {
 };
 
 export default Home;
+

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { Lock, ArrowRight, CheckCircle } from 'lucide-react';
 // eslint-disable-next-line no-unused-vars
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import api from '../utils/api';
 
 const ResetPassword = () => {

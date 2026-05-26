@@ -3,7 +3,7 @@ import { NavLink } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
 import {
   LayoutDashboard, Calendar, Users, Map,
-  LogOut, X, UserCircle2, UserCog, Ticket,
+  LogOut, X, UserCircle2, UserCog, Ticket, MessageSquare,
 } from 'lucide-react';
 
 const Sidebar = ({ closeMenu, isMobile }) => {
@@ -16,6 +16,7 @@ const Sidebar = ({ closeMenu, isMobile }) => {
     { name: 'Applications',    path: '/dashboard/applications', icon: <Users size={20} />,           roles: ['Organizer', 'Exhibitor', undefined] },
     { name: 'User Management', path: '/dashboard/users',        icon: <UserCircle2 size={20} />,     roles: ['Organizer'] },
     { name: 'My Orders',       path: '/dashboard/orders',       icon: <Ticket size={20} />,          roles: ['Attendee'] },
+    { name: 'Messages',        path: '/dashboard/chat',         icon: <MessageSquare size={20} />,   roles: ['Organizer', 'Exhibitor'] },
     { name: 'My Profile',      path: '/dashboard/profile',      icon: <UserCog size={20} />,         roles: ['Organizer', 'Exhibitor', 'Attendee', undefined] },
   ];
 
@@ -102,6 +103,7 @@ const styles = {
     minHeight: '100vh',
     position: 'sticky',
     top: 0,
+    overflowY: 'auto',
   },
   logo: {
     padding: '2rem 1.5rem',

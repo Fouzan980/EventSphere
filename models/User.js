@@ -22,7 +22,9 @@ const userSchema = new mongoose.Schema({
   lockCount:    { type: Number, default: 0 },
   // Password Reset
   resetPasswordToken: { type: String },
-  resetPasswordExpire: { type: Date }
+  resetPasswordExpire: { type: Date },
+  // E2E Encryption — ECDH public key (JWK string), stored per user
+  ecdhPublicKey: { type: String, default: '' },
 }, { timestamps: true });
 
 module.exports = mongoose.model('User', userSchema);

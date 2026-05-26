@@ -9,7 +9,7 @@ import { toast } from 'react-toastify';
 import axios from 'axios';
 import './PublicNavbar.css';
 
-const API = 'http://localhost:5000/api';
+const API = '/api';
 
 const compressImage = (file) => new Promise((resolve) => {
   const reader = new FileReader();

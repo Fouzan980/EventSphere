@@ -156,15 +156,15 @@ const ExhibitorDirectory = () => {
       {/* ── Full Profile Modal ── */}
       <AnimatePresence>
         {selectedExhibitor && (
-          <>
+          <div style={{ position: 'fixed', inset: 0, zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               onClick={() => setSelectedExhibitor(null)}
-              style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(6px)', zIndex: 2000 }} />
+              style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(6px)' }} />
+            
             <motion.div initial={{ opacity: 0, scale: 0.94, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.94 }}
               transition={{ type: 'spring', stiffness: 300, damping: 28 }}
-              style={{ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', zIndex: 2001,
-                width: 'min(520px, 94vw)', maxHeight: '88vh', overflowY: 'auto',
-                background: 'var(--bg-surface)', borderRadius: 20, padding: '2rem',
+              style={{ position: 'relative', width: '100%', maxWidth: '520px', maxHeight: 'min(90vh, 800px)', overflowY: 'auto', overflowX: 'hidden', WebkitOverflowScrolling: 'touch', boxSizing: 'border-box',
+                background: 'var(--bg-surface)', borderRadius: 20, padding: 'clamp(1.25rem, 5vw, 2rem)',
                 border: '1px solid var(--border-color)', boxShadow: '0 30px 80px rgba(0,0,0,0.25)' }}>
               <button onClick={() => setSelectedExhibitor(null)}
                 style={{ position: 'absolute', top: 14, right: 14, background: 'rgba(100,116,139,0.15)', border: 'none', borderRadius: 8, width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'var(--text-secondary)' }}>
@@ -172,16 +172,16 @@ const ExhibitorDirectory = () => {
               </button>
 
               {/* Avatar + name */}
-              <div style={{ display: 'flex', gap: '1.25rem', alignItems: 'center', marginBottom: '1.5rem' }}>
+              <div style={{ display: 'flex', gap: 'clamp(0.75rem, 3vw, 1.25rem)', alignItems: 'center', marginBottom: '1.5rem' }}>
                 {selectedExhibitor.avatar
-                  ? <img src={selectedExhibitor.avatar} alt="" style={{ width: 80, height: 80, borderRadius: 16, objectFit: 'cover', border: '2px solid rgba(255,42,95,0.2)', flexShrink: 0 }} />
-                  : <div style={{ width: 80, height: 80, borderRadius: 16, background: 'linear-gradient(135deg,#FF416C,#FF4B2B)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2rem', fontWeight: 800, color: '#fff', flexShrink: 0 }}>{(selectedExhibitor.companyName || selectedExhibitor.name).charAt(0)}</div>}
-                <div style={{ minWidth: 0 }}>
+                  ? <img src={selectedExhibitor.avatar} alt="" style={{ width: 'clamp(60px, 15vw, 80px)', height: 'clamp(60px, 15vw, 80px)', borderRadius: 16, objectFit: 'cover', border: '2px solid rgba(255,42,95,0.2)', flexShrink: 0 }} />
+                  : <div style={{ width: 'clamp(60px, 15vw, 80px)', height: 'clamp(60px, 15vw, 80px)', borderRadius: 16, background: 'linear-gradient(135deg,#FF416C,#FF4B2B)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 'clamp(1.5rem, 5vw, 2rem)', fontWeight: 800, color: '#fff', flexShrink: 0 }}>{(selectedExhibitor.companyName || selectedExhibitor.name).charAt(0)}</div>}
+                <div style={{ minWidth: 0, flex: 1 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
-                    <h2 style={{ margin: 0, fontSize: '1.3rem', fontWeight: 800, color: 'var(--text-primary)' }}>{selectedExhibitor.companyName || selectedExhibitor.name}</h2>
-                    {selectedExhibitor.isVerified && <BadgeCheck size={20} color="#10b981" fill="#d1fae5" />}
+                    <h2 style={{ margin: 0, fontSize: 'clamp(1.1rem, 4vw, 1.3rem)', fontWeight: 800, color: 'var(--text-primary)', wordBreak: 'break-word', overflowWrap: 'break-word' }}>{selectedExhibitor.companyName || selectedExhibitor.name}</h2>
+                    {selectedExhibitor.isVerified && <BadgeCheck size={20} color="#10b981" fill="#d1fae5" style={{ flexShrink: 0 }} />}
                   </div>
-                  {selectedExhibitor.companyName && <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: 2 }}>{selectedExhibitor.name}</div>}
+                  {selectedExhibitor.companyName && <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: 2, wordBreak: 'break-word', overflowWrap: 'break-word' }}>{selectedExhibitor.name}</div>}
                   {selectedExhibitor.niche && <span style={{ display: 'inline-block', marginTop: 6, background: 'rgba(59,130,246,0.1)', color: '#3b82f6', padding: '3px 10px', borderRadius: 8, fontSize: '0.78rem', fontWeight: 700 }}>{selectedExhibitor.niche}</span>}
                 </div>
               </div>
@@ -190,7 +190,7 @@ const ExhibitorDirectory = () => {
               {selectedExhibitor.bio && (
                 <div style={{ marginBottom: '1.25rem' }}>
                   <div style={{ fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.8px', color: 'var(--text-secondary)', marginBottom: 6 }}>About</div>
-                  <p style={{ margin: 0, fontSize: '0.93rem', color: 'var(--text-secondary)', lineHeight: 1.7 }}>{selectedExhibitor.bio}</p>
+                  <p style={{ margin: 0, fontSize: '0.93rem', color: 'var(--text-secondary)', lineHeight: 1.7, wordBreak: 'break-word', whiteSpace: 'pre-wrap', overflowWrap: 'break-word' }}>{selectedExhibitor.bio}</p>
                 </div>
               )}
 
@@ -199,19 +199,19 @@ const ExhibitorDirectory = () => {
                 {selectedExhibitor.website && (
                   <a href={selectedExhibitor.website.startsWith('http') ? selectedExhibitor.website : `https://${selectedExhibitor.website}`}
                     target="_blank" rel="noopener noreferrer"
-                    style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(59,130,246,0.1)', color: '#3b82f6', padding: '8px 16px', borderRadius: 10, fontWeight: 600, fontSize: '0.88rem', textDecoration: 'none' }}>
-                    <Globe size={15} /> Visit Website
+                    style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(59,130,246,0.1)', color: '#3b82f6', padding: '8px 16px', borderRadius: 10, fontWeight: 600, fontSize: '0.88rem', textDecoration: 'none', maxWidth: '100%', wordBreak: 'break-word' }}>
+                    <Globe size={15} style={{ flexShrink: 0 }} /> <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Visit Website</span>
                   </a>
                 )}
                 {selectedExhibitor.email && (
                   <a href={`mailto:${selectedExhibitor.email}`}
-                    style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(255,42,95,0.1)', color: '#FF2A5F', padding: '8px 16px', borderRadius: 10, fontWeight: 600, fontSize: '0.88rem', textDecoration: 'none' }}>
-                    <Mail size={15} /> Email
+                    style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(255,42,95,0.1)', color: '#FF2A5F', padding: '8px 16px', borderRadius: 10, fontWeight: 600, fontSize: '0.88rem', textDecoration: 'none', maxWidth: '100%', wordBreak: 'break-word' }}>
+                    <Mail size={15} style={{ flexShrink: 0 }} /> <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Email</span>
                   </a>
                 )}
               </div>
             </motion.div>
-          </>
+          </div>
         )}
       </AnimatePresence>
 

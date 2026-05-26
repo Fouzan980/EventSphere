@@ -85,9 +85,11 @@ router.route('/')
   })
   .post(protect, authorize('Organizer'), async (req, res) => {
     try {
-      const { title, date, time, location, coordinates, description, price, category, capacity, poster, discounts, sessions, websiteLink, dressCode, isFeatured, speakers } = req.body;
+      const { title, date, time, location, coordinates, description, price, category, capacity, poster, banner, discounts, sessions, websiteLink, dressCode, isFeatured, speakers, hasMultipleTickets, tickets } = req.body;
       const event = await Event.create({
-        title, date, time, location, coordinates, description, price, category, capacity, poster, discounts, sessions, websiteLink, dressCode, isFeatured: isFeatured || false, speakers: speakers || [],
+        title, date, time, location, coordinates, description, price, category, capacity, poster, banner, discounts, sessions, websiteLink, dressCode, isFeatured: isFeatured || false, speakers: speakers || [],
+        hasMultipleTickets: hasMultipleTickets || false,
+        tickets: hasMultipleTickets ? (tickets || []) : [],
         organizer: req.user.id,
       });
 

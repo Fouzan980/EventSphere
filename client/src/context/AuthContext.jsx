@@ -1,36 +1,31 @@
-import React, { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState } from 'react';
 import axios from 'axios';
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
+  const [user, setUser] = useState(() => {
     const userInfo = localStorage.getItem('userInfo');
-    if (userInfo) {
-      try {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        setUser(JSON.parse(userInfo));
-      } catch (err) {
-        console.error('Failed to parse userInfo from localStorage:', err);
-        localStorage.removeItem('userInfo');
-      }
+    if (!userInfo) return null;
+    try {
+      return JSON.parse(userInfo);
+    } catch (err) {
+      console.error('Failed to parse userInfo from localStorage:', err);
+      localStorage.removeItem('userInfo');
+      return null;
     }
-    setLoading(false);
-  }, []);
+  });
 
   const login = async (email, password) => {
-    const { data } = await axios.post('http://localhost:5000/api/auth/login', { email, password });
+    const { data } = await axios.post('/api/auth/login', { email, password });
     setUser(data);
     localStorage.setItem('userInfo', JSON.stringify(data));
     return data;
   };
 
   const register = async (userData) => {
-    const { data } = await axios.post('http://localhost:5000/api/auth/register', userData);
+    const { data } = await axios.post('/api/auth/register', userData);
     // Removed auto-login logic to increase security as per user request
     return data;
   };
@@ -51,8 +46,8 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout, updateUser, loading }}>
-      {!loading && children}
+    <AuthContext.Provider value={{ user, login, register, logout, updateUser, loading: false }}>
+      {children}
     </AuthContext.Provider>
   );
 };

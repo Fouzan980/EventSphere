@@ -1,11 +1,8 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Ticket, Globe, Mail, Phone, ArrowRight, CheckCircle, Loader2, Send, MapPin } from 'lucide-react';
-import { AuthContext } from '../context/AuthContext';
-import { ThemeContext } from '../context/ThemeContext';
+import { Ticket, Mail, ArrowRight, CheckCircle, Loader2, Send } from 'lucide-react';
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sun, Moon } from 'lucide-react';
 import api from '../utils/api';
 import PublicNavbar from '../components/layout/PublicNavbar';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
@@ -390,8 +387,6 @@ const PageCareers = () => {
 // --- Main Shell Component ---
 
 const WebsitePage = ({ title, subtitle }) => {
-  useContext(AuthContext);
-  useContext(ThemeContext);
   const navigate = useNavigate();
   const location = useLocation();
 

@@ -1,62 +1,99 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Outlet, Navigate } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Topbar from './Topbar';
 import { AuthContext } from '../../context/AuthContext';
-import { Menu } from 'lucide-react';
+
+const SIDEBAR_W = 256;
 
 const Layout = () => {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const { user } = useContext(AuthContext);
 
-  const { user } = React.useContext(AuthContext);
+  const mobile = () => window.innerWidth < 768;
+  const [sidebarOpen, setSidebarOpen] = useState(!mobile());
+  const [isMobile, setIsMobile]       = useState(mobile());
 
   useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
-      if (window.innerWidth >= 768) {
-        setMobileMenuOpen(false);
-      }
+    const onResize = () => {
+      const m = mobile();
+      setIsMobile(m);
+      setSidebarOpen(!m);
     };
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
   }, []);
 
-  if (!user) {
-    return <Navigate to="/login" replace />;
-  }
+  if (!user) return <Navigate to="/login" replace />;
+
+  const toggle = () => setSidebarOpen(o => !o);
 
   return (
-    <div className="app-container">
-      {/* Mobile Overlay */}
-      {isMobile && mobileMenuOpen && (
-        <div 
+    <div style={{
+      display: 'flex',
+      height: '100vh',
+      width: '100vw',
+      overflow: 'hidden',
+      background: 'var(--bg-color)',
+      position: 'relative',
+    }}>
+
+      {/* ── Backdrop (mobile only) ─────────────────────────────── */}
+      {isMobile && sidebarOpen && (
+        <div
+          onClick={toggle}
           style={{
-            position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-            backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 99
+            position: 'fixed', inset: 0,
+            background: 'rgba(0,0,0,0.55)',
+            zIndex: 200,
+            backdropFilter: 'blur(2px)',
+            WebkitBackdropFilter: 'blur(2px)',
           }}
-          onClick={() => setMobileMenuOpen(false)}
         />
       )}
 
-      {/* Sidebar - Controlled by State on Mobile */}
-      <div 
+      {/* ── Sidebar ────────────────────────────────────────────── */}
+      <aside
         style={{
-          position: isMobile ? 'fixed' : 'sticky',
-          left: isMobile ? (mobileMenuOpen ? 0 : '-100%') : 0,
-          top: 0,
+          position: isMobile ? 'fixed' : 'relative',
+          top: 0, left: 0, bottom: 0,
           height: '100vh',
-          zIndex: 100,
-          transition: 'left 0.3s ease-in-out'
+          width: SIDEBAR_W,
+          flexShrink: 0,
+          transform: sidebarOpen ? 'translateX(0)' : `translateX(-${SIDEBAR_W}px)`,
+          transition: 'transform 0.26s cubic-bezier(.4,0,.2,1)',
+          zIndex: 201,
+          willChange: 'transform',
+          overflowY: 'auto',
+          overflowX: 'hidden',
         }}
       >
-        <Sidebar closeMenu={() => setMobileMenuOpen(false)} isMobile={isMobile} />
-      </div>
+        <Sidebar closeMenu={() => setSidebarOpen(false)} isMobile={isMobile} />
+      </aside>
 
-      {/* Main Content Area */}
-      <div className="main-content" style={{ width: '100%', display: 'flex', flexDirection: 'column', height: '100vh' }}>
-        <Topbar isMobile={isMobile} toggleMenu={() => setMobileMenuOpen(!mobileMenuOpen)} />
-        <main className="content-area" style={{ flexGrow: 1, overflowY: 'auto' }}>
+      {/* ── Main area ──────────────────────────────────────────── */}
+      <div
+        style={{
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          height: '100vh',
+          overflow: 'hidden',
+          minWidth: 0,          // critical: prevents flex children overflow
+          maxWidth: '100%',
+        }}
+      >
+        <Topbar isMobile={isMobile} toggleMenu={toggle} menuOpen={sidebarOpen} />
+
+        {/* Scrollable content */}
+        <main
+          style={{
+            flex: 1,
+            overflowY: 'auto',
+            overflowX: 'hidden',
+            minHeight: 0,
+            padding: 'clamp(0.75rem, 3vw, 2rem) clamp(0.75rem, 4vw, 2rem)',
+          }}
+        >
           <Outlet />
         </main>
       </div>

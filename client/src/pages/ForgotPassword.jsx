@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Mail, ArrowRight, CheckCircle } from 'lucide-react';
-// eslint-disable-next-line no-unused-vars
+/* eslint-disable no-unused-vars */
 import { motion } from 'framer-motion';
 import api from '../utils/api';
 

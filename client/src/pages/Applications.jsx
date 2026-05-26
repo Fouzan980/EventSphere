@@ -3,7 +3,7 @@ import api from '../utils/api';
 import { AuthContext } from '../context/AuthContext';
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
-import { FileText, CheckCircle, XCircle, Clock, Plus, Building2, Map, Tag, Globe, Users, X } from 'lucide-react';
+import { FileText, CheckCircle, XCircle, Clock, Plus, Building2, Map, Tag, X } from 'lucide-react';
 import { toast } from 'react-toastify';
 
 const Applications = () => {
@@ -84,16 +84,39 @@ const Applications = () => {
               : 'Secure prime floor space for your company at upcoming events.'}
           </p>
         </div>
+        {/* Desktop button — hidden on mobile, shown via CSS */}
         {user?.role === 'Exhibitor' && (
           <motion.button 
             whileTap={{ scale: 0.95 }}
-            style={styles.btnAdd} 
+            style={{...styles.btnAdd, display: window.innerWidth < 640 ? 'none' : 'flex'}} 
             onClick={() => setShowApply(true)}
           >
             <Plus size={18} /> Reserve a Booth
           </motion.button>
         )}
       </div>
+
+      {/* Mobile floating action button */}
+      {user?.role === 'Exhibitor' && (
+        <motion.button
+          whileTap={{ scale: 0.93 }}
+          onClick={() => setShowApply(true)}
+          style={{
+            display: window.innerWidth >= 640 ? 'none' : 'flex',
+            position: 'fixed', bottom: 24, right: 20, zIndex: 1000,
+            alignItems: 'center', gap: 8,
+            background: 'linear-gradient(135deg,#7c3aed,#a855f7)',
+            color: '#fff', border: 'none',
+            padding: '14px 22px', borderRadius: 50,
+            fontWeight: 700, fontSize: '1rem',
+            boxShadow: '0 6px 24px rgba(124,58,237,0.4)',
+            cursor: 'pointer', whiteSpace: 'nowrap',
+            minHeight: 52,
+          }}
+        >
+          <Plus size={20} /> Reserve Booth
+        </motion.button>
+      )}
 
       <div style={styles.grid}>
         {loading ? (
@@ -122,8 +145,12 @@ const Applications = () => {
                     </div>
                     {user?.role === 'Organizer' && app.status === 'Pending' && (
                       <div style={styles.actionBlock}>
-                        <button style={styles.btnApprove} onClick={() => handleStatus(app._id, 'Approved')}>Approve</button>
-                        <button style={styles.btnReject} onClick={() => handleStatus(app._id, 'Rejected')}>Reject</button>
+                        <button style={styles.btnApprove} onClick={() => handleStatus(app._id, 'Approved')}>
+                          <CheckCircle size={14}/> Approve
+                        </button>
+                        <button style={styles.btnReject} onClick={() => handleStatus(app._id, 'Rejected')}>
+                          <XCircle size={14}/> Reject
+                        </button>
                       </div>
                     )}
                   </div>
@@ -318,12 +345,18 @@ const styles = {
   },
   actionBlock: { display: 'flex', gap: '0.5rem', flexWrap: 'wrap' },
   btnApprove: {
-    backgroundColor: '#10b981', color: '#fff', border: 'none', padding: '6px 12px',
-    borderRadius: '6px', fontWeight: 600, cursor: 'pointer', fontSize: '0.8rem'
+    backgroundColor: '#10b981', color: '#fff', border: 'none',
+    padding: '10px 18px', borderRadius: '8px',
+    fontWeight: 700, cursor: 'pointer', fontSize: '0.875rem',
+    display: 'flex', alignItems: 'center', gap: 6,
+    minHeight: 44, // touch-friendly
   },
   btnReject: {
-    backgroundColor: 'transparent', color: '#e11d48', border: '1px solid #e11d48',
-    padding: '6px 12px', borderRadius: '6px', fontWeight: 600, cursor: 'pointer', fontSize: '0.8rem'
+    backgroundColor: 'transparent', color: '#e11d48', border: '1.5px solid #e11d48',
+    padding: '10px 18px', borderRadius: '8px',
+    fontWeight: 700, cursor: 'pointer', fontSize: '0.875rem',
+    display: 'flex', alignItems: 'center', gap: 6,
+    minHeight: 44, // touch-friendly
   },
   eventName: { fontSize: '1.15rem', fontWeight: 700, margin: '0 0 1rem 0', color: 'var(--text-primary)' },
   infoLine: {
@@ -361,10 +394,27 @@ const styles = {
   },
   formGroup: { marginBottom: '1.2rem', display: 'flex', flexDirection: 'column', gap: '0.4rem' },
   label: { fontWeight: 600, fontSize: '0.9rem', color: 'var(--text-primary)' },
-  input: { padding: '12px 14px', borderRadius: '10px', border: '1px solid var(--border-color)', backgroundColor: 'var(--bg-color)', fontSize: '0.95rem', color: 'var(--text-primary)', outline: 'none', width: '100%', boxSizing: 'border-box' },
+  input: {
+    padding: '14px 16px', borderRadius: '10px',
+    border: '1.5px solid var(--border-color)',
+    backgroundColor: 'var(--bg-color)',
+    fontSize: '1rem', color: 'var(--text-primary)',
+    outline: 'none', width: '100%', boxSizing: 'border-box',
+    minHeight: 50, // touch-friendly
+  },
   modalFooter: { display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginTop: '1.2rem', flexWrap: 'wrap' },
-  btnCancel: { padding: '11px 22px', borderRadius: '10px', border: '1px solid var(--border-color)', background: 'transparent', color: 'var(--text-primary)', fontWeight: 600, cursor: 'pointer' },
-  btnSubmit: { padding: '11px 22px', borderRadius: '10px', border: 'none', background: 'var(--primary-color)', color: '#fff', fontWeight: 600, cursor: 'pointer', flex: 1, minWidth: 140 }
+  btnCancel: {
+    padding: '14px 22px', borderRadius: '10px',
+    border: '1px solid var(--border-color)', background: 'transparent',
+    color: 'var(--text-primary)', fontWeight: 600, cursor: 'pointer',
+    minHeight: 50, fontSize: '1rem',
+  },
+  btnSubmit: {
+    padding: '14px 22px', borderRadius: '10px',
+    border: 'none', background: 'linear-gradient(135deg,#7c3aed,#a855f7)',
+    color: '#fff', fontWeight: 700, cursor: 'pointer',
+    flex: 1, minWidth: 140, fontSize: '1rem', minHeight: 50,
+  }
 };
 
 export default Applications;

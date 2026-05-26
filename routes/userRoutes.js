@@ -164,4 +164,44 @@ router.delete('/:id', protect, authorize('Organizer'), async (req, res) => {
   }
 });
 
+// ─── E2E ENCRYPTION: upload own ECDH public key ───────────────────────────────
+router.put('/me/ecdh-key', protect, async (req, res) => {
+  try {
+    const { ecdhPublicKey } = req.body;
+    if (!ecdhPublicKey || typeof ecdhPublicKey !== 'string') {
+      return res.status(400).json({ message: 'ecdhPublicKey (JWK string) is required.' });
+    }
+    // Basic sanity check — must be valid JSON JWK
+    try { JSON.parse(ecdhPublicKey); } catch {
+      return res.status(400).json({ message: 'ecdhPublicKey must be a valid JWK JSON string.' });
+    }
+    await User.findByIdAndUpdate(req.user.id, { ecdhPublicKey });
+    res.json({ message: 'ECDH public key saved.' });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// ─── E2E ENCRYPTION: get another user's ECDH public key ──────────────────────
+// Only Organizer↔Exhibitor pairs can fetch each other's keys
+router.get('/:id/ecdh-key', protect, async (req, res) => {
+  try {
+    const other = await User.findById(req.params.id).select('role ecdhPublicKey');
+    if (!other) return res.status(404).json({ message: 'User not found.' });
+
+    // Only allow Organizer↔Exhibitor key exchange
+    const myRole = req.user.role;
+    const otherRole = other.role;
+    const allowed =
+      (myRole === 'Organizer' && otherRole === 'Exhibitor') ||
+      (myRole === 'Exhibitor' && otherRole === 'Organizer');
+    if (!allowed) return res.status(403).json({ message: 'Key exchange not permitted between these roles.' });
+
+    res.json({ ecdhPublicKey: other.ecdhPublicKey || null });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 module.exports = router;
+
