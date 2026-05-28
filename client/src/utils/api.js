@@ -1,7 +1,11 @@
 import axios from 'axios';
 
+const getApiBaseURL = () => {
+  return window.location.pathname.startsWith('/projects/eventsphere') ? '/projects/eventsphere/api' : '/api';
+};
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || '/projects/eventsphere/api',
+  baseURL: import.meta.env.VITE_API_URL || getApiBaseURL(),
 });
 
 api.interceptors.request.use((config) => {
@@ -20,7 +24,7 @@ api.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem('userInfo');
-      window.location.href = '/login';
+      window.location.href = window.location.pathname.startsWith('/projects/eventsphere') ? '/projects/eventsphere/login' : '/login';
     }
     return Promise.reject(error);
   }

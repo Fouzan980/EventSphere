@@ -7,6 +7,17 @@ export default defineConfig({
   base: '/projects/eventsphere/',
   server: {
     proxy: {
+      '/projects/eventsphere/api': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/projects\/eventsphere\/api/, '/api'),
+      },
+      '/projects/eventsphere/socket.io': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+        ws: true,
+        rewrite: (path) => path.replace(/^\/projects\/eventsphere\/socket.io/, '/socket.io'),
+      },
       '/api': {
         target: 'http://localhost:5000',
         changeOrigin: true,

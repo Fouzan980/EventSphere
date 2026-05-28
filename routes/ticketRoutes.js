@@ -13,15 +13,45 @@ router.post('/book/:eventId', protect, async (req, res) => {
     const event = await Event.findById(req.params.eventId);
     if (!event) return res.status(404).json({ message: 'Event not found' });
 
+    // Check if the event has already ended
+    const isPast = event.endDate ? new Date(event.endDate) < new Date() : new Date(event.date) < new Date();
+    if (isPast) {
+      return res.status(400).json({ message: 'This event has already ended.' });
+    }
+
+    // Check if the event is marked as sold out
+    if (event.soldOut) {
+      return res.status(400).json({ message: 'This event is sold out.' });
+    }
+
+    const ticketType = req.body.ticketType || 'Standard';
+
+    // Check if the specific ticket tier is sold out
+    if (event.hasMultipleTickets && event.tickets && event.tickets.length > 0) {
+      const matchedTicket = event.tickets.find(t => t.name.toLowerCase() === ticketType.toLowerCase());
+      if (matchedTicket && matchedTicket.soldOut) {
+        return res.status(400).json({ message: `The ${ticketType} ticket tier is sold out.` });
+      }
+    }
+
     const existingTicket = await Ticket.findOne({ user: req.user.id, event: event._id });
     if (existingTicket) {
       return res.status(400).json({ message: 'You have already booked a ticket for this event.' });
     }
 
-    const ticketType = req.body.ticketType || 'Standard';
     let finalPrice = event.price || 0;
-    if (ticketType === 'VIP') finalPrice = finalPrice * 2;
-    if (ticketType === 'Meet & Greet') finalPrice = finalPrice * 4;
+    if (event.hasMultipleTickets && event.tickets && event.tickets.length > 0) {
+      const matchedTicket = event.tickets.find(t => t.name.toLowerCase() === ticketType.toLowerCase());
+      if (matchedTicket) {
+        finalPrice = matchedTicket.price || 0;
+      } else {
+        if (ticketType === 'VIP') finalPrice = finalPrice * 2;
+        if (ticketType === 'Meet & Greet') finalPrice = finalPrice * 4;
+      }
+    } else {
+      if (ticketType === 'VIP') finalPrice = finalPrice * 2;
+      if (ticketType === 'Meet & Greet') finalPrice = finalPrice * 4;
+    }
 
     const ticket = await Ticket.create({
       user: req.user.id,

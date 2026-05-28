@@ -147,7 +147,10 @@ const Home = () => {
     api.get('/events').then(r => setEvents(r.data)).catch(console.error).finally(() => setLoading(false));
   }, []);
 
-  const bannerEvents = events.length > 0 ? events : [];
+  const bannerEvents = events.filter(e => {
+    const isPast = e.endDate ? new Date(e.endDate) < new Date() : new Date(e.date) < new Date();
+    return !isPast;
+  });
 
   useEffect(() => {
     if (bannerEvents.length <= 1) return;
@@ -238,7 +241,11 @@ const Home = () => {
     const normCity = normalizeCity(e.location);
     const matchCity = selectedCity ? normCity.toLowerCase() === selectedCity.toLowerCase() : true;
     const matchCat = selectedCategory ? e.category === selectedCategory : true;
-    return matchQ && matchCity && matchCat;
+    
+    // Check if the event has ended
+    const isPast = e.endDate ? new Date(e.endDate) < new Date() : new Date(e.date) < new Date();
+
+    return matchQ && matchCity && matchCat && !isPast;
   });
 
   // Speaker suggestions for the unified search dropdown
@@ -435,7 +442,9 @@ const Home = () => {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
               <div>
                 <h2 style={S.sectionTitle}>Upcoming Events</h2>
-                <p style={{ color: '#64748b', fontSize: 'clamp(0.85rem,2vw,1rem)', marginTop: '0.25rem' }}>Don't miss out on the most anticipated experiences.</p>
+                <p style={{ color: '#64748b', fontSize: 'clamp(0.85rem,2vw,1rem)', marginTop: '0.25rem' }}>
+                  Don't miss out on the most anticipated experiences.
+                </p>
               </div>
               {(searchQuery || selectedCategory || selectedCity) && (
                 <button onClick={() => { setSearchQuery(''); setSelectedCity(''); setSelectedCategory(''); }} style={{ ...S.btnSearch, background: 'transparent', color: '#FF2A5F', border: '1px solid #FF2A5F', padding: '0.6rem 1.2rem', fontSize: '0.85rem' }}>
@@ -461,6 +470,37 @@ const Home = () => {
                       <div style={{ position: 'absolute', top: '1rem', left: '1rem', backgroundColor: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(4px)', color: '#fff', padding: '4px 10px', borderRadius: '7px', fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.8px' }}>{event.category || 'Event'}</div>
                       {event.isFeatured && <div style={{ position: 'absolute', top: '1rem', right: '1rem', backgroundColor: '#f59e0b', color: '#fff', padding: '4px 10px', borderRadius: '7px', fontSize: '0.72rem', fontWeight: 800 }}>⭐ Featured</div>}
                       {event.discounts && !event.isFeatured && <div style={{ position: 'absolute', top: '1rem', right: '1rem', backgroundColor: '#FF2A5F', color: '#fff', padding: '4px 10px', borderRadius: '7px', fontSize: '0.72rem', fontWeight: 800 }}>🔥 {event.discounts}</div>}
+                      {event.soldOut && (
+                        <div style={{
+                          position: 'absolute',
+                          top: 0,
+                          left: 0,
+                          right: 0,
+                          bottom: 0,
+                          backgroundColor: 'rgba(0,0,0,0.65)',
+                          backdropFilter: 'blur(2px)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          zIndex: 2
+                        }}>
+                          <span style={{
+                            border: '3px solid #ef4444',
+                            color: '#ef4444',
+                            textTransform: 'uppercase',
+                            fontSize: '1.25rem',
+                            fontWeight: 900,
+                            padding: '6px 16px',
+                            borderRadius: '8px',
+                            transform: 'rotate(-10deg)',
+                            letterSpacing: '2px',
+                            boxShadow: '0 0 12px rgba(239,68,68,0.4)',
+                            backgroundColor: 'rgba(15,23,42,0.95)'
+                          }}>
+                            Sold Out
+                          </span>
+                        </div>
+                      )}
                     </div>
                     <div style={{ padding: '1.25rem', display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
                       <h4 style={{ fontSize: 'clamp(0.95rem,2.5vw,1.1rem)', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.85rem', lineHeight: 1.4 }}>{event.title}</h4>
@@ -507,6 +547,37 @@ const Home = () => {
                     onMouseOver={e => e.currentTarget.style.transform = 'scale(1.03)'}
                     onMouseOut={e => e.currentTarget.style.transform = 'scale(1)'}
                   >
+                    {evt.soldOut && (
+                      <div style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        backgroundColor: 'rgba(0,0,0,0.65)',
+                        backdropFilter: 'blur(2px)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        zIndex: 2
+                      }}>
+                        <span style={{
+                          border: '2px solid #ef4444',
+                          color: '#ef4444',
+                          textTransform: 'uppercase',
+                          fontSize: '1rem',
+                          fontWeight: 900,
+                          padding: '4px 12px',
+                          borderRadius: '6px',
+                          transform: 'rotate(-10deg)',
+                          letterSpacing: '1px',
+                          boxShadow: '0 0 10px rgba(239,68,68,0.3)',
+                          backgroundColor: 'rgba(15,23,42,0.95)'
+                        }}>
+                          Sold Out
+                        </span>
+                      </div>
+                    )}
                     <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '60%', background: 'linear-gradient(to top,rgba(0,0,0,0.9),transparent)', padding: '1.25rem', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
                       <div style={{ color: '#FF2A5F', fontSize: '0.7rem', fontWeight: 800, textTransform: 'uppercase', marginBottom: '4px' }}>{evt.category}</div>
                       <div style={{ color: '#fff', fontSize: 'clamp(0.9rem,2.5vw,1.1rem)', fontWeight: 800, lineHeight: 1.2, marginBottom: '4px' }}>{evt.title}</div>
@@ -666,8 +737,8 @@ const Home = () => {
                 <h3 style={{ margin: '0 0 0.85rem', fontSize: '1rem', color: 'var(--text-primary)' }}>Select Ticket Type</h3>
                 <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
                   {(selectedEventModal.hasMultipleTickets && selectedEventModal.tickets?.length > 0 
-                    ? selectedEventModal.tickets.map(t => ({ tier: t.name, price: t.price, soldOut: t.soldOut || false }))
-                    : [{ tier: 'Standard', price: selectedEventModal.price || 0, soldOut: false }]
+                    ? selectedEventModal.tickets.map(t => ({ tier: t.name, price: t.price, soldOut: selectedEventModal.soldOut || t.soldOut || false }))
+                    : [{ tier: 'Standard', price: selectedEventModal.price || 0, soldOut: selectedEventModal.soldOut || false }]
                   ).map(({tier, price, soldOut}) => (
                     <div
                       key={tier}
@@ -695,14 +766,14 @@ const Home = () => {
                 </div>
               </div>
               {(() => {
-                const isSelectedSoldOut = selectedEventModal.hasMultipleTickets && selectedEventModal.tickets?.find(t => t.name === ticketType)?.soldOut;
+                const isSelectedSoldOut = selectedEventModal.soldOut || (selectedEventModal.hasMultipleTickets && selectedEventModal.tickets?.find(t => t.name === ticketType)?.soldOut);
                 return (
                   <button
                     style={{ ...S.btnBook, width: '100%', justifyContent: 'center', padding: '14px', fontSize: '1rem', marginTop: '1.25rem', borderRadius: '12px', opacity: isSelectedSoldOut ? 0.5 : 1, cursor: isSelectedSoldOut ? 'not-allowed' : 'pointer' }}
                     disabled={!!isSelectedSoldOut}
                     onClick={() => { if (!isSelectedSoldOut) { openPaymentModal(selectedEventModal, ticketType); setSelectedEventModal(null); setTicketType('Standard'); } }}
                   >
-                    {isSelectedSoldOut ? '🚫 This Tier is Sold Out' : `Proceed to Payment — ${(() => {
+                    {isSelectedSoldOut ? (selectedEventModal.soldOut ? '🚫 Event is Sold Out' : '🚫 This Tier is Sold Out') : `Proceed to Payment — ${(() => {
                       if (selectedEventModal.hasMultipleTickets && selectedEventModal.tickets?.length > 0) {
                         const matchedTicket = selectedEventModal.tickets.find(t => t.name === ticketType);
                         const price = matchedTicket ? matchedTicket.price : 0;

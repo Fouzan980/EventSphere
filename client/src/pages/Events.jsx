@@ -3,7 +3,7 @@ import api from '../utils/api';
 import { AuthContext } from '../context/AuthContext';
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
-import { Calendar, MapPin, Plus, Trash2, Search, X, Loader2, Clock, Users, Edit, Navigation, Mic, Star } from 'lucide-react';
+import { Calendar, MapPin, Plus, Trash2, Search, X, Loader2, Clock, Users, Edit, Navigation, Mic, Star, Ban } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { PageSkeleton } from '../components/Skeleton';
 import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-leaflet';
@@ -44,6 +44,7 @@ const Events = () => {
     price: 0, category: 'Expo', capacity: 100, websiteLink: '', dressCode: '',
     poster: '', usePosterLink: false, banner: '', useBannerLink: false,
     isSingleDay: true, hasEndTime: false, discounts: '', sessions: [], speakers: [], isFeatured: false,
+    soldOut: false,
     hasMultipleTickets: false, tickets: [],
     coordinates: { lat: null, lng: null }
   });
@@ -252,7 +253,9 @@ const Events = () => {
       title: '', date: '', time: '10:00', location: '', description: '',
       price: 0, category: 'Expo', capacity: 100, websiteLink: '', dressCode: '',
       poster: '', usePosterLink: false, banner: '', useBannerLink: false,
-      discounts: '', endDate: '', endTime: '', hasEndTime: false, isSingleDay: true, sessions: [], speakers: [], isFeatured: false, hasMultipleTickets: false, tickets: [],
+      discounts: '', endDate: '', endTime: '', hasEndTime: false, isSingleDay: true, sessions: [], speakers: [], isFeatured: false,
+      soldOut: false,
+      hasMultipleTickets: false, tickets: [],
       coordinates: { lat: null, lng: null }
     });
     setMapPosition(null);
@@ -289,6 +292,7 @@ const Events = () => {
       sessions: event.sessions || [],
       speakers: event.speakers || [],
       isFeatured: event.isFeatured || false,
+      soldOut: event.soldOut || false,
       coordinates: event.coordinates || { lat: null, lng: null }
     });
     setIsEditing(true);
@@ -311,6 +315,18 @@ const Events = () => {
         console.error(err);
         toast.error('Failed to delete event');
       }
+    }
+  };
+
+  const handleToggleSoldOut = async (event) => {
+    try {
+      const updatedSoldOut = !event.soldOut;
+      await api.put(`/events/${event._id}`, { soldOut: updatedSoldOut });
+      fetchEvents();
+      toast.success(updatedSoldOut ? 'Event marked as Sold Out' : 'Event marked as Available');
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to update event status');
     }
   };
 
@@ -406,6 +422,11 @@ const Events = () => {
                     }
                   </div>
                   <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                    {event.soldOut && (
+                      <span style={{ fontSize: '0.72rem', backgroundColor: '#ef4444', color: '#fff', padding: '2px 8px', borderRadius: '4px', fontWeight: 700 }}>
+                        🚫 Sold Out
+                      </span>
+                    )}
                     {event.isFeatured && (
                       <span style={{ fontSize: '0.72rem', backgroundColor: '#f59e0b', color: '#fff', padding: '2px 8px', borderRadius: '4px', fontWeight: 700 }}>
                         ⭐ Featured
@@ -413,6 +434,13 @@ const Events = () => {
                     )}
                     {user?.role === 'Organizer' && user._id === event.organizer?._id && (
                       <div style={{ display: 'flex', gap: '8px' }}>
+                        <button
+                          style={{ ...styles.btnDelete, backgroundColor: event.soldOut ? '#10b981' : '#ef4444' }}
+                          onClick={() => handleToggleSoldOut(event)}
+                          title={event.soldOut ? "Mark as Available" : "Mark as Sold Out"}
+                        >
+                          <Ban size={18} />
+                        </button>
                         <button
                           style={{ ...styles.btnDelete, backgroundColor: 'var(--primary-color)' }}
                           onClick={() => handleEdit(event)}
@@ -795,6 +823,13 @@ const Events = () => {
                       <input type="checkbox" id="isFeaturedChk" checked={formData.isFeatured} onChange={e => setFormData({ ...formData, isFeatured: e.target.checked })} style={{ width: '18px', height: '18px', cursor: 'pointer' }} />
                       <label htmlFor="isFeaturedChk" style={{ ...styles.label, margin: 0, cursor: 'pointer', color: '#b45309', display: 'flex', alignItems: 'center', gap: '6px' }}>
                         <Star size={15} color="#f59e0b" fill="#f59e0b" /> Mark as Featured Event (shows in home banner)
+                      </label>
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem', backgroundColor: 'rgba(239,68,68,0.08)', borderRadius: '8px', border: '1px solid rgba(239,68,68,0.2)', marginTop: '0.5rem' }}>
+                      <input type="checkbox" id="soldOutChk" checked={formData.soldOut || false} onChange={e => setFormData({ ...formData, soldOut: e.target.checked })} style={{ width: '18px', height: '18px', cursor: 'pointer' }} />
+                      <label htmlFor="soldOutChk" style={{ ...styles.label, margin: 0, cursor: 'pointer', color: '#b91c1c', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        🚫 Mark entire Event as Sold Out
                       </label>
                     </div>
 

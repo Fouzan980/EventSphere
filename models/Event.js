@@ -15,6 +15,7 @@ const eventSchema = new mongoose.Schema({
   price: { type: Number, default: 0 },
   capacity: { type: Number, default: 100 },
   hasMultipleTickets: { type: Boolean, default: false },
+  soldOut: { type: Boolean, default: false },
   tickets: [{
     name: { type: String },
     price: { type: Number },

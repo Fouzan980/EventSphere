@@ -22,8 +22,12 @@ import Orders from './pages/Orders';
 import Chat from './pages/Chat';
 
 function App() {
+  const getBasename = () => {
+    return window.location.pathname.startsWith('/projects/eventsphere') ? '/projects/eventsphere' : '';
+  };
+
   return (
-    <Router basename="/projects/eventsphere">
+    <Router basename={getBasename()}>
       <ToastContainer 
         position="top-right" 
         autoClose={4000} 
