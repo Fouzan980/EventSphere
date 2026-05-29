@@ -4,7 +4,7 @@ import api from '../utils/api';
 import { AuthContext } from '../context/AuthContext';
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Calendar, MapPin, Ticket, X, ChevronLeft, ChevronRight, Mic, Download, Users, Building2, Globe, Clock, DollarSign, Ban, PartyPopper } from 'lucide-react';
+import { Search, Calendar, MapPin, Ticket, X, ChevronLeft, ChevronRight, Mic, Download, Users, Building2, Globe, Clock, DollarSign, Ban, PartyPopper, Zap, CheckCircle, ExternalLink, Music, Star } from 'lucide-react';
 import { toast } from 'react-toastify';
 import PublicNavbar from '../components/layout/PublicNavbar';
 import { PageSkeleton } from '../components/Skeleton';
@@ -79,42 +79,42 @@ const StatCounter = ({ icon, target, suffix, label }) => {
 const FEATURES = [
   {
     gradient: 'linear-gradient(135deg, #FF416C 0%, #FF4B2B 100%)',
-    icon: '⚡',
+    IconEl: Zap,
     title: 'Instant Booking',
     desc: 'Book tickets in under 60 seconds with our streamlined, friction-free checkout.',
     stat: '< 60s',
   },
   {
     gradient: 'linear-gradient(135deg, #1A2980 0%, #26D0CE 100%)',
-    icon: '🔒',
+    IconEl: CheckCircle,
     title: 'Secure Payments',
     desc: 'End-to-end encrypted payments with PCI-DSS compliance and zero fraud guarantee.',
     stat: '100%',
   },
   {
     gradient: 'linear-gradient(135deg, #8E2DE2 0%, #4A00E0 100%)',
-    icon: '🎙️',
+    IconEl: Mic,
     title: 'Top Artists',
     desc: "Access concerts by Pakistan's most celebrated musicians, from pop to sufiana.",
     stat: '50+ Artists',
   },
   {
     gradient: 'linear-gradient(135deg, #F09819 0%, #EDDE5D 100%)',
-    icon: '📊',
+    IconEl: Users,
     title: 'Organizer Tools',
     desc: 'Full management dashboard with analytics, booth control, speaker management and more.',
     stat: 'Real-time',
   },
   {
     gradient: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)',
-    icon: '📱',
+    IconEl: Globe,
     title: 'Mobile Ready',
     desc: 'Fully responsive across all phones, tablets, and desktops with native-like experience.',
     stat: 'All Screens',
   },
   {
     gradient: 'linear-gradient(135deg, #ee0979 0%, #ff6a00 100%)',
-    icon: '💬',
+    IconEl: Ticket,
     title: '24/7 Support',
     desc: 'Dedicated support team always available via chat, email, or call — never left alone.',
     stat: '24/7',
@@ -283,12 +283,12 @@ const Home = () => {
   };
 
   const CATS = [
-    { label: 'All', icon: '🎯', cat: '' },
-    { label: 'Concerts', icon: '🎵', cat: 'Concert' },
-    { label: 'Expos', icon: '🏛️', cat: 'Expo' },
-    { label: 'Workshops', icon: '🔨', cat: 'Workshop' },
-    { label: 'Conferences', icon: '🎤', cat: 'Conference' },
-    { label: 'Jobs', icon: '💼', cat: 'Recruitment Drive' },
+    { label: 'All',         IconEl: null,       cat: '' },
+    { label: 'Concerts',    IconEl: Music,       cat: 'Concert' },
+    { label: 'Expos',       IconEl: Building2,   cat: 'Expo' },
+    { label: 'Workshops',   IconEl: Users,       cat: 'Workshop' },
+    { label: 'Conferences', IconEl: Mic,         cat: 'Conference' },
+    { label: 'Jobs',        IconEl: Ticket,      cat: 'Recruitment Drive' },
   ];
 
   return (
@@ -300,7 +300,7 @@ const Home = () => {
       <header style={S.hero}>
         <div style={{ maxWidth: '800px', width: '100%', textAlign: 'center' }}>
           <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} style={S.heroBadge}>
-            <span>🎉</span> Pakistan's #1 Event Discovery Platform
+            <span style={{display:'inline-flex',alignItems:'center',gap:4}}><PartyPopper size={14}/></span> Pakistan's #1 Event Discovery Platform
           </motion.div>
           <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} style={S.heroTitle}>
             Find your next<br /><span style={{ color: '#FF2A5F' }}>Live Experience</span>
@@ -392,7 +392,7 @@ const Home = () => {
                         <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: 'clamp(1rem,3vw,2rem)' }}>
                           <div style={{ display: 'flex', gap: 8, marginBottom: 8, flexWrap: 'wrap' }}>
                             <span style={{ background: '#FF2A5F', color: '#fff', padding: '3px 12px', borderRadius: 20, fontSize: '0.75rem', fontWeight: 700 }}>{ev.category}</span>
-                            {ev.isFeatured && <span style={{ background: '#f59e0b', color: '#fff', padding: '3px 12px', borderRadius: 20, fontSize: '0.75rem', fontWeight: 700 }}>⭐ Featured</span>}
+                            {ev.isFeatured && <span style={{ background: '#f59e0b', color: '#fff', padding: '3px 12px', borderRadius: 20, fontSize: '0.75rem', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 4 }}><Star size={11}/> Featured</span>}
                           </div>
                           <h3 style={{ color: '#fff', fontSize: 'clamp(1.1rem,3.5vw,2rem)', fontWeight: 900, margin: '0 0 8px', lineHeight: 1.2 }}>{ev.title}</h3>
                           <div style={{ display: 'flex', gap: '1.25rem', color: '#cbd5e1', fontSize: 'clamp(0.75rem,2vw,0.9rem)', flexWrap: 'wrap', alignItems: 'center' }}>
@@ -438,7 +438,7 @@ const Home = () => {
                 <button key={c.label}
                   onClick={() => { setSelectedCategory(c.cat); setTimeout(scrollToEvents, 80); }}
                   style={{ ...S.catPill, background: selectedCategory === c.cat ? '#FF2A5F' : 'var(--bg-surface)', color: selectedCategory === c.cat ? '#fff' : 'var(--text-primary)', border: selectedCategory === c.cat ? 'none' : '1px solid var(--border-color)' }}>
-                  {c.icon} {c.label}
+                  {c.IconEl ? <c.IconEl size={14}/> : null} {c.label}
                 </button>
               ))}
             </div>
@@ -477,8 +477,8 @@ const Home = () => {
                   >
                     <div style={{ height: 'clamp(170px,28vw,220px)', background: event.poster ? `url(${event.poster}) center/cover` : getGradient(event.title || ''), position: 'relative' }}>
                       <div style={{ position: 'absolute', top: '1rem', left: '1rem', backgroundColor: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(4px)', color: '#fff', padding: '4px 10px', borderRadius: '7px', fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.8px' }}>{event.category || 'Event'}</div>
-                      {event.isFeatured && <div style={{ position: 'absolute', top: '1rem', right: '1rem', backgroundColor: '#f59e0b', color: '#fff', padding: '4px 10px', borderRadius: '7px', fontSize: '0.72rem', fontWeight: 800 }}>⭐ Featured</div>}
-                      {event.discounts && !event.isFeatured && <div style={{ position: 'absolute', top: '1rem', right: '1rem', backgroundColor: '#FF2A5F', color: '#fff', padding: '4px 10px', borderRadius: '7px', fontSize: '0.72rem', fontWeight: 800 }}>🔥 {event.discounts}</div>}
+                      {event.isFeatured && <div style={{ position: 'absolute', top: '1rem', right: '1rem', backgroundColor: '#f59e0b', color: '#fff', padding: '4px 10px', borderRadius: '7px', fontSize: '0.72rem', fontWeight: 800, display: 'flex', alignItems: 'center', gap: 4 }}><Star size={11}/> Featured</div>}
+                      {event.discounts && !event.isFeatured && <div style={{ position: 'absolute', top: '1rem', right: '1rem', backgroundColor: '#FF2A5F', color: '#fff', padding: '4px 10px', borderRadius: '7px', fontSize: '0.72rem', fontWeight: 800, display: 'flex', alignItems: 'center', gap: 4 }}><Zap size={11}/> {event.discounts}</div>}
                       {event.soldOut && (
                         <div style={{
                           position: 'absolute',
@@ -533,7 +533,7 @@ const Home = () => {
                             : (event.price === 0 ? 'FREE' : `Rs. ${event.price}`)}
                         </div>
                         {bookingState[event._id] === 'booked'
-                          ? <button disabled style={{ ...S.btnBook, backgroundColor: '#10b981' }}>✓ Booked!</button>
+                          ? <button disabled style={{ ...S.btnBook, backgroundColor: '#10b981' }}><CheckCircle size={14}/> Booked!</button>
                           : <button style={S.btnBook} onClick={() => setSelectedEventModal(event)}>View Details</button>
                         }
                       </div>
@@ -549,7 +549,7 @@ const Home = () => {
         {events.length > 0 && (
           <section style={{ padding: '0 5% 2.5rem' }}>
             <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-              <h2 style={{ ...S.sectionTitle, marginBottom: '1.25rem' }}>🔥 Trending Now</h2>
+              <h2 style={{ ...S.sectionTitle, marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: 8 }}><Zap size={22} color="#FF2A5F"/> Trending Now</h2>
               <div style={{ display: 'flex', gap: '1.25rem', overflowX: 'auto', paddingBottom: '1rem', scrollbarWidth: 'none' }}>
                 {events.slice(0, 10).map((evt, i) => (
                   <div key={i} onClick={() => setSelectedEventModal(evt)} style={{ minWidth: 'clamp(180px,28vw,250px)', height: 'clamp(240px,38vw,300px)', borderRadius: '20px', background: evt.poster ? `url(${evt.poster}) center/cover` : getGradient(evt.title || ''), flexShrink: 0, cursor: 'pointer', position: 'relative', overflow: 'hidden', boxShadow: '0 8px 20px rgba(0,0,0,0.12)', transition: 'transform 0.3s' }}
@@ -665,7 +665,7 @@ const Home = () => {
                     {/* Decorative circles */}
                     <div style={{ position: 'absolute', top: '-20px', right: '-20px', width: '100px', height: '100px', borderRadius: '50%', background: 'rgba(255,255,255,0.1)' }} />
                     <div style={{ position: 'absolute', bottom: '-30px', left: '-10px', width: '80px', height: '80px', borderRadius: '50%', background: 'rgba(255,255,255,0.07)' }} />
-                    <div style={{ fontSize: '3.5rem', lineHeight: 1, position: 'relative', zIndex: 1 }}>{f.icon}</div>
+                    <div style={{ position: 'relative', zIndex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', width: 60, height: 60, borderRadius: '50%', background: 'rgba(255,255,255,0.2)' }}>{f.IconEl && <f.IconEl size={32} color="#fff"/>}</div>
                     <div style={{ position: 'relative', zIndex: 1, textAlign: 'right' }}>
                       <div style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '4px' }}>Highlights</div>
                       <div style={{ color: '#fff', fontWeight: 900, fontSize: '1.25rem', lineHeight: 1 }}>{f.stat}</div>
@@ -693,7 +693,7 @@ const Home = () => {
             <div style={{ padding: 'clamp(1.25rem,4vw,2rem)' }}>
               <div style={{ display: 'flex', gap: '8px', marginBottom: '10px', flexWrap: 'wrap' }}>
                 <span style={{ backgroundColor: '#FF2A5F', color: '#fff', padding: '3px 10px', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 700 }}>{selectedEventModal.category}</span>
-                {selectedEventModal.isFeatured && <span style={{ backgroundColor: '#f59e0b', color: '#fff', padding: '3px 10px', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 700 }}>⭐ Featured</span>}
+                {selectedEventModal.isFeatured && <span style={{ backgroundColor: '#f59e0b', color: '#fff', padding: '3px 10px', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 4 }}><Star size={11}/> Featured</span>}
               </div>
               <h2 style={{ margin: '0 0 1rem', color: 'var(--text-primary)', fontSize: 'clamp(1.2rem,4vw,1.7rem)' }}>{selectedEventModal.title}</h2>
               <div style={{ display: 'flex', gap: '16px', color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
@@ -921,7 +921,7 @@ const Home = () => {
         {/* Palestine solidarity in footer too */}
         <div style={{ borderTop: '1px solid rgba(255,255,255,0.07)', padding: '1.25rem 0', textAlign: 'center' }}>
           <p style={{ color: '#475569', fontSize: '0.82rem', margin: '0 0 4px' }}>
-            🇵🇸 We stand in solidarity with the people of Palestine — Free Palestine 🕊️
+            We stand in solidarity with the people of Palestine — Free Palestine
           </p>
           <p style={{ color: '#334155', fontSize: '0.8rem', margin: 0 }}>
             &copy; {new Date().getFullYear()} EventSphere. All rights reserved.
@@ -1028,12 +1028,12 @@ const Home = () => {
                     )}
                     {selectedArtist.genre && (
                       <span style={{ background: 'rgba(255,42,95,0.14)', color: '#ff7b9b', border: '1px solid rgba(255,42,95,0.3)', padding: '4px 12px', borderRadius: 20, fontSize: '0.73rem', fontWeight: 700 }}>
-                        🎵 {selectedArtist.genre}
+                        <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><Music size={14}/> {selectedArtist.genre}</span>
                       </span>
                     )}
                     {selectedArtist.expertise && (
                       <span style={{ background: 'rgba(16,185,129,0.12)', color: '#34d399', border: '1px solid rgba(16,185,129,0.3)', padding: '4px 12px', borderRadius: 20, fontSize: '0.73rem', fontWeight: 700 }}>
-                        ⚡ {selectedArtist.expertise}
+                        <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><Zap size={14}/> {selectedArtist.expertise}</span>
                       </span>
                     )}
                   </div>
@@ -1062,7 +1062,7 @@ const Home = () => {
                       onMouseOver={e => { e.currentTarget.style.background = 'rgba(139,92,246,0.38)'; }}
                       onMouseOut={e => { e.currentTarget.style.background = 'rgba(124,58,237,0.22)'; }}
                     >
-                      🔗 View Full Profile
+                      <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><ExternalLink size={14}/> View Full Profile</span>
                     </a>
                   )}
                 </div>

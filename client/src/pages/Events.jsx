@@ -3,7 +3,7 @@ import api from '../utils/api';
 import { AuthContext } from '../context/AuthContext';
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
-import { Calendar, MapPin, Plus, Trash2, Search, X, Loader2, Clock, Users, Edit, Navigation, Mic, Star, Ban } from 'lucide-react';
+import { Calendar, MapPin, Plus, Trash2, Search, X, Loader2, Clock, Users, Edit, Navigation, Mic, Star, Ban, CheckCircle, Rocket, Image as ImageIcon, Film, Pin, UserCircle } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { PageSkeleton } from '../components/Skeleton';
 import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-leaflet';
@@ -424,12 +424,12 @@ const Events = () => {
                   <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
                     {event.soldOut && (
                       <span style={{ fontSize: '0.72rem', backgroundColor: '#ef4444', color: '#fff', padding: '2px 8px', borderRadius: '4px', fontWeight: 700 }}>
-                        🚫 Sold Out
+                        <span style={{display:'flex',alignItems:'center',gap:4}}><Ban size={14}/> Sold Out</span>
                       </span>
                     )}
                     {event.isFeatured && (
                       <span style={{ fontSize: '0.72rem', backgroundColor: '#f59e0b', color: '#fff', padding: '2px 8px', borderRadius: '4px', fontWeight: 700 }}>
-                        ⭐ Featured
+                        <span style={{display:'flex',alignItems:'center',gap:4}}><Star size={14}/> Featured</span>
                       </span>
                     )}
                     {user?.role === 'Organizer' && user._id === event.organizer?._id && (
@@ -524,7 +524,7 @@ const Events = () => {
             >
               <div style={styles.modalHeader}>
                 <h2 style={{ margin: 0, color: 'var(--text-primary)', fontSize: 'clamp(1.1rem, 3vw, 1.5rem)' }}>
-                  {isEditing ? '✏️ Update Event' : '🚀 Create New Event'}
+                  {isEditing ? <><Edit size={16}/> Update Event</> : <><Rocket size={16}/> Create New Event</>}
                 </h2>
                 <button style={styles.btnClose} onClick={() => { setShowModal(false); resetForm(); }}>
                   <X size={24} />
@@ -631,7 +631,7 @@ const Events = () => {
                             borderColor: mapPosition ? 'var(--primary-color)' : undefined,
                             boxShadow: mapPosition ? '0 0 0 2px rgba(109,40,217,0.15)' : undefined,
                           }}
-                          placeholder="Type address or 📍 drop a pin on the map →"
+                          placeholder="Type address or drop a pin on the map →"
                           value={formData.location}
                           onChange={e => handleLocationSearch(e.target.value)}
                           onBlur={() => setTimeout(() => setLocationSuggestions([]), 200)}
@@ -742,14 +742,14 @@ const Events = () => {
 
                     {/* ── Image Uploads ── */}
                     <div style={{ ...styles.inputGroup, borderTop: '1px solid var(--border-color)', paddingTop: '1rem' }}>
-                      <label style={{ ...styles.label, fontSize: '0.9rem', color: 'var(--primary-color)', display: 'flex', alignItems: 'center', gap: 6 }}>🖼️ Event Images</label>
+                      <label style={{ ...styles.label, fontSize: '0.9rem', color: 'var(--primary-color)', display: 'flex', alignItems: 'center', gap: 6 }}><ImageIcon size={16}/> Event Images</label>
                       <p style={{ margin: '0 0 0.75rem', fontSize: '0.78rem', color: 'var(--text-secondary)' }}>Upload separate images for the event card thumbnail and the wide hero banner carousel.</p>
 
                       {/* Card Poster */}
                       <div style={{ background: 'var(--bg-color)', border: '1px solid var(--border-color)', borderRadius: 12, padding: '1rem', marginBottom: '0.85rem' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
                           <div>
-                            <div style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-primary)' }}>📌 Card Poster <span style={{ fontWeight: 400, color: 'var(--text-secondary)' }}>(square/portrait · shown on event cards)</span></div>
+                            <div style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: 4 }}><Pin size={13}/> Card Poster <span style={{ fontWeight: 400, color: 'var(--text-secondary)' }}>(square/portrait · shown on event cards)</span></div>
                           </div>
                           <label style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '0.75rem', color: 'var(--text-secondary)', cursor: 'pointer' }}>
                             <input type="checkbox" checked={formData.usePosterLink} onChange={e => setFormData({ ...formData, usePosterLink: e.target.checked, poster: '' })} /> Use URL
@@ -772,8 +772,8 @@ const Events = () => {
                         {formData.poster && (
                           <div style={{ marginTop: '0.6rem', display: 'flex', gap: '0.5rem', alignItems: 'flex-start' }}>
                             <div style={{ width: 80, height: 80, borderRadius: 10, backgroundImage: `url(${formData.poster})`, backgroundSize: 'cover', backgroundPosition: 'center', border: '2px solid var(--border-color)', flexShrink: 0 }} />
-                            <div style={{ flex: 1, fontSize: '0.75rem', color: 'var(--text-secondary)', paddingTop: 4 }}>✅ Card poster set — shows as thumbnail in the event grid.</div>
-                            <button type="button" onClick={() => setFormData({ ...formData, poster: '' })} style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', padding: 0, fontSize: '0.75rem', flexShrink: 0 }}>✕ Remove</button>
+                            <div style={{ flex: 1, fontSize: '0.75rem', color: 'var(--text-secondary)', paddingTop: 4, display: 'flex', alignItems: 'center', gap: 4 }}><CheckCircle size={12} color="#10b981"/> Card poster set — shows as thumbnail in the event grid.</div>
+                            <button type="button" onClick={() => setFormData({ ...formData, poster: '' })} style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', padding: 0, fontSize: '0.75rem', flexShrink: 0, display:'flex', alignItems:'center', gap:3 }}><X size={11}/> Remove</button>
                           </div>
                         )}
                       </div>
@@ -782,7 +782,7 @@ const Events = () => {
                       <div style={{ background: 'var(--bg-color)', border: '1px solid var(--border-color)', borderRadius: 12, padding: '1rem' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
                           <div>
-                            <div style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-primary)' }}>🎬 Hero Banner <span style={{ fontWeight: 400, color: 'var(--text-secondary)' }}>(wide 16:9 · shown in home carousel)</span></div>
+                            <div style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: 4 }}><Film size={13}/> Hero Banner <span style={{ fontWeight: 400, color: 'var(--text-secondary)' }}>(wide 16:9 · shown in home carousel)</span></div>
                           </div>
                           <label style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '0.75rem', color: 'var(--text-secondary)', cursor: 'pointer' }}>
                             <input type="checkbox" checked={formData.useBannerLink} onChange={e => setFormData({ ...formData, useBannerLink: e.target.checked, banner: '' })} /> Use URL
@@ -806,8 +806,8 @@ const Events = () => {
                           <div style={{ marginTop: '0.6rem' }}>
                             <div style={{ width: '100%', height: 110, borderRadius: 10, backgroundImage: `url(${formData.banner})`, backgroundSize: 'cover', backgroundPosition: 'center', border: '2px solid var(--border-color)' }} />
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 4 }}>
-                              <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>✅ Banner set — appears in home page sliding carousel.</span>
-                              <button type="button" onClick={() => setFormData({ ...formData, banner: '' })} style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontSize: '0.75rem' }}>✕ Remove</button>
+                              <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: 4 }}><CheckCircle size={12} color="#10b981"/> Banner set — appears in home page sliding carousel.</span>
+                              <button type="button" onClick={() => setFormData({ ...formData, banner: '' })} style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontSize: '0.75rem', display:'flex', alignItems:'center', gap:3 }}><X size={11}/> Remove</button>
                             </div>
                           </div>
                         )}
@@ -829,7 +829,7 @@ const Events = () => {
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem', backgroundColor: 'rgba(239,68,68,0.08)', borderRadius: '8px', border: '1px solid rgba(239,68,68,0.2)', marginTop: '0.5rem' }}>
                       <input type="checkbox" id="soldOutChk" checked={formData.soldOut || false} onChange={e => setFormData({ ...formData, soldOut: e.target.checked })} style={{ width: '18px', height: '18px', cursor: 'pointer' }} />
                       <label htmlFor="soldOutChk" style={{ ...styles.label, margin: 0, cursor: 'pointer', color: '#b91c1c', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        🚫 Mark entire Event as Sold Out
+                        <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}><Ban size={14}/> Mark entire Event as Sold Out</span>
                       </label>
                     </div>
 
@@ -940,12 +940,12 @@ const Events = () => {
                       )}
                       {!geocoding && mapPosition && (
                         <div style={{ ...styles.mapTip, background: 'rgba(109,40,217,0.85)' }}>
-                          📍 Pin dropped — address filled above!
+                          <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><Navigation size={13} color="#10b981"/> Pin dropped — address filled above!</span>
                         </div>
                       )}
                       {!geocoding && !mapPosition && (
                         <div style={styles.mapTip}>
-                          👆 Click the map to set the precise location
+                          <span style={{display:'flex',alignItems:'center',gap:4}}><MapPin size={13}/> Click the map to set the precise location</span>
                         </div>
                       )}
                     </div>
@@ -972,7 +972,7 @@ const Events = () => {
           <div style={{ ...styles.modalBackdrop, zIndex: 10001 }} onClick={e => { if (e.target === e.currentTarget) handleCloseSpeakerModal(); }}>
             <motion.div initial={{ y: 40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 20, opacity: 0 }} style={{ ...styles.modalContent, maxWidth: '540px' }}>
               <div style={styles.modalHeader}>
-                <h2 style={{ margin: 0, color: 'var(--text-primary)', fontSize: '1.2rem' }}>🎤 Add Speaker / Performer</h2>
+                <h2 style={{ margin: 0, color: 'var(--text-primary)', fontSize: '1.2rem', display:'flex', alignItems:'center', gap:6 }}><Mic size={18}/> Add Speaker / Performer</h2>
                 <button style={styles.btnClose} onClick={handleCloseSpeakerModal}><X size={22} /></button>
               </div>
 
@@ -1071,7 +1071,7 @@ const Events = () => {
                     <img src={newSpeaker.photo} alt="" style={{ width: '54px', height: '54px', borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--primary-color)', flexShrink: 0 }} />
                     <div>
                       <div style={{ fontWeight: 700, color: 'var(--text-primary)', fontSize: '0.95rem' }}>{newSpeaker.name || 'Person'}</div>
-                      <div style={{ fontSize: '0.75rem', color: 'var(--primary-color)', fontWeight: 600 }}>✓ Profile fetched — edit any field below</div>
+                      <div style={{ fontSize: '0.75rem', color: 'var(--primary-color)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4 }}><CheckCircle size={12} color="var(--primary-color)"/> Profile fetched — edit any field below</div>
                     </div>
                   </div>
                 )}

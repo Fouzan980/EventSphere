@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import api from '../utils/api';
-import { Calendar, MapPin, Clock, Ticket, Info, X, Music, Download } from 'lucide-react';
+import { Calendar, MapPin, Clock, Ticket, Info, X, Music, Download, LayoutList, CalendarDays, Shirt, Globe } from 'lucide-react';
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 import { downloadTicketPDF } from '../utils/downloadTicket';
@@ -199,7 +199,7 @@ const Orders = () => {
                                   {ev.sessions && ev.sessions.length > 0 ? (
                                     <>
                                       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: '1rem', fontWeight: 700, color: 'var(--text-primary)', fontSize: '0.9rem' }}>
-                                        📋 Event Schedule
+                                        <LayoutList size={16} color="#8b5cf6"/> Event Schedule
                                       </div>
                                       <div style={{ overflowX: 'auto' }}>
                                         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
@@ -232,9 +232,9 @@ const Orders = () => {
 
                                   {/* Extra event details */}
                                   <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem', flexWrap: 'wrap', alignItems: 'center' }}>
-                                    {ev.dressCode && <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', background: 'var(--bg-color)', padding: '4px 12px', borderRadius: 20, border: '1px solid var(--border-color)' }}>👔 {ev.dressCode}</span>}
-                                    {ev.websiteLink && <a href={ev.websiteLink} target="_blank" rel="noreferrer" style={{ fontSize: '0.8rem', color: '#3b82f6', textDecoration: 'none', background: 'rgba(59,130,246,0.08)', padding: '4px 12px', borderRadius: 20, border: '1px solid rgba(59,130,246,0.2)' }}>🌐 Event Website</a>}
-                                    <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', background: 'var(--bg-color)', padding: '4px 12px', borderRadius: 20, border: '1px solid var(--border-color)' }}>📅 Booked: {new Date(ticket.purchaseDate || ticket.createdAt).toLocaleDateString()}</span>
+                                    {ev.dressCode && <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', background: 'var(--bg-color)', padding: '4px 12px', borderRadius: 20, border: '1px solid var(--border-color)', display: 'inline-flex', alignItems: 'center', gap: 4 }}><Shirt size={12}/> {ev.dressCode}</span>}
+                                    {ev.websiteLink && <a href={ev.websiteLink} target="_blank" rel="noreferrer" style={{ fontSize: '0.8rem', color: '#3b82f6', textDecoration: 'none', background: 'rgba(59,130,246,0.08)', padding: '4px 12px', borderRadius: 20, border: '1px solid rgba(59,130,246,0.2)', display: 'inline-flex', alignItems: 'center', gap: 4 }}><Globe size={12}/> Event Website</a>}
+                                    <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', background: 'var(--bg-color)', padding: '4px 12px', borderRadius: 20, border: '1px solid var(--border-color)', display: 'inline-flex', alignItems: 'center', gap: 4 }}><CalendarDays size={12}/> Booked: {new Date(ticket.purchaseDate || ticket.createdAt).toLocaleDateString()}</span>
                                     {ticket.status === 'Booked' && (
                                       <button
                                         className="download-btn"

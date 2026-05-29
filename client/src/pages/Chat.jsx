@@ -3,7 +3,7 @@ import { io } from 'socket.io-client';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
 import { useSearchParams } from 'react-router-dom';
-import { MessageSquare, Send, Search, Check, CheckCheck, Wifi, WifiOff, Shield, ShieldCheck, ArrowLeft, Image, X, Lock, Smile, Trash2, PanelLeft } from 'lucide-react';
+import { MessageSquare, Send, Search, Check, CheckCheck, Wifi, WifiOff, Shield, ShieldCheck, ArrowLeft, Image, X, Lock, Smile, Trash2, PanelLeft, Download, AlertTriangle, TrendingUp, Ban } from 'lucide-react';
 
 const getApiBaseURL = () => {
   return window.location.pathname.startsWith('/projects/eventsphere') ? '/projects/eventsphere/api' : '/api';
@@ -309,7 +309,7 @@ export default function Chat() {
               </a>
               <button onClick={()=>setModalImg(null)}
                 style={{display:'flex',alignItems:'center',gap:6,padding:'9px 20px',background:'rgba(255,255,255,0.12)',color:'#fff',border:'none',borderRadius:10,fontWeight:700,fontSize:'0.85rem',cursor:'pointer'}}>
-                ✕ Close
+                <X size={16}/> Close
               </button>
             </div>
           </div>
@@ -338,7 +338,7 @@ export default function Chat() {
           </div>
           <div style={S.list}>
             {loadC ? <p style={S.hint}>Loading…</p>
-              : contactsErr ? <p style={{...S.hint,color:'#ef4444'}}>⚠️ {contactsErr}</p>
+              : contactsErr ? <p style={{...S.hint,color:'#ef4444',display:'flex',alignItems:'center',gap:4}}><AlertTriangle size={13}/> {contactsErr}</p>
               : fil.length===0 ? <p style={S.hint}>No {user?.role==='Organizer'?'exhibitors':'organizers'} found.</p>
               : fil.map(c => {
                 const cnt=unread[c._id]||0, act=contact?._id===c._id;
@@ -377,7 +377,7 @@ export default function Chat() {
         <div style={{...S.chatWrap, width:isMobile?'100%':'auto'}}>
           {!contact ? (
             <div style={S.empty}>
-              <div style={{fontSize:52,marginBottom:12}}>💬</div>
+              <MessageSquare size={52} color="#7c3aed" style={{ marginBottom: 12, opacity: 0.5 }}/>
               <h3 style={{margin:'0 0 8px',color:'var(--text-primary)',fontWeight:800}}>Pick a conversation</h3>
               <p style={{color:'#64748b',fontSize:'0.86rem',margin:0}}>{user?.role==='Organizer'?'Select an exhibitor to message.':'Select an organizer to reach out.'}</p>
 
@@ -412,7 +412,7 @@ export default function Chat() {
               <div style={S.msgs} onClick={() => setActiveDeleteMenu(null)}>
                 <div style={{flex:1}}/>
                 {loadM&&<p style={S.hint}>Loading…</p>}
-                {!loadM&&messages.length===0&&<p style={{...S.hint}}>No messages yet. Say hi! 👋</p>}
+                {!loadM&&messages.length===0&&<p style={{...S.hint,display:'flex',alignItems:'center',justifyContent:'center',gap:6}}><MessageSquare size={14}/> No messages yet. Say hi!</p>}
                 {messages.map((msg,i) => {
                   const mine=isMe(msg);
                   const {text,img}=msgText(msg);
@@ -432,7 +432,7 @@ export default function Chat() {
                         <div style={{maxWidth:isMobile?'82%':'65%', userSelect: mine ? 'none' : 'auto'}}>
                           {msg.isDeleted ? (
                             <div style={{padding:'7px 12px',fontSize:'0.82rem',fontStyle:'italic',borderRadius:mine?'16px 16px 4px 16px':'16px 16px 16px 4px',background:mine?'rgba(124,58,237,0.1)':'var(--bg-surface)',color:'#94a3b8',border:mine?'1px solid rgba(124,58,237,0.2)':'1px solid var(--border-color)', display:'flex', alignItems:'center', gap:6}}>
-                              🚫 This message was deleted
+                              <Ban size={13}/> This message was deleted
                             </div>
                           ) : (
                             <>
@@ -511,7 +511,7 @@ export default function Chat() {
                   {/* Section label */}
                   {!gifLoading&&!gifError&&gifs.length>0&&(
                     <div style={{padding:'4px 10px 2px',fontSize:'0.62rem',fontWeight:700,color:'#94a3b8',letterSpacing:'0.06em',flexShrink:0,textTransform:'uppercase'}}>
-                      {gifMode==='trending'?'🔥 Trending':'🔍 Results'}
+                      {gifMode==='trending'?<><TrendingUp size={11}/> Trending</>:<><Search size={11}/> Results</>}
                     </div>
                   )}
                   {/* Grid */}
@@ -525,7 +525,7 @@ export default function Chat() {
                     )}
                     {!gifLoading&&gifError&&(
                       <div style={{textAlign:'center',color:'#ef4444',fontSize:'0.8rem',padding:'2rem 1rem'}}>
-                        <div style={{fontSize:'1.5rem',marginBottom:6}}>⚠️</div>
+                        <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:6,marginBottom:6}}><AlertTriangle size={22} color="#ef4444"/></div>
                         <div style={{fontWeight:600,marginBottom:4}}>GIF load failed</div>
                         <div style={{color:'#94a3b8',fontSize:'0.72rem',marginBottom:12}}>{gifError}</div>
                         <button onClick={()=>gifSearch?searchGifs(gifSearch):loadTrending()}
