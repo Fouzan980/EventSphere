@@ -149,7 +149,7 @@ const Dashboard = () => {
         <p style={{ color: 'var(--text-secondary)', fontSize: '0.93rem', margin: 0 }}>
           {user.role === 'Organizer'
             ? 'Your real-time organizer analytics — every number pulled live from the database.'
-            : 'Here's your platform overview. Monitor performance and track recent activity.'}
+            : "Here's your platform overview. Monitor performance and track recent activity."}
         </p>
       </div>
 
