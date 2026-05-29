@@ -4,6 +4,8 @@
  * Usage: import { welcomeEmail, ticketConfirmEmail, ... } from './emailTemplates';
  */
 
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
+
 // ─── Shared Brand Shell ───────────────────────────────────────────────────────
 const shell = (bodyContent) => `
 <!DOCTYPE html>
@@ -14,18 +16,19 @@ const shell = (bodyContent) => `
   <title>EventSphere</title>
 </head>
 <body style="margin:0;padding:0;background:#0f0a1e;font-family:'Segoe UI',Arial,sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:#0f0a1e;padding:40px 0;">
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#0f0a1e;padding:40px 0;">
     <tr><td align="center">
-      <table width="600" cellpadding="0" cellspacing="0" style="
+      <table width="600" cellpadding="0" cellspacing="0" border="0" style="
         max-width:600px;
-        background:linear-gradient(145deg,#1a1035 0%,#12082b 100%);
+        background:#12082b;
+        background-image:linear-gradient(145deg,#1a1035 0%,#12082b 100%);
         border-radius:20px;overflow:hidden;
         box-shadow:0 25px 60px rgba(106,17,203,0.4);
         border:1px solid rgba(139,92,246,0.25);
       ">
         <!-- Header -->
         <tr>
-          <td style="background:linear-gradient(135deg,#6a11cb 0%,#8b5cf6 50%,#a855f7 100%);padding:40px;text-align:center;">
+          <td style="background:#8b5cf6;background-image:linear-gradient(135deg,#6a11cb 0%,#8b5cf6 50%,#a855f7 100%);padding:40px;text-align:center;">
             <div style="display:inline-block;background:rgba(255,255,255,0.15);border-radius:50%;padding:14px;margin-bottom:16px;">
               <span style="font-size:36px;line-height:1;">🎪</span>
             </div>
@@ -55,11 +58,12 @@ const shell = (bodyContent) => `
 
 // ─── Reusable inner pieces ────────────────────────────────────────────────────
 const ctaBtn = (href, label) => `
-  <table width="100%" cellpadding="0" cellspacing="0" style="margin-top:32px;">
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:32px;">
     <tr><td align="center">
       <a href="${href}" style="
         display:inline-block;
-        background:linear-gradient(135deg,#7c3aed,#a855f7);
+        background:#7c3aed;
+        background-image:linear-gradient(135deg,#7c3aed,#a855f7);
         color:#fff;font-size:15px;font-weight:700;
         text-decoration:none;padding:14px 40px;border-radius:12px;
         letter-spacing:0.5px;box-shadow:0 8px 24px rgba(168,85,247,0.4);
@@ -68,17 +72,17 @@ const ctaBtn = (href, label) => `
   </table>`;
 
 const infoBox = (rows) => `
-  <table width="100%" cellpadding="0" cellspacing="0" style="
-    background:rgba(139,92,246,0.1);border-radius:14px;
-    border:1px solid rgba(139,92,246,0.3);margin:24px 0;overflow:hidden;">
-    <tr><td style="padding:20px 24px;">
-      ${rows.map(([k, v]) => `
-        <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:10px;">
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="
+    background:#1c113a;background:rgba(139,92,246,0.1);border-radius:14px;
+    border:1px solid rgba(139,92,246,0.3);margin:24px 0;">
+    <tr><td style="padding:20px 24px 10px;">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        ${rows.map(([k, v]) => `
           <tr>
-            <td style="width:140px;color:#a78bfa;font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:1px;">${k}</td>
-            <td style="color:#e2d9f3;font-size:14px;font-weight:500;">${v}</td>
-          </tr>
-        </table>`).join('')}
+            <td style="width:140px;color:#a78bfa;font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:1px;padding-bottom:10px;vertical-align:top;">${k}</td>
+            <td style="color:#e2d9f3;font-size:14px;font-weight:500;padding-bottom:10px;vertical-align:top;">${v}</td>
+          </tr>`).join('')}
+      </table>
     </td></tr>
   </table>`;
 
@@ -101,13 +105,13 @@ const welcomeEmail = (name, role = 'Attendee') => shell(`
   <p style="margin:0 0 20px;color:#c4b5fd;font-size:15px;line-height:1.7;">
     Your EventSphere account has been <strong style="color:#a855f7;">successfully created</strong>. We're thrilled to have you join our event universe!
   </p>
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:rgba(139,92,246,0.1);border-radius:14px;border:1px solid rgba(139,92,246,0.3);margin-bottom:8px;overflow:hidden;">
-    <tr><td style="padding:20px 24px;">
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#1c113a;background:rgba(139,92,246,0.1);border-radius:14px;border:1px solid rgba(139,92,246,0.3);margin-bottom:8px;">
+    <tr><td style="padding:20px 24px 10px;">
       <p style="margin:0 0 14px;color:#a78bfa;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:2px;">🚀 What's waiting for you</p>
-      ${(roleFeatures[role] || roleFeatures.Attendee).map(f => `<p style="margin:0 0 8px;color:#d8b4fe;font-size:14px;">✅ &nbsp;${f}</p>`).join('')}
+      ${(roleFeatures[role] || roleFeatures.Attendee).map(f => `<p style="margin:0 0 10px;color:#d8b4fe;font-size:14px;line-height:1.4;">✅ &nbsp;${f}</p>`).join('')}
     </td></tr>
   </table>
-  ${ctaBtn('http://localhost:5173/login', 'Go to Dashboard')}
+  ${ctaBtn(`${FRONTEND_URL}/login`, 'Go to Dashboard')}
 `);
 
 // ─── 2. Ticket / Event Booking Confirmation ───────────────────────────────────
@@ -124,7 +128,7 @@ const ticketConfirmEmail = (name, event, ticket = {}) => {
     <p style="margin:0 0 24px;color:#c4b5fd;font-size:15px;line-height:1.7;">
       Hi <strong style="color:#e9d5ff;">${name}</strong>, your booking for <strong style="color:#a855f7;">${event.title}</strong> is complete. See you there!
     </p>
-    \${infoBox([
+    ${infoBox([
       ['🎟️ Ticket No', ticketNumber],
       ['👤 Attendee',  name],
       ['📅 Date',       event.date ? new Date(event.date).toLocaleDateString('en-US', { weekday:'long', year:'numeric', month:'long', day:'numeric' }) : 'TBA'],
@@ -134,7 +138,7 @@ const ticketConfirmEmail = (name, event, ticket = {}) => {
       ['💰 Price',      priceDisplay],
     ])}
     <p style="margin:0;color:#c4b5fd;font-size:14px;line-height:1.7;">Keep this email as your booking reference. Please present either a printed copy or show it on your mobile device at entry.</p>
-    \${ctaBtn('http://localhost:5173/dashboard', 'View My Schedule')}
+    ${ctaBtn(`${FRONTEND_URL}/dashboard`, 'View My Schedule')}
   `);
 };
 
@@ -153,7 +157,7 @@ const applicationSubmittedEmail = (name, eventTitle, companyName) => shell(`
   <p style="margin:0;color:#c4b5fd;font-size:14px;line-height:1.7;">
     You'll receive another email once the organizer has made a decision. In the meantime, you can track your application status in your dashboard.
   </p>
-  ${ctaBtn('http://localhost:5173/dashboard/applications', 'Track Application')}
+  ${ctaBtn(`${FRONTEND_URL}/dashboard/applications`, 'Track Application')}
 `);
 
 // ─── 4. Application Approved (Exhibitor) ─────────────────────────────────────
@@ -172,7 +176,7 @@ const applicationApprovedEmail = (name, eventTitle, boothInfo) => shell(`
   <p style="margin:0;color:#c4b5fd;font-size:14px;line-height:1.7;">
     Head to your dashboard to view your assigned booth and floor plan details.
   </p>
-  ${ctaBtn('http://localhost:5173/dashboard/floor-plan', 'View Floor Plan')}
+  ${ctaBtn(`${FRONTEND_URL}/dashboard/floor-plan`, 'View Floor Plan')}
 `);
 
 // ─── 5. Application Rejected (Exhibitor) ─────────────────────────────────────
@@ -183,7 +187,7 @@ const applicationRejectedEmail = (name, eventTitle) => shell(`
     Hi <strong style="color:#e9d5ff;">${name}</strong>, thank you for your interest in exhibiting at
     <strong style="color:#a855f7;">${eventTitle}</strong>. Unfortunately, your application was not selected at this time.
   </p>
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:rgba(239,68,68,0.08);border-radius:14px;border:1px solid rgba(239,68,68,0.25);margin:0 0 24px;overflow:hidden;">
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#2a1122;background:rgba(239,68,68,0.08);border-radius:14px;border:1px solid rgba(239,68,68,0.25);margin:0 0 24px;">
     <tr><td style="padding:20px 24px;">
       <p style="margin:0;color:#fca5a5;font-size:14px;line-height:1.7;">
         Don't be discouraged — there are many more events on EventSphere. Browse other upcoming events and apply for future opportunities.
@@ -193,7 +197,7 @@ const applicationRejectedEmail = (name, eventTitle) => shell(`
   <p style="margin:0;color:#c4b5fd;font-size:14px;line-height:1.7;">
     We appreciate your time and hope to see you at future EventSphere events!
   </p>
-  ${ctaBtn('http://localhost:5173/dashboard/events', 'Browse Other Events')}
+  ${ctaBtn(`${FRONTEND_URL}/dashboard/events`, 'Browse Other Events')}
 `);
 
 // ─── 6. Event Created (Organizer confirmation) ───────────────────────────────
@@ -213,7 +217,7 @@ const eventCreatedEmail = (name, event) => shell(`
   <p style="margin:0;color:#c4b5fd;font-size:14px;line-height:1.7;">
     Attendees and exhibitors can now discover and register for your event. Manage everything from your organizer dashboard.
   </p>
-  ${ctaBtn('http://localhost:5173/dashboard/events', 'Manage Events')}
+  ${ctaBtn(`${FRONTEND_URL}/dashboard/events`, 'Manage Events')}
 `);
 
 // ─── 7. Profile Updated ───────────────────────────────────────────────────────
@@ -222,7 +226,7 @@ const profileUpdatedEmail = (name) => shell(`
   <p style="margin:0 0 24px;color:#c4b5fd;font-size:15px;line-height:1.7;">
     Hi <strong style="color:#e9d5ff;">${name}</strong>, your EventSphere profile has been <strong style="color:#a855f7;">successfully updated</strong>.
   </p>
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:rgba(139,92,246,0.1);border-radius:14px;border:1px solid rgba(139,92,246,0.3);margin-bottom:24px;overflow:hidden;">
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#1c113a;background:rgba(139,92,246,0.1);border-radius:14px;border:1px solid rgba(139,92,246,0.3);margin-bottom:24px;">
     <tr><td style="padding:20px 24px;">
       <p style="margin:0;color:#d8b4fe;font-size:14px;line-height:1.7;">
         If you did not make this change, please <strong style="color:#f87171;">secure your account immediately</strong> by changing your password.
@@ -232,7 +236,7 @@ const profileUpdatedEmail = (name) => shell(`
   <p style="margin:0;color:#c4b5fd;font-size:14px;line-height:1.7;">
     Your profile information is used across the platform and may be visible to other users based on your role.
   </p>
-  ${ctaBtn('http://localhost:5173/dashboard/profile', 'View Profile')}
+  ${ctaBtn(`${FRONTEND_URL}/dashboard/profile`, 'View Profile')}
 `);
 
 // ─── 8. Password Changed ─────────────────────────────────────────────────────
@@ -241,7 +245,7 @@ const passwordChangedEmail = (name) => shell(`
   <p style="margin:0 0 24px;color:#c4b5fd;font-size:15px;line-height:1.7;">
     Hi <strong style="color:#e9d5ff;">${name}</strong>, your EventSphere account password was just changed.
   </p>
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:rgba(239,68,68,0.08);border-radius:14px;border:1px solid rgba(239,68,68,0.25);margin-bottom:24px;overflow:hidden;">
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#2a1122;background:rgba(239,68,68,0.08);border-radius:14px;border:1px solid rgba(239,68,68,0.25);margin-bottom:24px;">
     <tr><td style="padding:20px 24px;">
       <p style="margin:0 0 6px;color:#fca5a5;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1px;">⚠️ Security Notice</p>
       <p style="margin:0;color:#fca5a5;font-size:14px;line-height:1.7;">
@@ -252,7 +256,7 @@ const passwordChangedEmail = (name) => shell(`
   <p style="margin:0;color:#c4b5fd;font-size:14px;line-height:1.7;">
     If this was you, no action is needed. Your new password is now active.
   </p>
-  ${ctaBtn('http://localhost:5173/login', 'Sign In')}
+  ${ctaBtn(`${FRONTEND_URL}/login`, 'Sign In')}
 `);
 
 // ─── 8.1 Password Reset Request ──────────────────────────────────────────────
@@ -285,7 +289,7 @@ const newApplicationNotifyEmail = (organizerName, exhibitorName, companyName, ev
   <p style="margin:0;color:#c4b5fd;font-size:14px;line-height:1.7;">
     Review the application and approve or reject from your organizer dashboard.
   </p>
-  ${ctaBtn('http://localhost:5173/dashboard/applications', 'Review Application')}
+  ${ctaBtn(`${FRONTEND_URL}/dashboard/applications`, 'Review Application')}
 `);
 
 // ─── 10. Contact / Subscribe Email ──────────────────────────────────────────────
@@ -294,7 +298,7 @@ const contactEmail = (name, message) => shell(`
   <p style="margin:0 0 16px;color:#c4b5fd;font-size:15px;line-height:1.7;">
     Thank you for reaching out via our Contact page.
   </p>
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:rgba(139,92,246,0.1);border-radius:14px;border:1px solid rgba(139,92,246,0.3);margin-bottom:16px;overflow:hidden;">
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#1c113a;background:rgba(139,92,246,0.1);border-radius:14px;border:1px solid rgba(139,92,246,0.3);margin-bottom:16px;">
     <tr><td style="padding:20px 24px;">
       <p style="margin:0 0 6px;color:#d8b4fe;font-size:16px;font-weight:700;">You have successfully subscribed to the newsletter!</p>
       <p style="margin:0;color:#c4b5fd;font-size:14px;line-height:1.7;">
@@ -303,7 +307,7 @@ const contactEmail = (name, message) => shell(`
     </td></tr>
   </table>
   ${message ? `<p style="font-size: 14px; color: #a78bfa; font-style: italic; margin-bottom: 24px;">We also received your message: "${message}"</p>` : ''}
-  ${ctaBtn(process.env.FRONTEND_URL || 'http://localhost:5173', 'Explore Upcoming Events')}
+  ${ctaBtn(FRONTEND_URL, 'Explore Upcoming Events')}
 `);
 
 // ─── 11. Event Reminder Email ──────────────────────────────────────────────
@@ -318,7 +322,7 @@ const eventReminderEmail = (name, event) => shell(`
     ['📍 Location', event.location || 'TBA'],
   ])}
   <p style="margin:0;color:#c4b5fd;font-size:14px;line-height:1.7;">Get ready for an amazing experience. See you soon!</p>
-  ${ctaBtn(process.env.FRONTEND_URL ? process.env.FRONTEND_URL + '/dashboard/orders' : 'http://localhost:5173/dashboard/orders', 'View Ticket Details')}
+  ${ctaBtn(`${FRONTEND_URL}/dashboard/orders`, 'View Ticket Details')}
 `);
 
 // ─── 12. Verification Email ──────────────────────────────────────────────
@@ -330,7 +334,7 @@ const verificationEmail = (name, verificationUrl) => shell(`
   <p style="margin:0 0 24px;color:#c4b5fd;font-size:15px;line-height:1.7;">
     Please verify your email address by clicking the button below to activate your account.
   </p>
-  ${ctaBtn(verificationUrl, 'Verify Email Address')}
+  ${verificationUrl ? ctaBtn(verificationUrl, 'Verify Email Address') : ''}
   <p style="margin:24px 0 0;color:#94a3b8;font-size:13px;line-height:1.7;">
     If you did not create an account on EventSphere, please ignore this email.
   </p>

@@ -226,7 +226,7 @@ const ExhibitorDirectory = () => {
 
 const styles = {
   container: {
-    minHeight: '100vh', display: 'flex', flexDirection: 'column',
+    minHeight: '100dvh', display: 'flex', flexDirection: 'column',
     backgroundColor: 'var(--bg-color)', paddingTop: '130px'
   },
   searchBar: {

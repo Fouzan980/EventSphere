@@ -41,8 +41,6 @@ const BarChart = ({ data, valueKey, labelKey, color = 'var(--primary-color)', he
 /* ─── Gauge (sell-through) ───────────────────────────────────────────────── */
 const Gauge = ({ value, max = 100, color = '#10b981' }) => {
   const pct = Math.min(100, (value / max) * 100);
-  const r = 36, circ = 2 * Math.PI * r;
-  const dash = (pct / 100) * circ;
   return (
     <svg width="100" height="60" viewBox="0 0 100 60">
       <path d="M 10 55 A 40 40 0 0 1 90 55" fill="none" stroke="var(--border-color)" strokeWidth="10" strokeLinecap="round" />

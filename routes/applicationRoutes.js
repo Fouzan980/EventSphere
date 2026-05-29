@@ -65,6 +65,15 @@ router.post('/', protect, authorize('Exhibitor'), async (req, res) => {
       }).catch(err => console.warn('⚠️ New-app notify email failed:', err.message));
     }
 
+    // Create Notification for Exhibitor
+    const Notification = require('../models/Notification');
+    await Notification.create({
+      recipient: req.user.id,
+      title: 'Application Submitted',
+      message: `Your application for event "${event?.title || 'Event'}" has been submitted and is pending review.`,
+      type: 'info'
+    });
+
     await logActivity(req.user.id, 'Application Submitted', `You submitted an application for ${event?.title || 'an event'}.`);
 
     res.status(201).json(app);
@@ -108,6 +117,17 @@ router.put('/:id/status', protect, authorize('Organizer'), async (req, res) => {
           : applicationRejectedEmail(app.exhibitorId.name, app.eventId?.title),
       }).catch(err => console.warn('⚠️ Status-update email failed:', err.message));
     }
+
+    // Create Notification for Exhibitor
+    const Notification = require('../models/Notification');
+    await Notification.create({
+      recipient: app.exhibitorId._id,
+      title: `Application ${status}`,
+      message: status === 'Approved'
+        ? `Your application for "${app.eventId?.title}" was Approved! ${boothLabel ? `You have been assigned ${boothLabel}.` : ''}`
+        : `Your application for "${app.eventId?.title}" was Rejected.`,
+      type: status === 'Approved' ? 'success' : 'error'
+    });
 
     await logActivity(req.user.id, `Application ${status}`, `You marked an application as ${status} for event ${app.eventId?.title}.`);
 

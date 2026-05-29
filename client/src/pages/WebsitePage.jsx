@@ -493,7 +493,7 @@ const formStyles = {
 };
 
 const shellStyles = {
-  container: { minHeight: '100vh', display: 'flex', flexDirection: 'column', overflowX: 'hidden', fontFamily: "'Inter', sans-serif" },
+  container: { minHeight: '100dvh', display: 'flex', flexDirection: 'column', overflowX: 'hidden', fontFamily: "'Inter', sans-serif" },
   navbar: { backgroundColor: 'var(--nav-bg)', color: 'var(--nav-text)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1.2rem 5%', borderBottom: '1px solid rgba(255,255,255,0.1)' },
   logo: { display: 'flex', alignItems: 'center', gap: '0.6rem', cursor: 'pointer' },
   brandTitle: { margin: 0, fontSize: '1.5rem', fontWeight: '900', letterSpacing: '1px', color: '#fff' },

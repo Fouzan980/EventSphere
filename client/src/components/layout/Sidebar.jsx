@@ -100,7 +100,7 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     transition: 'var(--transition-speed)',
-    minHeight: '100vh',
+    minHeight: '100dvh',
     position: 'sticky',
     top: 0,
     overflowY: 'auto',

@@ -237,7 +237,7 @@ const PublicNavbar = () => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -24 }}
             transition={{ duration: 0.28, ease: 'easeOut' }}
-            style={{ top: hasBanner ? '32px' : 0, height: hasBanner ? 'calc(100vh - 32px)' : '100vh' }}
+            style={{ top: hasBanner ? '32px' : 0, height: hasBanner ? 'calc(100dvh - 32px)' : '100dvh' }}
           >
             <button className="close-btn" onClick={() => setIsMenuOpen(false)}><X size={32} /></button>
 

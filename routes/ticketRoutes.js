@@ -10,6 +10,10 @@ const { ticketConfirmEmail } = require('../utils/emailTemplates');
 // ─── Book a ticket ────────────────────────────────────────────────────────────
 router.post('/book/:eventId', protect, async (req, res) => {
   try {
+    if (req.user.role === 'Organizer' || req.user.role === 'Exhibitor') {
+      return res.status(403).json({ message: 'Event booking is restricted to Attendees only.' });
+    }
+
     const event = await Event.findById(req.params.eventId);
     if (!event) return res.status(404).json({ message: 'Event not found' });
 

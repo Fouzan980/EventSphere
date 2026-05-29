@@ -30,7 +30,7 @@ const Layout = () => {
   return (
     <div style={{
       display: 'flex',
-      height: '100vh',
+      height: '100dvh',
       width: '100vw',
       overflow: 'hidden',
       background: 'var(--bg-color)',
@@ -56,7 +56,7 @@ const Layout = () => {
         style={{
           position: isMobile ? 'fixed' : 'relative',
           top: 0, left: 0, bottom: 0,
-          height: '100vh',
+          height: '100dvh',
           width: SIDEBAR_W,
           flexShrink: 0,
           transform: sidebarOpen ? 'translateX(0)' : `translateX(-${SIDEBAR_W}px)`,
@@ -76,7 +76,7 @@ const Layout = () => {
           flex: 1,
           display: 'flex',
           flexDirection: 'column',
-          height: '100vh',
+          height: '100dvh',
           overflow: 'hidden',
           minWidth: 0,          // critical: prevents flex children overflow
           maxWidth: '100%',

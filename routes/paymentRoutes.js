@@ -7,6 +7,10 @@ router.post('/create-intent', protect, async (req, res) => {
   const key = process.env.STRIPE_SECRET_KEY;
   if (!key) return res.status(503).json({ message: 'Card payments not configured (STRIPE_SECRET_KEY missing).' });
 
+  if (req.user.role === 'Organizer' || req.user.role === 'Exhibitor') {
+    return res.status(403).json({ message: 'Event booking is restricted to Attendees only.' });
+  }
+
   try {
     const stripe = require('stripe')(key);
     const { amount, currency = 'pkr', description = 'EventSphere Ticket', metadata = {} } = req.body;
@@ -35,6 +39,10 @@ router.post('/safepay-init', protect, async (req, res) => {
 
   if (!secret || !pubKey) {
     return res.status(503).json({ message: 'Safepay not configured (SAFEPAY_SECRET_KEY / SAFEPAY_PUBLIC_KEY missing).' });
+  }
+
+  if (req.user.role === 'Organizer' || req.user.role === 'Exhibitor') {
+    return res.status(403).json({ message: 'Event booking is restricted to Attendees only.' });
   }
 
   try {

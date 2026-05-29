@@ -186,6 +186,7 @@ app.use('/api/person',       require('./routes/personRoutes'));
 app.use('/api/payments',     require('./routes/paymentRoutes'));
 app.use('/api/chat',         require('./routes/chatRoutes'));
 app.use('/api/analytics',    require('./routes/analyticsRoutes'));
+app.use('/api/notifications', require('./routes/notificationRoutes'));
 
 app.get('/', (req, res) => res.json({ status: 'ok', message: 'EventSphere API is running.' }));
 

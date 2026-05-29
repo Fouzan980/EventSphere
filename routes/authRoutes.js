@@ -1,5 +1,21 @@
 const express = require('express');
 const router = express.Router();
+
+const getFrontendUrl = (req) => {
+  if (process.env.FRONTEND_URL) {
+    return process.env.FRONTEND_URL.replace(/\/$/, '');
+  }
+  const host = req.headers['x-forwarded-host'] || req.headers.host || '';
+  const proto = req.headers['x-forwarded-proto'] || (req.secure ? 'https' : 'http');
+  if (host.includes('fouzan.me') || host.startsWith('13.233.109.185')) {
+    return 'https://fouzan.me/projects/eventsphere';
+  }
+  if (req.originalUrl.startsWith('/projects/eventsphere')) {
+    return `${proto}://${host}/projects/eventsphere`;
+  }
+  return `${proto}://${host}`;
+};
+
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
@@ -105,7 +121,7 @@ router.post('/register', async (req, res) => {
     });
 
     // 4. Send verification email (non-blocking)
-    const origin = process.env.FRONTEND_URL || req.headers.origin || 'http://localhost:5173';
+    const origin = getFrontendUrl(req);
     // Link goes to backend GET endpoint → verifies token → redirects to frontend
     const verificationUrl = `${origin}/api/auth/verify-email/${verificationToken}`;
 
@@ -136,7 +152,7 @@ router.get('/verify-email/:token', async (req, res) => {
     });
 
     if (!user) {
-      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+      const frontendUrl = getFrontendUrl(req);
       return res.redirect(`${frontendUrl}/verify-email?error=invalid`);
     }
 
@@ -146,10 +162,10 @@ router.get('/verify-email/:token', async (req, res) => {
     user.verificationTokenExpire = undefined;
     await user.save();
 
-    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+    const frontendUrl = getFrontendUrl(req);
     return res.redirect(`${frontendUrl}/verify-email?success=1`);
   } catch (error) {
-    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+    const frontendUrl = getFrontendUrl(req);
     return res.redirect(`${frontendUrl}/verify-email?error=server`);
   }
 });
@@ -207,7 +223,7 @@ router.post('/resend-verification', async (req, res) => {
     user.verificationTokenExpire = verificationTokenExpire;
     await user.save();
 
-    const origin = process.env.FRONTEND_URL || req.headers.origin || 'http://localhost:5173';
+    const origin = getFrontendUrl(req);
     // Link goes to backend GET endpoint → verifies token → redirects to frontend
     const verificationUrl = `${origin}/api/auth/verify-email/${verificationToken}`;
 
@@ -313,7 +329,7 @@ router.post('/forgot-password', async (req, res) => {
     user.resetPasswordExpire = Date.now() + 15 * 60 * 1000; // 15 mins
     await user.save();
 
-    const origin = process.env.FRONTEND_URL || req.headers.origin || 'http://localhost:5173';
+    const origin = getFrontendUrl(req);
     const resetUrl = `${origin}/reset-password/${resetToken}`;
 
     await sendEmail({

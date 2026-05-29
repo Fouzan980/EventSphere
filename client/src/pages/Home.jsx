@@ -161,6 +161,10 @@ const Home = () => {
 
   const openPaymentModal = (event, type) => {
     if (!user) { navigate('/login'); return; }
+    if (user.role === 'Organizer' || user.role === 'Exhibitor') {
+      toast.error('Event booking is restricted to Attendee accounts only.');
+      return;
+    }
     let price = 0;
     if (event.hasMultipleTickets && event.tickets?.length > 0) {
       const t = event.tickets.find(tk => tk.name === type);
@@ -179,6 +183,10 @@ const Home = () => {
 
   const handleBookTicket = async (event, type = 'Standard', paymentInfo = {}) => {
     if (!user) { navigate('/login'); return; }
+    if (user.role === 'Organizer' || user.role === 'Exhibitor') {
+      toast.error('Event booking is restricted to Attendee accounts only.');
+      return;
+    }
     setBookingState(prev => ({ ...prev, [event._id]: 'loading' }));
     try {
       const response = await api.post(`/tickets/book/${event._id}`, {
@@ -292,7 +300,7 @@ const Home = () => {
   ];
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', overflowX: 'hidden' }}>
+    <div style={{ minHeight: '100dvh', display: 'flex', flexDirection: 'column', overflowX: 'hidden' }}>
 
       <PublicNavbar />
 
@@ -776,13 +784,14 @@ const Home = () => {
               </div>
               {(() => {
                 const isSelectedSoldOut = selectedEventModal.soldOut || (selectedEventModal.hasMultipleTickets && selectedEventModal.tickets?.find(t => t.name === ticketType)?.soldOut);
+                const isUserRestricted = user && (user.role === 'Organizer' || user.role === 'Exhibitor');
                 return (
                   <button
-                    style={{ ...S.btnBook, width: '100%', justifyContent: 'center', padding: '14px', fontSize: '1rem', marginTop: '1.25rem', borderRadius: '12px', opacity: isSelectedSoldOut ? 0.5 : 1, cursor: isSelectedSoldOut ? 'not-allowed' : 'pointer' }}
-                    disabled={!!isSelectedSoldOut}
-                    onClick={() => { if (!isSelectedSoldOut) { openPaymentModal(selectedEventModal, ticketType); setSelectedEventModal(null); setTicketType('Standard'); } }}
+                    style={{ ...S.btnBook, width: '100%', justifyContent: 'center', padding: '14px', fontSize: '1rem', marginTop: '1.25rem', borderRadius: '12px', opacity: (isSelectedSoldOut || isUserRestricted) ? 0.5 : 1, cursor: (isSelectedSoldOut || isUserRestricted) ? 'not-allowed' : 'pointer' }}
+                    disabled={!!isSelectedSoldOut || isUserRestricted}
+                    onClick={() => { if (!isSelectedSoldOut && !isUserRestricted) { openPaymentModal(selectedEventModal, ticketType); setSelectedEventModal(null); setTicketType('Standard'); } }}
                   >
-                    {isSelectedSoldOut ? (<span style={{display:'flex',alignItems:'center',gap:6}}><Ban size={16}/> {selectedEventModal.soldOut ? 'Event is Sold Out' : 'This Tier is Sold Out'}</span>) : `Proceed to Payment — ${(() => {
+                    {isUserRestricted ? (<span style={{display:'flex',alignItems:'center',gap:6}}><Ban size={16}/> Booking restricted to Attendees only</span>) : isSelectedSoldOut ? (<span style={{display:'flex',alignItems:'center',gap:6}}><Ban size={16}/> {selectedEventModal.soldOut ? 'Event is Sold Out' : 'This Tier is Sold Out'}</span>) : `Proceed to Payment — ${(() => {
                       if (selectedEventModal.hasMultipleTickets && selectedEventModal.tickets?.length > 0) {
                         const matchedTicket = selectedEventModal.tickets.find(t => t.name === ticketType);
                         const price = matchedTicket ? matchedTicket.price : 0;
