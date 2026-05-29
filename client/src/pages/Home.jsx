@@ -4,7 +4,7 @@ import api from '../utils/api';
 import { AuthContext } from '../context/AuthContext';
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Calendar, MapPin, Ticket, X, ChevronLeft, ChevronRight, Mic, Download, Users, Building2, Globe, Clock } from 'lucide-react';
+import { Search, Calendar, MapPin, Ticket, X, ChevronLeft, ChevronRight, Mic, Download, Users, Building2, Globe, Clock, DollarSign, Ban, PartyPopper } from 'lucide-react';
 import { toast } from 'react-toastify';
 import PublicNavbar from '../components/layout/PublicNavbar';
 import { PageSkeleton } from '../components/Skeleton';
@@ -782,7 +782,7 @@ const Home = () => {
                     disabled={!!isSelectedSoldOut}
                     onClick={() => { if (!isSelectedSoldOut) { openPaymentModal(selectedEventModal, ticketType); setSelectedEventModal(null); setTicketType('Standard'); } }}
                   >
-                    {isSelectedSoldOut ? (selectedEventModal.soldOut ? '🚫 Event is Sold Out' : '🚫 This Tier is Sold Out') : `Proceed to Payment — ${(() => {
+                    {isSelectedSoldOut ? (<span style={{display:'flex',alignItems:'center',gap:6}}><Ban size={16}/> {selectedEventModal.soldOut ? 'Event is Sold Out' : 'This Tier is Sold Out'}</span>) : `Proceed to Payment — ${(() => {
                       if (selectedEventModal.hasMultipleTickets && selectedEventModal.tickets?.length > 0) {
                         const matchedTicket = selectedEventModal.tickets.find(t => t.name === ticketType);
                         const price = matchedTicket ? matchedTicket.price : 0;
@@ -811,14 +811,14 @@ const Home = () => {
       {successMsg && (
         <div style={S.overlay} onClick={() => setSuccessMsg(null)}>
           <motion.div style={S.modal} initial={{ scale: 0.85, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} onClick={e => e.stopPropagation()}>
-            <div style={{ fontSize: '3.5rem', marginBottom: '0.75rem' }}>🎉</div>
+            <div style={{ marginBottom: '0.75rem', display: 'flex', justifyContent: 'center' }}><PartyPopper size={48} color="#FF2A5F" /></div>
             <h2 style={{ margin: '0 0 0.5rem', color: '#0F172A' }}>Booking Confirmed!</h2>
             <p style={{ color: '#64748b', marginBottom: '1.5rem', fontSize: '0.9rem' }}>Email sent to <strong>{successMsg.email}</strong></p>
             <div style={{ backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '1.5rem', textAlign: 'left' }}>
               <h3 style={{ margin: '0 0 1rem', color: '#0F172A', borderBottom: '1px dashed #e2e8f0', paddingBottom: '0.75rem', fontSize: '1rem' }}>{successMsg.title}</h3>
               <div style={S.tRow}><span style={{display:'flex',alignItems:'center',gap:4}}><Calendar size={13} /> Date</span><span>{successMsg.date ? new Date(successMsg.date).toLocaleDateString() : 'TBA'}</span></div>
               <div style={S.tRow}><span style={{display:'flex',alignItems:'center',gap:4}}><MapPin size={13} /> Venue</span><span>{successMsg.location || 'TBA'}</span></div>
-              <div style={S.tRow}><span>💰 Price</span><span style={{ color: '#10b981', fontWeight: 700 }}>{successMsg.price === 0 ? 'FREE' : `Rs. ${successMsg.price}`}</span></div>
+              <div style={S.tRow}><span style={{display:'flex',alignItems:'center',gap:4}}><DollarSign size={13} /> Price</span><span style={{ color: '#10b981', fontWeight: 700 }}>{successMsg.price === 0 ? 'FREE' : `Rs. ${successMsg.price}`}</span></div>
             </div>
             <button
               style={{

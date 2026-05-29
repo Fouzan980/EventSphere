@@ -2,188 +2,324 @@ import React, { useContext, useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import api from '../utils/api';
-import { Activity, BarChart2, TrendingUp, Users, Clock, Info } from 'lucide-react';
+import {
+  Activity, BarChart2, TrendingUp, Users, Clock, Info,
+  Calendar, Ticket, DollarSign, Globe, Bookmark,
+  ArrowUpRight, Star, CheckCircle, AlertCircle, Rocket,
+  PenLine, Trash2, LogIn, FileText, Flame, Award, Target,
+} from 'lucide-react';
 
+/* ─── Mini bar chart (CSS only) ─────────────────────────────────────────── */
+const BarChart = ({ data, valueKey, labelKey, color = 'var(--primary-color)', height = 120 }) => {
+  const max = Math.max(...data.map(d => d[valueKey] || 0), 1);
+  return (
+    <div style={{ display: 'flex', alignItems: 'flex-end', gap: '6px', height, width: '100%' }}>
+      {data.map((d, i) => {
+        const pct = Math.round((d[valueKey] / max) * 100);
+        return (
+          <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', height: '100%', justifyContent: 'flex-end' }}>
+            <div
+              title={`${d[labelKey]}: ${d[valueKey]?.toLocaleString()}`}
+              style={{
+                width: '100%', borderRadius: '4px 4px 0 0',
+                height: `${Math.max(pct, 4)}%`,
+                background: `linear-gradient(180deg, ${color}, ${color}88)`,
+                transition: 'height 0.6s ease',
+                cursor: 'default',
+              }}
+            />
+            <span style={{ fontSize: '0.6rem', color: 'var(--text-secondary)', whiteSpace: 'nowrap', overflow: 'hidden', maxWidth: '100%', textAlign: 'center' }}>
+              {d[labelKey]}
+            </span>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
+/* ─── Gauge (sell-through) ───────────────────────────────────────────────── */
+const Gauge = ({ value, max = 100, color = '#10b981' }) => {
+  const pct = Math.min(100, (value / max) * 100);
+  const r = 36, circ = 2 * Math.PI * r;
+  const dash = (pct / 100) * circ;
+  return (
+    <svg width="100" height="60" viewBox="0 0 100 60">
+      <path d="M 10 55 A 40 40 0 0 1 90 55" fill="none" stroke="var(--border-color)" strokeWidth="10" strokeLinecap="round" />
+      <path d="M 10 55 A 40 40 0 0 1 90 55" fill="none" stroke={color} strokeWidth="10" strokeLinecap="round"
+        strokeDasharray={`${(pct / 100) * 125.66} 125.66`} style={{ transition: 'stroke-dasharray 1s ease' }} />
+      <text x="50" y="52" textAnchor="middle" fontSize="13" fontWeight="800" fill={color}>{value}%</text>
+    </svg>
+  );
+};
+
+/* ─── Stat Card ──────────────────────────────────────────────────────────── */
+const StatCard = ({ icon: Icon, iconColor, borderColor, title, value, sub, trend }) => (
+  <div style={{ ...S.card, borderTop: `3px solid ${borderColor}` }}>
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
+      <div style={{ width: 40, height: 40, borderRadius: 10, background: `${iconColor}18`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <Icon size={20} color={iconColor} />
+      </div>
+      {trend !== undefined && (
+        <span style={{ fontSize: '0.75rem', color: trend >= 0 ? '#10b981' : '#ef4444', display: 'flex', alignItems: 'center', gap: 2 }}>
+          <TrendingUp size={12} /> {trend >= 0 ? '+' : ''}{trend}%
+        </span>
+      )}
+    </div>
+    <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', margin: '0 0 4px', textTransform: 'uppercase', letterSpacing: '0.5px', fontWeight: 500 }}>{title}</p>
+    <p style={{ fontSize: '2.2rem', fontWeight: 800, color: 'var(--text-primary)', margin: 0, lineHeight: 1 }}>{value}</p>
+    {sub && <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginTop: 6 }}>{sub}</p>}
+  </div>
+);
+
+/* ─── Section heading ────────────────────────────────────────────────────── */
+const SectionHead = ({ icon: Icon, label, color = 'var(--primary-color)' }) => (
+  <h2 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: 8, margin: '0 0 1.25rem' }}>
+    <Icon size={20} color={color} /> {label}
+  </h2>
+);
+
+/* ─── Log action icon map ────────────────────────────────────────────────── */
+const LOG_META = {
+  'Event Created': { color: '#10b981', Icon: Rocket },
+  'Event Updated': { color: '#3b82f6', Icon: PenLine },
+  'Event Deleted': { color: '#ef4444', Icon: Trash2 },
+  'Login':         { color: '#8b5cf6', Icon: LogIn },
+};
+
+/* ════════════════════════════════════════════════════════════════════════════
+   MAIN COMPONENT
+════════════════════════════════════════════════════════════════════════════ */
 const Dashboard = () => {
   const { user } = useContext(AuthContext);
-  const [stats, setStats] = useState({ events: 0, applications: 0, bookmarks: 0 });
+  const [analytics, setAnalytics] = useState(null);
   const [logs, setLogs] = useState([]);
+  const [bookmarks, setBookmarks] = useState(0);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchStats = async () => {
+    if (!user) return;
+
+    const fetchAll = async () => {
       try {
-        if (!user) return;
-        const [evRes, appRes, bkRes, logRes] = await Promise.all([
-          api.get('/events').catch(() => ({ data: [] })),
-          user.role !== 'Attendee' ? api.get('/applications').catch(() => ({ data: [] })) : Promise.resolve({ data: [] }),
+        const [logRes, bkRes] = await Promise.all([
+          user.role !== 'Attendee' ? api.get('/logs').catch(() => ({ data: [] })) : Promise.resolve({ data: [] }),
           api.get('/bookmarks').catch(() => ({ data: [] })),
-          user.role !== 'Attendee' ? api.get('/logs').catch(() => ({ data: [] })) : Promise.resolve({ data: [] })
         ]);
-
-        let filteredEvents = evRes.data;
-        if (user.role === 'Organizer') {
-          filteredEvents = evRes.data.filter(e => e.organizer?._id === user._id);
-        }
-
-        setStats({
-          events: filteredEvents.length,
-          applications: appRes.data.length,
-          bookmarks: bkRes.data.length,
-          ticketsBooked: Math.floor(filteredEvents.reduce((sum, e) => sum + (e.capacity || 50), 0) * 0.85) + (appRes.data.length * 2),
-          totalRevenue: Math.floor(filteredEvents.reduce((sum, e) => sum + ((e.price || 25) * (e.capacity ? e.capacity * 0.85 : 42)), 0)),
-          websiteVisits: filteredEvents.length * 340 + appRes.data.length * 12 + 1245,
-          userBehaviorPct: 78 // Dynamic base percentage
-        });
         setLogs(logRes.data);
+        setBookmarks(bkRes.data.length);
+
+        if (user.role === 'Organizer') {
+          const { data } = await api.get('/analytics/organizer');
+          setAnalytics(data);
+        }
       } catch (err) {
         console.error(err);
+      } finally {
+        setLoading(false);
       }
     };
-    fetchStats();
+    fetchAll();
   }, [user]);
 
-  if (!user) {
-    return (
-      <div style={{ textAlign: 'center', marginTop: '3rem' }}>
-        <h2 style={{ color: 'var(--primary-color)' }}>Welcome to EventSphere</h2>
-        <p style={{ color: 'var(--text-secondary)' }}>Please login from the side to access your capabilities.</p>
-      </div>
-    );
-  }
+  if (!user) return (
+    <div style={{ textAlign: 'center', marginTop: '3rem' }}>
+      <h2 style={{ color: 'var(--primary-color)' }}>Welcome to EventSphere</h2>
+      <p style={{ color: 'var(--text-secondary)' }}>Please login to access your dashboard.</p>
+    </div>
+  );
 
-  if (user.role === 'Attendee') {
-    return <Navigate to="/" />;
-  }
+  if (user.role === 'Attendee') return <Navigate to="/" />;
 
-  const actionColors = {
-    'Event Created': { bg: 'rgba(16,185,129,0.1)', border: 'rgba(16,185,129,0.3)', dot: '#10b981', icon: '🚀' },
-    'Event Updated': { bg: 'rgba(59,130,246,0.1)', border: 'rgba(59,130,246,0.3)', dot: '#3b82f6', icon: '✏️' },
-    'Event Deleted': { bg: 'rgba(239,68,68,0.1)', border: 'rgba(239,68,68,0.3)', dot: '#ef4444', icon: '🗑️' },
-    'Login': { bg: 'rgba(139,92,246,0.1)', border: 'rgba(139,92,246,0.3)', dot: '#8b5cf6', icon: '🔑' },
-  };
+  const ov = analytics?.overview || {};
 
-  const getLogStyle = (action) => actionColors[action] || { bg: 'rgba(100,116,139,0.08)', border: 'rgba(100,116,139,0.2)', dot: '#64748b', icon: '📋' };
+  /* ── type breakdown bars ── */
+  const typeData = Object.entries(analytics?.typeBreakdown || {}).map(([k, v]) => ({ label: k, tickets: v }));
+  /* ── category bars ── */
+  const catData  = Object.entries(analytics?.categoryBreakdown || {}).map(([k, v]) => ({ label: k, count: v }));
 
   return (
-    <div>
-      <div style={{ marginBottom: '2rem' }}>
-        <h1 style={{ fontSize: 'clamp(1.4rem, 4vw, 1.8rem)', marginBottom: '0.5rem', color: 'var(--text-primary)' }}>
-          Welcome back, <span style={{ color: 'var(--primary-color)' }}>{user.name}</span>! 👋
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem' }}>
+
+      {/* ── Header ── */}
+      <div>
+        <h1 style={{ fontSize: 'clamp(1.4rem,4vw,1.8rem)', marginBottom: '0.4rem', color: 'var(--text-primary)' }}>
+          Welcome back, <span style={{ color: 'var(--primary-color)' }}>{user.name}</span>
         </h1>
-        <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem' }}>
-          Here's your real-time overview. Monitor performance and track recent activity.
+        <p style={{ color: 'var(--text-secondary)', fontSize: '0.93rem', margin: 0 }}>
+          {user.role === 'Organizer'
+            ? 'Your real-time organizer analytics — every number pulled live from the database.'
+            : 'Here's your platform overview. Monitor performance and track recent activity.'}
         </p>
       </div>
 
-      {/* Stats Grid */}
-      <div style={styles.grid}>
-        <div style={{ ...styles.card, borderTop: '3px solid var(--primary-color)' }}>
-          <div style={styles.cardIcon}>📅</div>
-          <h3 style={styles.cardTitle}>{user.role === 'Organizer' ? 'My Managed Events' : 'Total Platform Events'}</h3>
-          <p style={styles.cardData}>{stats.events}</p>
-          <p style={styles.cardSubtext}>{user.role === 'Organizer' ? 'Active events you created' : 'All events on platform'}</p>
-        </div>
-        {user.role !== 'Attendee' && (
-          <div style={{ ...styles.card, borderTop: '3px solid #ec4899' }}>
-            <div style={styles.cardIcon}>📝</div>
-            <h3 style={styles.cardTitle}>{user.role === 'Organizer' ? 'Pending Applications' : 'My Applications'}</h3>
-            <p style={{ ...styles.cardData, color: '#ec4899' }}>{stats.applications}</p>
-            <p style={styles.cardSubtext}>Booth applications received</p>
-          </div>
-        )}
-        <div style={{ ...styles.card, borderTop: '3px solid #f59e0b' }}>
-          <div style={styles.cardIcon}>🔖</div>
-          <h3 style={styles.cardTitle}>My Bookmarks</h3>
-          <p style={{ ...styles.cardData, color: '#f59e0b' }}>{stats.bookmarks}</p>
-          <p style={styles.cardSubtext}>Events saved to your list</p>
-        </div>
-      </div>
-
-      {/* Analytics Section */}
-      {user.role === 'Organizer' && (
-        <div style={{ marginTop: '3rem' }}>
-          <h2 style={styles.sectionHeading}>
-            <BarChart2 size={22} color="#8b5cf6" />
-            Platform & Organizer Analytics
-          </h2>
-          <div style={{ ...styles.grid, gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))' }}>
-            <div style={{ ...styles.card, borderLeft: '4px solid #8b5cf6' }}>
-              <div style={styles.cardHeaderBox}>
-                <h3 style={styles.cardTitle}>Tickets Booked</h3>
-                <span style={{ padding: '4px 8px', backgroundColor: 'rgba(139,92,246,0.1)', color: '#8b5cf6', borderRadius: '8px', fontSize: '1rem' }}>🎟️</span>
-              </div>
-              <p style={{ ...styles.cardData, color: '#8b5cf6' }}>{stats.ticketsBooked?.toLocaleString() || 0}</p>
-              <p style={{ fontSize: '0.82rem', color: '#10b981', marginTop: '8px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <TrendingUp size={13} /> Highly Booked This Week
-              </p>
-            </div>
-            
-            <div style={{ ...styles.card, borderLeft: '4px solid #10b981' }}>
-              <div style={styles.cardHeaderBox}>
-                <h3 style={styles.cardTitle}>Revenue Earned</h3>
-                <span style={{ padding: '4px 8px', backgroundColor: 'rgba(16,185,129,0.1)', color: '#10b981', borderRadius: '8px', fontSize: '1rem' }}>💰</span>
-              </div>
-              <p style={{ ...styles.cardData, color: '#10b981' }}>${stats.totalRevenue?.toLocaleString() || 0}</p>
-              <p style={{ fontSize: '0.82rem', color: '#10b981', marginTop: '8px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <TrendingUp size={13} /> +12% from last month
-              </p>
-            </div>
-            
-            <div style={{ ...styles.card, borderLeft: '4px solid #f59e0b' }}>
-              <div style={styles.cardHeaderBox}>
-                <h3 style={styles.cardTitle}>Website Visitors</h3>
-                <span style={{ padding: '4px 8px', backgroundColor: 'rgba(245,158,11,0.1)', color: '#f59e0b', borderRadius: '8px', fontSize: '1rem' }}>🌐</span>
-              </div>
-              <p style={{ ...styles.cardData, color: '#f59e0b' }}>{stats.websiteVisits?.toLocaleString() || 0}</p>
-              <p style={{ fontSize: '0.82rem', color: '#f59e0b', marginTop: '8px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <Users size={13} /> Active Traffic
-              </p>
-            </div>
-
-            <div style={{ ...styles.card, borderLeft: '4px solid #ec4899' }}>
-              <div style={styles.cardHeaderBox}>
-                <h3 style={styles.cardTitle}>User Behavior (Retention)</h3>
-                <span style={{ padding: '4px 8px', backgroundColor: 'rgba(236,72,153,0.1)', color: '#ec4899', borderRadius: '8px', fontSize: '1rem' }}>📈</span>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
-                <p style={{ ...styles.cardData, color: '#ec4899' }}>{stats.userBehaviorPct || 0}%</p>
-                <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Returning</span>
-              </div>
-              
-              <div style={{ marginTop: '12px', width: '100%', height: '6px', backgroundColor: 'var(--border-color)', borderRadius: '3px', overflow: 'hidden' }}>
-                <div style={{ height: '100%', width: `${stats.userBehaviorPct || 0}%`, backgroundColor: '#ec4899', borderRadius: '3px' }} />
-              </div>
-            </div>
-          </div>
+      {/* ── Loading skeleton ── */}
+      {loading && (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(200px,1fr))', gap: '1.25rem' }}>
+          {[1,2,3,4].map(i => (
+            <div key={i} style={{ ...S.card, height: 120, background: 'linear-gradient(90deg,var(--bg-surface) 25%,var(--border-color) 50%,var(--bg-surface) 75%)', backgroundSize: '200% 100%', animation: 'shimmer 1.5s infinite', borderRadius: 14 }} />
+          ))}
+          <style>{`@keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }`}</style>
         </div>
       )}
 
-      {/* Activity Logs */}
-      {user.role !== 'Attendee' && (
-        <div style={{ marginTop: '3rem' }}>
-          <h2 style={styles.sectionHeading}>
-            <Activity size={22} color="var(--primary-color)" />
-            Recent Activity Logs
-          </h2>
+      {/* ── Organizer Analytics ── */}
+      {!loading && user.role === 'Organizer' && analytics && (
+        <>
+          {/* Overview stat cards */}
+          <div style={S.grid4}>
+            <StatCard icon={Calendar}    iconColor="var(--primary-color)" borderColor="var(--primary-color)" title="Total Events"       value={ov.totalEvents ?? 0}        sub={`${ov.upcomingEvents ?? 0} upcoming · ${ov.pastEvents ?? 0} past`} />
+            <StatCard icon={Ticket}      iconColor="#8b5cf6"              borderColor="#8b5cf6"              title="Tickets Sold"       value={(ov.totalTickets ?? 0).toLocaleString()}   sub="Active bookings" />
+            <StatCard icon={DollarSign}  iconColor="#10b981"              borderColor="#10b981"              title="Total Revenue"      value={`Rs. ${(ov.totalRevenue ?? 0).toLocaleString()}`}  sub="Across all events" />
+            <StatCard icon={Users}       iconColor="#f59e0b"              borderColor="#f59e0b"              title="Unique Attendees"   value={(ov.uniqueAttendees ?? 0).toLocaleString()}  sub="Distinct ticket holders" />
+          </div>
+
+          <div style={S.grid4}>
+            <StatCard icon={Target}      iconColor="#ec4899"              borderColor="#ec4899"              title="Sell-Through Rate"  value={`${ov.sellThroughRate ?? 0}%`}  sub="Tickets sold vs capacity" />
+            <StatCard icon={FileText}    iconColor="#3b82f6"              borderColor="#3b82f6"              title="Applications"       value={ov.totalApplications ?? 0}      sub="Booth applications received" />
+            <StatCard icon={Bookmark}    iconColor="#f59e0b"              borderColor="#f59e0b"              title="Bookmarks"          value={ov.totalBookmarks ?? 0}         sub="Users saved your events" />
+            <StatCard icon={Globe}       iconColor="#06b6d4"              borderColor="#06b6d4"              title="Events Upcoming"    value={ov.upcomingEvents ?? 0}         sub="Scheduled ahead" />
+          </div>
+
+          {/* Monthly Revenue + Tickets charts */}
+          <div style={S.twoCol}>
+            <div style={S.card}>
+              <SectionHead icon={BarChart2} label="Monthly Revenue (Last 6 Months)" color="#10b981" />
+              {(analytics.monthlyData || []).every(d => d.revenue === 0)
+                ? <EmptyChart label="No revenue yet" />
+                : <BarChart data={analytics.monthlyData} valueKey="revenue" labelKey="month" color="#10b981" height={130} />
+              }
+            </div>
+            <div style={S.card}>
+              <SectionHead icon={Ticket} label="Monthly Tickets Sold (Last 6 Months)" color="#8b5cf6" />
+              {(analytics.monthlyData || []).every(d => d.tickets === 0)
+                ? <EmptyChart label="No ticket sales yet" />
+                : <BarChart data={analytics.monthlyData} valueKey="tickets" labelKey="month" color="#8b5cf6" height={130} />
+              }
+            </div>
+          </div>
+
+          {/* Top Events + Sell-Through Gauge */}
+          <div style={S.twoCol}>
+            <div style={S.card}>
+              <SectionHead icon={Award} label="Top Events by Ticket Sales" color="#f59e0b" />
+              {(analytics.topEvents || []).length === 0
+                ? <EmptyChart label="No events created yet" />
+                : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                    {analytics.topEvents.map((ev, i) => {
+                      const pct = ev.capacity > 0 ? Math.min(100, Math.round((ev.tickets / ev.capacity) * 100)) : 0;
+                      return (
+                        <div key={ev._id} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                          <span style={{ width: 22, height: 22, borderRadius: '50%', background: i === 0 ? '#f59e0b' : 'var(--border-color)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', fontWeight: 800, color: i === 0 ? '#fff' : 'var(--text-secondary)', flexShrink: 0 }}>{i + 1}</span>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{ev.title}</div>
+                            <div style={{ height: 5, background: 'var(--border-color)', borderRadius: 3, marginTop: 4, overflow: 'hidden' }}>
+                              <div style={{ height: '100%', width: `${pct}%`, background: 'linear-gradient(90deg,#8b5cf6,#ec4899)', borderRadius: 3, transition: 'width 0.8s ease' }} />
+                            </div>
+                          </div>
+                          <span style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', flexShrink: 0 }}>{ev.tickets} / {ev.capacity}</span>
+                          <span style={{ fontSize: '0.78rem', color: '#10b981', fontWeight: 700, flexShrink: 0 }}>Rs. {ev.revenue.toLocaleString()}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )
+              }
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+              {/* Sell-through gauge */}
+              <div style={{ ...S.card, textAlign: 'center' }}>
+                <SectionHead icon={Target} label="Overall Sell-Through" color="#ec4899" />
+                <Gauge value={ov.sellThroughRate ?? 0} color="#ec4899" />
+                <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: 8 }}>
+                  {ov.totalTickets ?? 0} tickets sold of {(analytics.topEvents || []).reduce((s, e) => s + e.capacity, 0)} total capacity
+                </p>
+              </div>
+
+              {/* Ticket type breakdown */}
+              {typeData.length > 0 && (
+                <div style={S.card}>
+                  <SectionHead icon={Ticket} label="Ticket Type Breakdown" color="#8b5cf6" />
+                  <BarChart data={typeData} valueKey="tickets" labelKey="label" color="#8b5cf6" height={80} />
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Category breakdown */}
+          {catData.length > 0 && (
+            <div style={S.card}>
+              <SectionHead icon={Flame} label="Events by Category" color="#f59e0b" />
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
+                {catData.map(c => (
+                  <div key={c.label} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 14px', borderRadius: 20, background: 'rgba(109,40,217,0.08)', border: '1px solid rgba(109,40,217,0.2)' }}>
+                    <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--primary-color)' }}>{c.count}</span>
+                    <span style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>{c.label}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Recent ticket sales */}
+          {(analytics.recentTickets || []).length > 0 && (
+            <div style={S.card}>
+              <SectionHead icon={ArrowUpRight} label="Recent Ticket Sales" color="#10b981" />
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {analytics.recentTickets.map((t, i) => (
+                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px', background: 'var(--bg-color)', borderRadius: 10, border: '1px solid var(--border-color)' }}>
+                    <CheckCircle size={16} color="#10b981" style={{ flexShrink: 0 }} />
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontWeight: 600, fontSize: '0.88rem', color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.eventTitle}</div>
+                      <div style={{ fontSize: '0.76rem', color: 'var(--text-secondary)' }}>{t.ticketType}</div>
+                    </div>
+                    <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#10b981', flexShrink: 0 }}>Rs. {t.price.toLocaleString()}</span>
+                    <span style={{ fontSize: '0.73rem', color: 'var(--text-secondary)', flexShrink: 0, display: 'flex', alignItems: 'center', gap: 4 }}>
+                      <Clock size={11} /> {new Date(t.purchaseDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </>
+      )}
+
+      {/* ── Non-organizer basic overview ── */}
+      {!loading && user.role !== 'Organizer' && (
+        <div style={S.grid4}>
+          <StatCard icon={Bookmark} iconColor="#f59e0b" borderColor="#f59e0b" title="My Bookmarks" value={bookmarks} sub="Events saved to your list" />
+        </div>
+      )}
+
+      {/* ── Activity Logs ── */}
+      {!loading && user.role !== 'Attendee' && (
+        <div style={S.card}>
+          <SectionHead icon={Activity} label="Recent Activity Logs" />
           {logs.length === 0 ? (
-            <div style={styles.emptyLogs}>
-              <Info size={28} style={{ marginBottom: '0.75rem', opacity: 0.4 }} />
-              <p style={{ margin: 0, fontWeight: 600, color: 'var(--text-primary)' }}>No activities yet</p>
-              <p style={{ margin: '0.25rem 0 0', fontSize: '0.87rem', color: 'var(--text-secondary)' }}>Your activity will appear here once you start creating events.</p>
+            <div style={S.empty}>
+              <Info size={28} style={{ opacity: 0.35, marginBottom: 8 }} />
+              <p style={{ margin: 0, fontWeight: 600 }}>No activities yet</p>
+              <p style={{ margin: '4px 0 0', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Your activity will appear here once you start creating events.</p>
             </div>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              {logs.map((log) => {
-                const logStyle = getLogStyle(log.action);
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {logs.map(log => {
+                const meta = LOG_META[log.action] || { color: '#64748b', Icon: FileText };
+                const { color, Icon: LogIcon } = meta;
                 return (
-                  <div key={log._id} style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', backgroundColor: logStyle.bg, padding: '1rem 1.25rem', borderRadius: '12px', border: `1px solid ${logStyle.border}`, transition: '0.2s' }}>
-                    <div style={{ fontSize: '1.3rem', lineHeight: 1, flexShrink: 0, marginTop: '2px' }}>{logStyle.icon}</div>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontWeight: 700, color: 'var(--text-primary)', marginBottom: '3px', fontSize: '0.98rem' }}>{log.action}</div>
-                      <div style={{ fontSize: '0.88rem', color: 'var(--text-secondary)', lineHeight: 1.5, wordBreak: 'break-word' }}>{log.details}</div>
+                  <div key={log._id} style={{ display: 'flex', alignItems: 'flex-start', gap: 14, background: `${color}10`, border: `1px solid ${color}30`, borderRadius: 12, padding: '12px 16px' }}>
+                    <div style={{ width: 34, height: 34, borderRadius: 9, background: `${color}18`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      <LogIcon size={16} color={color} />
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '0.78rem', color: 'var(--text-secondary)', whiteSpace: 'nowrap', flexShrink: 0, marginTop: '3px' }}>
-                      <Clock size={12} />
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontWeight: 700, fontSize: '0.92rem', color: 'var(--text-primary)', marginBottom: 2 }}>{log.action}</div>
+                      <div style={{ fontSize: '0.84rem', color: 'var(--text-secondary)', lineHeight: 1.5, wordBreak: 'break-word' }}>{log.details}</div>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: '0.73rem', color: 'var(--text-secondary)', whiteSpace: 'nowrap', flexShrink: 0, marginTop: 2 }}>
+                      <Clock size={11} />
                       {new Date(log.createdAt).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                     </div>
                   </div>
@@ -197,69 +333,23 @@ const Dashboard = () => {
   );
 };
 
-const styles = {
-  grid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-    gap: '1.25rem'
-  },
+const EmptyChart = ({ label }) => (
+  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: 100, color: 'var(--text-secondary)', gap: 8 }}>
+    <AlertCircle size={22} style={{ opacity: 0.4 }} />
+    <span style={{ fontSize: '0.82rem' }}>{label}</span>
+  </div>
+);
+
+const S = {
+  grid4: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(200px,1fr))', gap: '1.25rem' },
+  twoCol: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(300px,1fr))', gap: '1.25rem' },
   card: {
-    backgroundColor: 'var(--bg-surface)',
-    padding: '1.5rem',
-    borderRadius: '14px',
-    border: '1px solid var(--border-color)',
-    boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
-    transition: '0.2s',
-    position: 'relative',
-    overflow: 'hidden',
+    background: 'var(--bg-surface)', borderRadius: 14, border: '1px solid var(--border-color)',
+    padding: '1.4rem', boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
   },
-  cardIcon: {
-    fontSize: '1.8rem',
-    marginBottom: '0.75rem',
-    lineHeight: 1,
-  },
-  cardTitle: {
-    fontSize: '0.88rem',
-    color: 'var(--text-secondary)',
-    marginBottom: '0.5rem',
-    fontWeight: 500,
-    textTransform: 'uppercase',
-    letterSpacing: '0.5px',
-  },
-  cardHeaderBox: {
-    display: 'flex', 
-    justifyContent: 'space-between', 
-    alignItems: 'flex-start',
-    marginBottom: '0.5rem'
-  },
-  cardData: {
-    fontSize: '2.6rem',
-    fontWeight: 800,
-    color: 'var(--primary-color)',
-    margin: 0,
-    lineHeight: 1,
-  },
-  cardSubtext: {
-    fontSize: '0.8rem',
-    color: 'var(--text-secondary)',
-    marginTop: '0.5rem',
-  },
-  sectionHeading: {
-    fontSize: '1.25rem',
-    marginBottom: '1.25rem',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
-    color: 'var(--text-primary)',
-    fontWeight: 700,
-  },
-  emptyLogs: {
-    padding: '2.5rem 2rem',
-    textAlign: 'center',
-    backgroundColor: 'var(--bg-surface)',
-    borderRadius: '12px',
-    border: '1px dashed var(--border-color)',
-    color: 'var(--text-secondary)',
+  empty: {
+    padding: '2rem', textAlign: 'center', background: 'var(--bg-color)',
+    borderRadius: 10, border: '1px dashed var(--border-color)', color: 'var(--text-secondary)',
   },
 };
 

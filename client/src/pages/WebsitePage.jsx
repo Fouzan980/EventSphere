@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Ticket, Mail, ArrowRight, CheckCircle, Loader2, Send } from 'lucide-react';
+import { Ticket, Mail, ArrowRight, CheckCircle, Loader2, Send, MapPin, Globe, Rocket, Search, Wrench, Zap, BarChart2, CreditCard } from 'lucide-react';
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../utils/api';
@@ -147,7 +147,7 @@ const PageEventsCategory = ({ category }) => {
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontWeight: 700, fontSize: '0.92rem', color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{ev.title}</div>
                   <div style={{ fontSize: '0.75rem', color: '#FF2A5F', fontWeight: 600, marginTop: 2 }}>{new Date(ev.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</div>
-                  <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>📍 {ev.location || 'TBA'}</div>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: 4 }}><MapPin size={10}/> {ev.location || 'TBA'}</div>
                 </div>
               </motion.div>
             ))}
@@ -188,18 +188,24 @@ const PageListEvent = () => {
         <p style={{ color: 'var(--text-secondary)', lineHeight: 1.8, fontSize: '0.95rem', marginBottom: '1.5rem' }}>
           Empower your events with state-of-the-art management tools — real-time analytics, instant payouts, and custom floor plans. Fill the form and our team will reach out within 24 hours.
         </p>
-        {[['🎯', 'Instant Ticketing', 'Go live in minutes with our setup wizard.'],
-          ['📊', 'Real-Time Analytics', 'Track sales, check-ins and revenue live.'],
-          ['💳', 'Fast Payouts', 'Get paid within 48 hours of your event.'],
-        ].map(([icon, title, desc]) => (
-          <div key={title} style={{ display: 'flex', gap: '0.85rem', marginBottom: '1rem', alignItems: 'flex-start' }}>
-            <div style={{ fontSize: '1.3rem', flexShrink: 0 }}>{icon}</div>
-            <div>
-              <div style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--text-primary)' }}>{title}</div>
-              <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{desc}</div>
+        {[['Zap', 'Instant Ticketing', 'Go live in minutes with our setup wizard.'],
+          ['BarChart2', 'Real-Time Analytics', 'Track sales, check-ins and revenue live.'],
+          ['CreditCard', 'Fast Payouts', 'Get paid within 48 hours of your event.'],
+        ].map(([iconName, title, desc]) => {
+          const iconMap = { Zap, BarChart2, CreditCard };
+          const Icon = iconMap[iconName];
+          return (
+            <div key={title} style={{ display: 'flex', gap: '0.85rem', marginBottom: '1rem', alignItems: 'flex-start' }}>
+              <div style={{ width: 34, height: 34, borderRadius: 8, background: 'rgba(255,42,95,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <Icon size={16} color="#FF2A5F" />
+              </div>
+              <div>
+                <div style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--text-primary)' }}>{title}</div>
+                <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{desc}</div>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Right — compact form card */}
@@ -225,10 +231,10 @@ const PageListEvent = () => {
 
 const PageAboutUs = () => {
   const sections = [
-    { icon: '🚀', title: 'How We Started',    text: 'Born in 2023 with one vision — unify live entertainment discovery and ticketing into a single seamless platform.',        accent: '#FF2A5F' },
-    { icon: '🔍', title: 'The Problem We Saw', text: 'Fans faced crashing sites and hidden fees. Organizers juggled spreadsheets and manual validators just to run a concert.',   accent: '#a855f7' },
-    { icon: '🛠️', title: 'The Journey',        text: 'Late-night sessions, live stress tests, and direct work with venue managers forged the robust ecosystem we built.',          accent: '#3b82f6' },
-    { icon: '⚡', title: 'Where We Stand',      text: 'Thousands of secure transactions per minute, dynamic directories, and zero-friction hosting from workshops to global expos.', accent: '#10b981' },
+    { icon: 'Rocket',   title: 'How We Started',    text: 'Born in 2023 with one vision — unify live entertainment discovery and ticketing into a single seamless platform.',        accent: '#FF2A5F' },
+    { icon: 'Search',   title: 'The Problem We Saw', text: 'Fans faced crashing sites and hidden fees. Organizers juggled spreadsheets and manual validators just to run a concert.',   accent: '#a855f7' },
+    { icon: 'Wrench',   title: 'The Journey',        text: 'Late-night sessions, live stress tests, and direct work with venue managers forged the robust ecosystem we built.',          accent: '#3b82f6' },
+    { icon: 'Zap',      title: 'Where We Stand',     text: 'Thousands of secure transactions per minute, dynamic directories, and zero-friction hosting from workshops to global expos.', accent: '#10b981' },
   ];
 
   return (
@@ -261,7 +267,9 @@ const PageAboutUs = () => {
             onMouseOver={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = `0 8px 24px ${accent}22`; }}
             onMouseOut={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none'; }}
           >
-            <div style={{ fontSize: '1.5rem' }}>{icon}</div>
+            <div style={{ width: 40, height: 40, borderRadius: 10, background: `${accent}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '0.5rem' }}>
+              {(() => { const iconMap = { Rocket, Search, Wrench, Zap }; const I = iconMap[icon]; return I ? <I size={20} color={accent}/> : null; })()}
+            </div>
             <h3 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 800, color: '#f1f5f9' }}>{title}</h3>
             <p style={{ margin: 0, fontSize: '0.82rem', lineHeight: '1.6', color: '#94a3b8' }}>{text}</p>
           </div>
@@ -270,7 +278,10 @@ const PageAboutUs = () => {
 
       {/* Closing banner */}
       <div style={{ background: 'linear-gradient(135deg,#FF2A5F18,#a855f718)', border: '1px solid rgba(255,42,95,0.2)', borderRadius: 20, padding: '2rem', display: 'flex', alignItems: 'center', gap: '1.5rem', flexWrap: 'wrap' }}>
-        <div style={{ fontSize: '2.5rem' }}>🌍🚀</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', fontSize: '2rem' }}>
+          <Globe size={36} color="#FF2A5F" style={{flexShrink:0}}/>
+          <Rocket size={36} color="#a855f7" style={{flexShrink:0}}/>
+        </div>
         <div>
           <h3 style={{ margin: '0 0 6px', color: '#f1f5f9', fontWeight: 800, fontSize: '1.2rem' }}>This is just the beginning.</h3>
           <p style={{ margin: 0, color: '#94a3b8', fontSize: '0.95rem', lineHeight: 1.7 }}>

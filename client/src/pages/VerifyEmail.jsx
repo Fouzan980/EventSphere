@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Mail, CheckCircle, XCircle, Loader2, ArrowRight } from 'lucide-react';
 import { toast } from 'react-toastify';
@@ -7,13 +7,27 @@ import api from '../utils/api';
 
 const VerifyEmail = () => {
   const { token } = useParams();
-  const [status, setStatus] = useState(token ? 'verifying' : 'resend_only'); // verifying, success, error, resend_only, resending
+  const [searchParams] = useSearchParams();
+  const [status, setStatus] = useState(() => {
+    // Handle redirect from GET /api/auth/verify-email/:token (Gmail link click)
+    if (searchParams.get('success') === '1') return 'success';
+    if (searchParams.get('error')) return 'error';
+    return token ? 'verifying' : 'resend_only';
+  });
   const [email, setEmail] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
-  const [successMessage, setSuccessMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState(() => {
+    const err = searchParams.get('error');
+    if (err === 'invalid') return 'This verification link is invalid or has already expired. Request a new one below.';
+    if (err === 'server') return 'A server error occurred. Please try again or request a new link.';
+    return '';
+  });
+  const [successMessage, setSuccessMessage] = useState(() =>
+    searchParams.get('success') === '1' ? 'Your email has been successfully verified! You can now log in.' : ''
+  );
 
   useEffect(() => {
-    if (!token) return;
+    // Already resolved via query params (GET redirect) — skip POST call
+    if (!token || searchParams.get('success') || searchParams.get('error')) return;
 
     const verifyToken = async () => {
       try {

@@ -40,7 +40,7 @@ const PublicNavbar = () => {
   const [tickets, setTickets] = useState([]);
   const [ticketsLoading, setTicketsLoading] = useState(false);
   const [ticketTab, setTicketTab] = useState('upcoming');
-  const [bannerMessages, setBannerMessages] = useState(['Free Palestine 🇵🇸', 'Peace and Justice 🕊️', 'Standing in Solidarity 🌿']);
+  const [bannerMessages, setBannerMessages] = useState(['Free Palestine', 'Peace and Justice', 'Standing in Solidarity']);
   const fileRef = useRef();
 
   // Profile form state
@@ -460,7 +460,7 @@ const PublicNavbar = () => {
                 {/* Tabs */}
                 {!ticketsLoading && (
                   <div style={{display:'flex',gap:6,marginBottom:'1rem',background:'rgba(139,92,246,0.08)',borderRadius:10,padding:4}}>
-                    {[['upcoming','🗓 Upcoming'],['history','🕘 History']].map(([tab,label])=>(
+                    {[['upcoming','Upcoming'],['history','History']].map(([tab,label])=>(
                       <button key={tab} onClick={()=>setTicketTab(tab)}
                         style={{flex:1,padding:'7px 0',borderRadius:8,border:'none',fontWeight:700,fontSize:'0.82rem',cursor:'pointer',
                           background:ticketTab===tab?'linear-gradient(135deg,#7c3aed,#a855f7)':'transparent',
