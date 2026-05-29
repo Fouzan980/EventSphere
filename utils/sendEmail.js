@@ -13,7 +13,7 @@ const isEmailConfigured = () => {
 
 const sendEmail = async (options) => {
   if (!isEmailConfigured()) {
-    console.log(`📧 [Email skipped — credentials not configured] To: ${options.email} | Subject: ${options.subject}`);
+    console.log(`📧 [Email skipped — credentials not configured] To: ${options.email} | Subject: ${options.subject}\nMessage: ${options.message}`);
     return;
   }
 

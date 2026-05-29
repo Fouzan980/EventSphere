@@ -430,3 +430,88 @@ tr:hover td { background: rgba(0,0,0,0.02); }
     top: auto !important;
   }
 }
+
+/* ─────────────────────────── Floating Labels for Auth ─────────────────────────── */
+.auth-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+/* Adjust padding to shift text down for floating label space */
+.auth-input-wrapper .auth-input {
+  padding: 16px 14px 8px 42px !important;
+}
+
+/* Hide input placeholders when not focused so they do not overlap with label */
+.auth-input-wrapper .auth-input::placeholder {
+  color: transparent !important;
+  transition: color 0.2s ease;
+}
+
+.auth-input-wrapper .auth-input:focus::placeholder {
+  color: rgba(148, 163, 184, 0.4) !important;
+}
+
+.auth-floating-label {
+  position: absolute;
+  left: 42px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
+  font-size: 0.95rem;
+  pointer-events: none;
+  transition: all 0.2s ease-in-out;
+  padding: 0 4px;
+  background: transparent;
+  z-index: 2;
+}
+
+/* Floating states */
+.auth-input-wrapper .auth-input:focus ~ .auth-floating-label,
+.auth-input-wrapper .auth-input:not(:placeholder-shown) ~ .auth-floating-label,
+.auth-input-wrapper .auth-input:-webkit-autofill ~ .auth-floating-label,
+.auth-input-wrapper .auth-input:autofill ~ .auth-floating-label,
+.auth-input-wrapper .auth-select:focus ~ .auth-floating-label,
+.auth-input-wrapper .auth-select ~ .auth-floating-label {
+  top: 0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #FF2A5F !important;
+  transform: translateY(-50%);
+  background: #111422; /* dark color matching the card region to act as legend mask */
+  padding: 0 6px;
+  left: 12px;
+}
+
+/* Focus color change for inputs border and icon */
+.auth-input-wrapper .auth-input:focus {
+  border-color: #FF2A5F !important;
+  box-shadow: 0 0 0 3px rgba(255, 42, 95, 0.25) !important;
+}
+
+.auth-input-wrapper .auth-input:focus ~ .auth-input-icon {
+  color: #FF2A5F !important;
+}
+
+/* ── Select: suppress global SVG background-image arrow inside auth wrappers ── */
+.auth-input-wrapper .auth-select,
+.auth-select {
+  background-image: none !important;   /* kill the global SVG chevron */
+  padding-right: 42px !important;      /* space for our custom icon on the right */
+}
+
+/* Custom chevron icon sits on the right side of the select wrapper */
+.auth-select-icon {
+  position: absolute;
+  right: 14px;
+  pointer-events: none;
+  color: #94a3b8;
+  z-index: 2;
+  transition: color 0.2s ease;
+}
+
+.auth-input-wrapper .auth-select:focus ~ .auth-select-icon {
+  color: #FF2A5F;
+}

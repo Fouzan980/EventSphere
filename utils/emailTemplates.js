@@ -111,21 +111,32 @@ const welcomeEmail = (name, role = 'Attendee') => shell(`
 `);
 
 // ─── 2. Ticket / Event Booking Confirmation ───────────────────────────────────
-const ticketConfirmEmail = (name, event) => shell(`
-  <h2 style="margin:0 0 8px;color:#e2d9f3;font-size:24px;font-weight:700;">Booking Confirmed! 🎉</h2>
-  <p style="margin:0 0 24px;color:#c4b5fd;font-size:15px;line-height:1.7;">
-    Hi <strong style="color:#e9d5ff;">${name}</strong>, your ticket for <strong style="color:#a855f7;">${event.title}</strong> is confirmed. See you there!
-  </p>
-  ${infoBox([
-    ['📅 Date',     new Date(event.date).toLocaleDateString('en-US', { weekday:'long', year:'numeric', month:'long', day:'numeric' })],
-    ['🕐 Time',     event.time || 'TBA'],
-    ['📍 Location', event.location || 'TBA'],
-    ['🏷️ Category', event.category || 'General'],
-    ['💰 Price',    event.price === 0 ? 'Free' : `$${event.price}`],
-  ])}
-  <p style="margin:0;color:#c4b5fd;font-size:14px;line-height:1.7;">Keep this email as your booking reference. Check the dashboard for your full schedule.</p>
-  ${ctaBtn('http://localhost:5173/dashboard', 'View My Schedule')}
-`);
+const ticketConfirmEmail = (name, event, ticket = {}) => {
+  const cleanTicketId = ticket._id ? ticket._id.toString() : '';
+  const ticketNumber = cleanTicketId ? `ES-nd${cleanTicketId.slice(-8).toUpperCase()}` : 'TBA';
+  const ticketType = ticket.ticketType || 'Standard';
+  const priceDisplay = ticket.price !== undefined
+    ? (ticket.price === 0 ? 'FREE' : `Rs. ${ticket.price}`)
+    : (event.price === 0 ? 'FREE' : `Rs. ${event.price}`);
+
+  return shell(`
+    <h2 style="margin:0 0 8px;color:#e2d9f3;font-size:24px;font-weight:700;">Booking Confirmed! 🎉</h2>
+    <p style="margin:0 0 24px;color:#c4b5fd;font-size:15px;line-height:1.7;">
+      Hi <strong style="color:#e9d5ff;">${name}</strong>, your booking for <strong style="color:#a855f7;">${event.title}</strong> is complete. See you there!
+    </p>
+    \${infoBox([
+      ['🎟️ Ticket No', ticketNumber],
+      ['👤 Attendee',  name],
+      ['📅 Date',       event.date ? new Date(event.date).toLocaleDateString('en-US', { weekday:'long', year:'numeric', month:'long', day:'numeric' }) : 'TBA'],
+      ['🕐 Time',       event.time || 'TBA'],
+      ['📍 Location',   event.location || 'TBA'],
+      ['🏷️ Tier',       ticketType],
+      ['💰 Price',      priceDisplay],
+    ])}
+    <p style="margin:0;color:#c4b5fd;font-size:14px;line-height:1.7;">Keep this email as your booking reference. Please present either a printed copy or show it on your mobile device at entry.</p>
+    \${ctaBtn('http://localhost:5173/dashboard', 'View My Schedule')}
+  `);
+};
 
 // ─── 3. Application Submitted (Exhibitor) ─────────────────────────────────────
 const applicationSubmittedEmail = (name, eventTitle, companyName) => shell(`
@@ -310,6 +321,21 @@ const eventReminderEmail = (name, event) => shell(`
   ${ctaBtn(process.env.FRONTEND_URL ? process.env.FRONTEND_URL + '/dashboard/orders' : 'http://localhost:5173/dashboard/orders', 'View Ticket Details')}
 `);
 
+// ─── 12. Verification Email ──────────────────────────────────────────────
+const verificationEmail = (name, verificationUrl) => shell(`
+  <h2 style="margin:0 0 8px;color:#e2d9f3;font-size:24px;font-weight:700;">Verify Your Email Address ✉️</h2>
+  <p style="margin:0 0 24px;color:#c4b5fd;font-size:15px;line-height:1.7;">
+    Hi <strong style="color:#e9d5ff;">${name}</strong>, thank you for joining EventSphere!
+  </p>
+  <p style="margin:0 0 24px;color:#c4b5fd;font-size:15px;line-height:1.7;">
+    Please verify your email address by clicking the button below to activate your account.
+  </p>
+  ${ctaBtn(verificationUrl, 'Verify Email Address')}
+  <p style="margin:24px 0 0;color:#94a3b8;font-size:13px;line-height:1.7;">
+    If you did not create an account on EventSphere, please ignore this email.
+  </p>
+`);
+
 module.exports = {
   welcomeEmail,
   ticketConfirmEmail,
@@ -323,4 +349,5 @@ module.exports = {
   newApplicationNotifyEmail,
   contactEmail,
   eventReminderEmail,
+  verificationEmail,
 };

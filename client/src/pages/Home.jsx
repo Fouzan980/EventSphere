@@ -4,11 +4,12 @@ import api from '../utils/api';
 import { AuthContext } from '../context/AuthContext';
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Calendar, MapPin, Ticket, X, ChevronLeft, ChevronRight, Mic } from 'lucide-react';
+import { Search, Calendar, MapPin, Ticket, X, ChevronLeft, ChevronRight, Mic, Download, Users, Building2, Globe, Clock } from 'lucide-react';
 import { toast } from 'react-toastify';
 import PublicNavbar from '../components/layout/PublicNavbar';
 import { PageSkeleton } from '../components/Skeleton';
 import PaymentCheckout from '../components/PaymentCheckout';
+import { downloadTicketPDF } from '../utils/downloadTicket';
 const getBrandLogo = (domain) => `https://cdn.brandfetch.io/domain/${domain}/w/140/h/140/logo?c=1idWm8TWPtdWnIGpbBE`;
 
 const PARTNERS = [
@@ -65,7 +66,7 @@ const StatCounter = ({ icon, target, suffix, label }) => {
   const { count, ref } = useCounter(target);
   return (
     <div ref={ref} style={{ padding: '1.5rem 1rem', textAlign: 'center', position: 'relative' }}>
-      <div style={{ fontSize: '2.2rem', marginBottom: '0.5rem', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.08))' }}>{icon}</div>
+      <div style={{ fontSize: '2.2rem', marginBottom: '0.5rem', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.08))', display:'flex', alignItems:'center', justifyContent:'center' }}>{icon}</div>
       <div style={{ fontSize: 'clamp(1.8rem, 5vw, 2.6rem)', fontWeight: 900, color: 'var(--text-primary)', lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
         {count.toLocaleString()}{suffix}
       </div>
@@ -180,20 +181,28 @@ const Home = () => {
     if (!user) { navigate('/login'); return; }
     setBookingState(prev => ({ ...prev, [event._id]: 'loading' }));
     try {
-      await api.post(`/tickets/book/${event._id}`, {
+      const response = await api.post(`/tickets/book/${event._id}`, {
         ticketType: type,
         paymentMethod: paymentInfo.provider,
         paymentIntentId: paymentInfo.paymentIntentId,
       });
+      const ticket = response.data.ticket;
       setBookingState(prev => ({ ...prev, [event._id]: 'booked' }));
 
-      let bookedPrice = event.price || 0;
-      if (event.hasMultipleTickets && event.tickets?.length > 0) {
-        const matchedTicket = event.tickets.find(t => t.name === type);
-        bookedPrice = matchedTicket ? matchedTicket.price : 0;
-      }
+      let bookedPrice = ticket.price !== undefined ? ticket.price : (event.price || 0);
 
-      setSuccessMsg({ title: event.title, date: event.date, location: event.location, price: bookedPrice, email: user.email });
+      setSuccessMsg({
+        ticketId: ticket._id,
+        ticketType: ticket.ticketType,
+        price: bookedPrice,
+        title: event.title,
+        date: event.date,
+        time: event.time,
+        location: event.location,
+        email: user.email,
+        category: event.category,
+        poster: event.poster
+      });
     } catch (err) {
       const msg = err.response?.data?.message || 'Booking failed';
       setBookingState(prev => ({ ...prev, [event._id]: 'error' }));
@@ -349,10 +358,10 @@ const Home = () => {
         {/* ─── Animated Stats ─────────────────────────────────────────────── */}
         <section style={{ backgroundColor: 'var(--bg-surface)', borderBottom: '1px solid var(--border-color)', padding: 'clamp(2rem,5vw,3.5rem) 5%' }}>
           <div style={{ maxWidth: '1000px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '1rem' }}>
-            <StatCounter icon="🎪" target={1200} suffix="+" label="Events Hosted" />
-            <StatCounter icon="👥" target={85000} suffix="+" label="Happy Attendees" />
-            <StatCounter icon="🌍" target={12} suffix="+" label="Cities Covered" />
-            <StatCounter icon="🏢" target={50} suffix="+" label="Partner Companies" />
+            <StatCounter icon={<Calendar size={36} color="#FF2A5F" />} target={1200} suffix="+" label="Events Hosted" />
+            <StatCounter icon={<Users size={36} color="#8b5cf6" />} target={85000} suffix="+" label="Happy Attendees" />
+            <StatCounter icon={<Globe size={36} color="#06b6d4" />} target={12} suffix="+" label="Cities Covered" />
+            <StatCounter icon={<Building2 size={36} color="#f59e0b" />} target={50} suffix="+" label="Partner Companies" />
           </div>
         </section>
 
@@ -690,7 +699,7 @@ const Home = () => {
               <div style={{ display: 'flex', gap: '16px', color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
                 {selectedEventModal.date && <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Calendar size={14} />{new Date(selectedEventModal.date).toLocaleDateString()}</div>}
                 {selectedEventModal.location && <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><MapPin size={14} />{selectedEventModal.location}</div>}
-                {selectedEventModal.time && <div>🕐 {selectedEventModal.time}</div>}
+                {selectedEventModal.time && <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Clock size={14} />{selectedEventModal.time}</div>}
               </div>
               <p style={{ color: 'var(--text-secondary)', lineHeight: '1.65', marginBottom: '1.25rem' }}>{selectedEventModal.description || 'No description provided.'}</p>
 
@@ -720,7 +729,7 @@ const Home = () => {
 
               {selectedEventModal.sessions?.length > 0 && (
                 <div style={{ marginBottom: '1.25rem', borderTop: '1px solid var(--border-color)', paddingTop: '1.25rem' }}>
-                  <h3 style={{ margin: '0 0 1rem', fontSize: '1rem', color: 'var(--text-primary)' }}>📋 Schedule</h3>
+                  <h3 style={{ margin: '0 0 1rem', fontSize: '1rem', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '6px' }}><Calendar size={16} color="#8b5cf6" /> Schedule</h3>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
                     {selectedEventModal.sessions.map((s, i) => (
                       <div key={i} style={{ backgroundColor: 'var(--bg-color)', padding: '0.85rem 1rem', borderRadius: '10px', border: '1px solid var(--border-color)' }}>
@@ -807,11 +816,62 @@ const Home = () => {
             <p style={{ color: '#64748b', marginBottom: '1.5rem', fontSize: '0.9rem' }}>Email sent to <strong>{successMsg.email}</strong></p>
             <div style={{ backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '1.5rem', textAlign: 'left' }}>
               <h3 style={{ margin: '0 0 1rem', color: '#0F172A', borderBottom: '1px dashed #e2e8f0', paddingBottom: '0.75rem', fontSize: '1rem' }}>{successMsg.title}</h3>
-              <div style={S.tRow}><span>📅 Date</span><span>{successMsg.date ? new Date(successMsg.date).toLocaleDateString() : 'TBA'}</span></div>
-              <div style={S.tRow}><span>📍 Venue</span><span>{successMsg.location || 'TBA'}</span></div>
+              <div style={S.tRow}><span style={{display:'flex',alignItems:'center',gap:4}}><Calendar size={13} /> Date</span><span>{successMsg.date ? new Date(successMsg.date).toLocaleDateString() : 'TBA'}</span></div>
+              <div style={S.tRow}><span style={{display:'flex',alignItems:'center',gap:4}}><MapPin size={13} /> Venue</span><span>{successMsg.location || 'TBA'}</span></div>
               <div style={S.tRow}><span>💰 Price</span><span style={{ color: '#10b981', fontWeight: 700 }}>{successMsg.price === 0 ? 'FREE' : `Rs. ${successMsg.price}`}</span></div>
             </div>
-            <button style={{ ...S.btnBook, width: '100%', justifyContent: 'center', marginTop: '1.25rem', padding: '13px' }} onClick={() => setSuccessMsg(null)}>Close</button>
+            <button
+              style={{
+                ...S.btnBook,
+                width: '100%',
+                justifyContent: 'center',
+                marginTop: '1.25rem',
+                padding: '13px',
+                background: 'linear-gradient(135deg, #FF2A5F, #8b5cf6)',
+                border: 'none',
+                color: '#ffffff',
+                fontWeight: 700,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}
+              onClick={() => {
+                downloadTicketPDF({
+                  ticketId: successMsg.ticketId,
+                  ticketType: successMsg.ticketType,
+                  price: successMsg.price,
+                  eventTitle: successMsg.title,
+                  eventDate: successMsg.date,
+                  eventTime: successMsg.time,
+                  eventLocation: successMsg.location,
+                  buyerName: user ? (user.name || user.username) : 'Attendee',
+                  buyerEmail: user ? user.email : '',
+                  category: successMsg.category,
+                  poster: successMsg.poster
+                });
+              }}
+            >
+              <Download size={16} /> Download Ticket PDF
+            </button>
+            <button
+              style={{
+                width: '100%',
+                background: 'transparent',
+                border: '1px solid #cbd5e1',
+                borderRadius: '12px',
+                color: '#475569',
+                padding: '12px',
+                marginTop: '0.75rem',
+                cursor: 'pointer',
+                fontWeight: 600,
+                transition: 'all 0.2s'
+              }}
+              onClick={() => setSuccessMsg(null)}
+              onMouseOver={e => { e.currentTarget.style.backgroundColor = '#f1f5f9'; }}
+              onMouseOut={e => { e.currentTarget.style.backgroundColor = 'transparent'; }}
+            >
+              Close
+            </button>
           </motion.div>
         </div>
       )}

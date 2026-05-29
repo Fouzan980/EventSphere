@@ -10,6 +10,7 @@ import Register from './pages/Register';
 import WebsitePage from './pages/WebsitePage';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
+import VerifyEmail from './pages/VerifyEmail';
 import ExhibitorDirectory from './pages/ExhibitorDirectory';
 
 import Events from './pages/Events';
@@ -45,6 +46,8 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/verify-email" element={<VerifyEmail />} />
+        <Route path="/verify-email/:token" element={<VerifyEmail />} />
         <Route path="/exhibitors" element={<ExhibitorDirectory />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />

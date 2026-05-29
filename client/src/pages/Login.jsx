@@ -5,6 +5,7 @@ import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Mail, Lock, ArrowRight, Loader2, Clock, Eye, EyeOff } from 'lucide-react';
 import { toast } from 'react-toastify';
+import api from '../utils/api';
 
 const Login = () => {
   const location = useLocation();
@@ -14,6 +15,8 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [lockedUntil, setLockedUntil] = useState(null); // Date when lock expires
   const [lockCountdown, setLockCountdown] = useState(0); // seconds remaining
+  const [unverifiedEmail, setUnverifiedEmail] = useState(null);
+  const [resending, setResending] = useState(false);
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
 
@@ -39,9 +42,24 @@ const Login = () => {
     }
   }, [location.state]);
 
+  const handleResendVerification = async () => {
+    if (!unverifiedEmail) return;
+    setResending(true);
+    try {
+      const { data } = await api.post('/auth/resend-verification', { email: unverifiedEmail });
+      toast.success(data.message || 'Verification link sent!');
+      setUnverifiedEmail(null);
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to resend verification email.');
+    } finally {
+      setResending(false);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setUnverifiedEmail(null);
     try {
       const userData = await login(email, password);
       if (userData.role === 'Attendee') {
@@ -52,6 +70,9 @@ const Login = () => {
     } catch (err) {
       const errData = err.response?.data;
       const msg = errData?.message || 'Login failed. Please check your credentials.';
+      if (err.response?.status === 403 && errData?.isVerified === false) {
+        setUnverifiedEmail(errData.email || email);
+      }
       if (errData?.lockedUntil) {
         setLockedUntil(errData.lockedUntil);
       }
@@ -61,33 +82,33 @@ const Login = () => {
   };
 
   return (
-    <div style={styles.container}>
+    <div className="auth-container">
       {/* Decorative blurred background shapes */}
-      <div style={{ ...styles.blurShape, ...styles.shape1 }}></div>
-      <div style={{ ...styles.blurShape, ...styles.shape2 }}></div>
+      <div className="auth-blur-shape auth-shape-1"></div>
+      <div className="auth-blur-shape auth-shape-2"></div>
 
       <motion.div 
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
-        style={styles.card}
+        className="auth-card"
       >
-        <div style={styles.logoContainer}>
+        <div className="auth-logo-container">
           <motion.div 
             whileHover={{ rotate: 10, scale: 1.05 }}
-            style={styles.logoCircle}
+            className="auth-logo-circle"
           >
             ES
           </motion.div>
-          <h2 style={styles.brandTitle}>EventSphere</h2>
-          <p style={styles.brandSubtitle}>Welcome back! Please login to your account.</p>
+          <h2 className="auth-brand-title">EventSphere</h2>
+          <p className="auth-brand-subtitle">Welcome back! Please login to your account.</p>
         </div>
 
         {lockedUntil && lockCountdown > 0 && (
           <motion.div 
             initial={{ opacity: 0, x: -10 }} 
             animate={{ opacity: 1, x: 0 }} 
-            style={styles.errorAlert}
+            className="auth-error-alert"
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 700 }}>
               <Clock size={16} />
@@ -96,34 +117,72 @@ const Login = () => {
           </motion.div>
         )}
 
-        <form onSubmit={handleSubmit} style={styles.form}>
-          <div style={styles.inputGroup}>
-            <label style={styles.label}>Email Address</label>
-            <div style={styles.inputWrapper}>
-              <Mail style={styles.inputIcon} size={20} />
+        {unverifiedEmail && (
+          <motion.div 
+            initial={{ opacity: 0, y: -10 }} 
+            animate={{ opacity: 1, y: 0 }} 
+            className="auth-error-alert"
+            style={{ backgroundColor: 'rgba(244, 63, 94, 0.15)', borderLeft: '3px solid #FF2A5F', display: 'flex', flexDirection: 'column', gap: '10px' }}
+          >
+            <div style={{ color: '#fda4af', fontWeight: 500, fontSize: '0.85rem' }}>
+              Your email is not verified yet. Please check your inbox or request a new verification link.
+            </div>
+            <button 
+              type="button" 
+              onClick={handleResendVerification}
+              disabled={resending}
+              style={{
+                background: 'linear-gradient(135deg, #FF2A5F, #8b5cf6)',
+                color: '#fff',
+                border: 'none',
+                padding: '8px 14px',
+                borderRadius: '8px',
+                fontSize: '0.8rem',
+                fontWeight: 700,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '6px',
+                boxShadow: '0 4px 15px rgba(255, 42, 95, 0.25)',
+                width: 'fit-content'
+              }}
+            >
+              {resending ? <Loader2 className="animate-spin" size={14} /> : null}
+              {resending ? 'Resending...' : 'Resend Verification Email'}
+            </button>
+          </motion.div>
+        )}
+
+        <form onSubmit={handleSubmit} className="auth-form">
+          <div className="auth-input-group">
+            <div className="auth-input-wrapper">
               <input 
                 type="email" 
-                style={styles.input} 
+                className="auth-input" 
                 placeholder="Ex: john@example.com"
                 value={email} 
                 onChange={(e) => setEmail(e.target.value)} 
                 required 
               />
+              <Mail className="auth-input-icon" size={20} />
+              <label className="auth-floating-label">Email Address</label>
             </div>
           </div>
 
-          <div style={styles.inputGroup}>
-            <label style={styles.label}>Password</label>
-            <div style={{ ...styles.inputWrapper, position: 'relative' }}>
-              <Lock style={styles.inputIcon} size={20} />
+          <div className="auth-input-group">
+            <div className="auth-input-wrapper">
               <input 
                 type={showPassword ? "text" : "password"} 
-                style={{ ...styles.input, paddingRight: '40px' }} 
+                className="auth-input"
+                style={{ paddingRight: '40px' }} 
                 placeholder="Enter your password"
                 value={password} 
                 onChange={(e) => setPassword(e.target.value)} 
                 required 
               />
+              <Lock className="auth-input-icon" size={20} />
+              <label className="auth-floating-label">Password</label>
               <button 
                 type="button" 
                 onClick={() => setShowPassword(!showPassword)}
@@ -132,8 +191,8 @@ const Login = () => {
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '0.5rem' }}>
-              <Link to="/forgot-password" style={{ color: '#FF2A5F', fontSize: '0.85rem', fontWeight: 600, textDecoration: 'none' }}>Forgot Password?</Link>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '0.25rem' }}>
+              <Link to="/forgot-password" style={{ color: '#FF2A5F', fontSize: '0.82rem', fontWeight: 600, textDecoration: 'none' }}>Forgot Password?</Link>
             </div>
           </div>
 
@@ -141,7 +200,7 @@ const Login = () => {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             type="submit" 
-            style={styles.submitBtn}
+            className="auth-submit-btn"
             disabled={loading}
           >
             {loading ? <Loader2 className="animate-spin" size={20} /> : 'Sign In'}
@@ -149,188 +208,301 @@ const Login = () => {
           </motion.button>
         </form>
 
-        <p style={styles.footerText}>
+        <p className="auth-footer-text">
           Don't have an account?{' '}
-          <Link to="/register" style={styles.link}>
+          <Link to="/register" className="auth-link">
             Create one now
           </Link>
         </p>
       </motion.div>
+
+      {/* Global CSS Styles for auth pages */}
+      <style>{`
+        .auth-container {
+          min-height: 100dvh;
+          width: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: radial-gradient(circle at 80% 20%, #1e1b4b 0%, #0F172A 50%, #020617 100%);
+          position: relative;
+          overflow: hidden;
+          padding: 1rem;
+          box-sizing: border-box;
+        }
+
+        .auth-blur-shape {
+          position: absolute;
+          border-radius: 50%;
+          filter: blur(100px);
+          z-index: 0;
+          opacity: 0.35;
+          pointer-events: none;
+        }
+
+        .auth-shape-1 {
+          width: min(40vw, 400px);
+          height: min(40vw, 400px);
+          background-color: #7c3aed;
+          top: -5%;
+          left: -5%;
+        }
+
+        .auth-shape-2 {
+          width: min(50vw, 500px);
+          height: min(50vw, 500px);
+          background-color: #FF2A5F;
+          bottom: -10%;
+          right: -10%;
+        }
+
+        .auth-card {
+          background: rgba(15, 23, 42, 0.45);
+          backdrop-filter: blur(20px);
+          -webkit-backdrop-filter: blur(20px);
+          padding: 2.5rem;
+          border-radius: 24px;
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+          width: 100%;
+          max-width: 440px;
+          max-height: 96dvh;
+          z-index: 1;
+          color: #f8fafc;
+          display: flex;
+          flex-direction: column;
+          box-sizing: border-box;
+        }
+
+        .auth-logo-container {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          margin-bottom: 1.75rem;
+          text-align: center;
+        }
+
+        .auth-logo-circle {
+          width: 54px;
+          height: 54px;
+          border-radius: 14px;
+          background: linear-gradient(135deg, #FF2A5F, #8b5cf6);
+          color: #fff;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: 900;
+          font-size: 1.6rem;
+          margin-bottom: 0.75rem;
+          box-shadow: 0 8px 20px rgba(255, 42, 95, 0.3);
+        }
+
+        .auth-brand-title {
+          font-size: 1.6rem;
+          font-weight: 800;
+          color: #ffffff;
+          margin: 0 0 0.25rem;
+          letter-spacing: -0.5px;
+        }
+
+        .auth-brand-subtitle {
+          font-size: 0.85rem;
+          color: #94a3b8;
+          margin: 0;
+        }
+
+        .auth-form {
+          display: flex;
+          flex-direction: column;
+          gap: 1.1rem;
+        }
+
+        .auth-input-group {
+          display: flex;
+          flex-direction: column;
+          gap: 0.4rem;
+        }
+
+        .auth-label {
+          font-size: 0.82rem;
+          font-weight: 600;
+          color: #cbd5e1;
+          margin-left: 2px;
+        }
+
+        .auth-input-wrapper {
+          position: relative;
+          display: flex;
+          align-items: center;
+          width: 100%;
+        }
+
+        .auth-input-icon {
+          position: absolute;
+          left: 14px;
+          color: #94a3b8;
+          pointer-events: none;
+        }
+
+        .auth-input {
+          width: 100%;
+          padding: 12px 14px 12px 42px;
+          border-radius: 12px;
+          border: 1px solid rgba(255, 255, 255, 0.12);
+          background: rgba(15, 23, 42, 0.6);
+          color: #ffffff;
+          font-size: 0.95rem;
+          transition: all 0.25s ease;
+          outline: none;
+          box-sizing: border-box;
+        }
+
+        .auth-input:-webkit-autofill {
+          -webkit-box-shadow: 0 0 0 1000px #0f172a inset !important;
+          -webkit-text-fill-color: #ffffff !important;
+          transition: background-color 5000s ease-in-out 0s;
+        }
+
+        .auth-input:focus {
+          border-color: #FF2A5F !important;
+          box-shadow: 0 0 0 3px rgba(255, 42, 95, 0.25) !important;
+          background: rgba(15, 23, 42, 0.85);
+        }
+
+        .auth-submit-btn {
+          margin-top: 0.4rem;
+          padding: 14px;
+          border-radius: 12px;
+          background: linear-gradient(135deg, #FF2A5F, #8b5cf6);
+          color: #fff;
+          font-size: 0.95rem;
+          font-weight: 700;
+          border: none;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: 0 8px 25px rgba(255, 42, 95, 0.25);
+          transition: all 0.25s ease;
+        }
+
+        .auth-submit-btn:hover {
+          transform: translateY(-1px);
+          box-shadow: 0 10px 30px rgba(255, 42, 95, 0.4);
+          filter: brightness(1.1);
+        }
+
+        .auth-submit-btn:active {
+          transform: translateY(1px);
+        }
+
+        .auth-error-alert {
+          padding: 10px 14px;
+          background-color: rgba(244, 63, 94, 0.1);
+          border-left: 3px solid #F43F5E;
+          color: #fda4af;
+          border-radius: 8px;
+          margin-bottom: 1rem;
+          font-size: 0.82rem;
+        }
+
+        .auth-footer-text {
+          margin-top: 1.5rem;
+          text-align: center;
+          color: #94a3b8;
+          font-size: 0.85rem;
+        }
+
+        .auth-link {
+          color: #FF2A5F;
+          font-weight: 600;
+          text-decoration: none;
+          transition: color 0.2s;
+        }
+
+        .auth-link:hover {
+          color: #ff5e85;
+        }
+
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+        .animate-spin {
+          animation: spin 1s linear infinite;
+        }
+
+        @media (max-width: 480px), (max-height: 720px) {
+          .auth-container {
+            padding: 0.5rem;
+          }
+          
+          .auth-card {
+            padding: 1.25rem;
+            border-radius: 16px;
+            max-height: 98dvh;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+          }
+          
+          .auth-logo-container {
+            margin-bottom: 0.85rem;
+          }
+          
+          .auth-logo-circle {
+            width: 38px;
+            height: 38px;
+            font-size: 1.15rem;
+            margin-bottom: 0.4rem;
+            border-radius: 10px;
+          }
+          
+          .auth-brand-title {
+            font-size: 1.25rem;
+          }
+          
+          .auth-brand-subtitle {
+            font-size: 0.75rem;
+            display: none;
+          }
+          
+          .auth-form {
+            gap: 0.65rem;
+          }
+          
+          .auth-input-group {
+            gap: 0.25rem;
+          }
+          
+          .auth-label {
+            font-size: 0.75rem;
+          }
+          
+          .auth-input {
+            padding: 10px 12px 10px 36px;
+            font-size: 0.85rem;
+            border-radius: 10px;
+          }
+          
+          .auth-input-icon {
+            left: 12px;
+            width: 16px;
+            height: 16px;
+          }
+          
+          .auth-submit-btn {
+            padding: 11px;
+            font-size: 0.88rem;
+            border-radius: 10px;
+            margin-top: 0.2rem;
+          }
+          
+          .auth-footer-text {
+            margin-top: 1rem;
+            font-size: 0.78rem;
+          }
+        }
+      `}</style>
     </div>
   );
 };
-
-const styles = {
-  container: {
-    minHeight: '100vh',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#F8FAFC',
-    padding: '1rem',
-    position: 'relative',
-    overflow: 'hidden'
-  },
-  blurShape: {
-    position: 'absolute',
-    borderRadius: '50%',
-    filter: 'blur(80px)',
-    zIndex: 0,
-    opacity: 0.4
-  },
-  shape1: {
-    width: '400px',
-    height: '400px',
-    backgroundColor: '#bae6fd',
-    top: '-10%',
-    left: '-10%'
-  },
-  shape2: {
-    width: '500px',
-    height: '500px',
-    backgroundColor: '#d1fae5',
-    bottom: '-20%',
-    right: '-10%'
-  },
-  card: {
-    backgroundColor: '#ffffff',
-    padding: '3rem 2.5rem',
-    borderRadius: '24px',
-    boxShadow: '0 10px 40px rgba(15, 23, 42, 0.08)',
-    width: '100%',
-    maxWidth: '440px',
-    border: '1px solid #e2e8f0',
-    zIndex: 1,
-    color: '#0F172A'
-  },
-  logoContainer: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    marginBottom: '2.5rem'
-  },
-  logoCircle: {
-    width: '60px',
-    height: '60px',
-    borderRadius: '16px',
-    backgroundColor: '#1E3A8A',
-    color: '#fff',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontWeight: 'bold',
-    fontSize: '1.8rem',
-    marginBottom: '1rem',
-    boxShadow: '0 8px 16px rgba(30, 58, 138, 0.3)'
-  },
-  brandTitle: {
-    fontSize: '1.8rem',
-    fontWeight: '800',
-    color: '#0F172A',
-    marginBottom: '0.5rem',
-    letterSpacing: '-0.5px'
-  },
-  brandSubtitle: {
-    fontSize: '0.95rem',
-    color: '#475569',
-    textAlign: 'center'
-  },
-  form: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '1.5rem'
-  },
-  inputGroup: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '0.5rem'
-  },
-  label: {
-    fontSize: '0.9rem',
-    fontWeight: '600',
-    color: '#0F172A',
-    marginLeft: '4px'
-  },
-  inputWrapper: {
-    position: 'relative',
-    display: 'flex',
-    alignItems: 'center'
-  },
-  inputIcon: {
-    position: 'absolute',
-    left: '16px',
-    color: '#64748b'
-  },
-  input: {
-    width: '100%',
-    padding: '14px 14px 14px 48px',
-    borderRadius: '12px',
-    border: '1px solid #cbd5e1',
-    backgroundColor: '#f8fafc',
-    color: '#0F172A',
-    fontSize: '1rem',
-    transition: 'all 0.3s ease',
-    outline: 'none'
-  },
-  submitBtn: {
-    marginTop: '0.5rem',
-    padding: '16px',
-    borderRadius: '12px',
-    backgroundColor: '#1E3A8A',
-    color: '#fff',
-    fontSize: '1.05rem',
-    fontWeight: '600',
-    border: 'none',
-    cursor: 'pointer',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    boxShadow: '0 8px 16px rgba(30, 58, 138, 0.2)'
-  },
-  errorAlert: {
-    padding: '12px 16px',
-    backgroundColor: '#fff1f2',
-    borderLeft: '4px solid #F43F5E',
-    color: '#be123c',
-    borderRadius: '8px',
-    marginBottom: '1.5rem',
-    fontSize: '0.9rem'
-  },
-  footerText: {
-    marginTop: '2rem',
-    textAlign: 'center',
-    color: '#475569',
-    fontSize: '0.95rem'
-  },
-  link: {
-    color: '#3b82f6',
-    fontWeight: '600',
-    textDecoration: 'none',
-    transition: 'color 0.2s'
-  }
-};
-
-// Add global styles for autofill and animations
-const styleEl = document.createElement('style');
-styleEl.innerHTML = `
-  input:-webkit-autofill {
-    -webkit-box-shadow: 0 0 0 1000px #f8fafc inset !important;
-    -webkit-text-fill-color: #0F172A !important;
-    transition: background-color 5000s ease-in-out 0s;
-  }
-  input:focus {
-    border-color: #1E3A8A !important;
-    box-shadow: 0 0 0 2px rgba(30, 58, 138, 0.2) !important;
-  }
-  @keyframes spin {
-    to { transform: rotate(360deg); }
-  }
-  .animate-spin {
-    animation: spin 1s linear infinite;
-  }
-`;
-if (typeof document !== 'undefined') {
-  document.head.appendChild(styleEl);
-}
 
 export default Login;

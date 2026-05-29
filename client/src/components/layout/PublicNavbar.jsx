@@ -2,7 +2,7 @@ import React, { useContext, useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
 import { ThemeContext } from '../../context/ThemeContext';
-import { Ticket, Moon, Sun, LogOut, Menu, X, User, Lock, Phone, Camera, Save, Loader2 } from 'lucide-react';
+import { Ticket, Moon, Sun, LogOut, Menu, X, User, Lock, Phone, Camera, Save, Loader2, Calendar, Clock, MapPin } from 'lucide-react';
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-toastify';
@@ -252,7 +252,7 @@ const PublicNavbar = () => {
                 <div style={{ fontWeight: 800, color: '#fff', fontSize: '1.2rem' }}>{user.name}</div>
                 <div style={{ fontSize: '0.78rem', color: '#64748b', marginTop: 2 }}>{user.email}</div>
                 <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, marginTop: 8, background: 'rgba(168,85,247,0.15)', color: '#a855f7', border: '1px solid rgba(168,85,247,0.3)', padding: '2px 12px', borderRadius: 20, fontSize: '0.72rem', fontWeight: 700 }}>
-                  🎟️ {user.role?.toUpperCase()}
+                  <Ticket size={11} /> {user.role?.toUpperCase()}
                 </span>
               </motion.div>
             )}
@@ -380,7 +380,7 @@ const PublicNavbar = () => {
                   <div style={{ textAlign: 'center' }}>
                     <div style={{ fontWeight: 700, color: '#e2d9f3', fontSize: '1rem' }}>{user.name}</div>
                     <div style={{ fontSize: '0.8rem', color: '#7c6a96' }}>{user.email}</div>
-                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, marginTop: 6, background: 'rgba(168,85,247,0.15)', color: '#a855f7', border: '1px solid rgba(168,85,247,0.3)', padding: '2px 10px', borderRadius: 20, fontSize: '0.72rem', fontWeight: 700 }}>🎟️ ATTENDEE</span>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, marginTop: 6, background: 'rgba(168,85,247,0.15)', color: '#a855f7', border: '1px solid rgba(168,85,247,0.3)', padding: '2px 10px', borderRadius: 20, fontSize: '0.72rem', fontWeight: 700 }}><Ticket size={11} /> ATTENDEE</span>
                   </div>
                 </div>
 
@@ -504,10 +504,10 @@ const PublicNavbar = () => {
                                 <div style={{fontWeight:700,color: isPast ? '#94a3b8' : '#e2d9f3',fontSize:'0.92rem',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{ev.title||'Unknown Event'}</div>
                                 <div style={{fontSize:'0.76rem',color: isPast ? '#475569' : '#8b5cf6',fontWeight:600,marginTop:2,textTransform:'uppercase',letterSpacing:'0.5px'}}>{ev.category||'Event'}</div>
                                 <div style={{fontSize:'0.8rem',color:'#7c6a96',marginTop:4,display:'flex',flexWrap:'wrap',gap:'0.6rem'}}>
-                                  {evDate && <span>📅 {evDate.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}</span>}
-                                  {ev.time && <span>🕐 {ev.time}</span>}
+                                  {evDate && <span style={{display:'flex',alignItems:'center',gap:3}}><Calendar size={11} /> {evDate.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}</span>}
+                                  {ev.time && <span style={{display:'flex',alignItems:'center',gap:3}}><Clock size={11} /> {ev.time}</span>}
                                 </div>
-                                {ev.location && <div style={{fontSize:'0.78rem',color:'#7c6a96',marginTop:3,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>📍 {ev.location}</div>}
+                                {ev.location && <div style={{fontSize:'0.78rem',color:'#7c6a96',marginTop:3,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',display:'flex',alignItems:'center',gap:3}}><MapPin size={11} /> {ev.location}</div>}
                               </div>
                               <div style={{display:'flex',flexDirection:'column',alignItems:'flex-end',gap:6,flexShrink:0}}>
                                 <span style={{fontSize:'0.68rem',fontWeight:700,padding:'3px 8px',borderRadius:10,background: isPast ? 'rgba(100,116,139,0.2)' : 'rgba(168,85,247,0.15)',color: isPast ? '#94a3b8' : '#a855f7'}}>{isPast ? 'ATTENDED' : 'UPCOMING'}</span>
@@ -517,7 +517,7 @@ const PublicNavbar = () => {
                             </div>
                             {!isPast && ev.sessions?.length > 0 && (
                               <div style={{borderTop:'1px solid rgba(139,92,246,0.15)',padding:'0.7rem 0.9rem'}}>
-                                <div style={{fontSize:'0.72rem',fontWeight:700,color:'#a855f7',textTransform:'uppercase',letterSpacing:'0.8px',marginBottom:'0.5rem'}}>📋 Schedule</div>
+                                <div style={{fontSize:'0.72rem',fontWeight:700,color:'#a855f7',textTransform:'uppercase',letterSpacing:'0.8px',marginBottom:'0.5rem',display:'flex',alignItems:'center',gap:4}}><Calendar size={11} /> Schedule</div>
                                 {ev.sessions.slice(0,3).map((s,i)=>(
                                   <div key={i} style={{display:'flex',gap:'0.6rem',fontSize:'0.78rem',color:'#b8a9d4',marginBottom:'0.35rem'}}>
                                     <span style={{color:'#a855f7',fontWeight:600,minWidth:45,flexShrink:0}}>{s.time||'—'}</span>

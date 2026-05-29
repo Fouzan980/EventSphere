@@ -4,13 +4,18 @@ import axios from 'axios';
 import {
   User, Mail, Building2, Shield, BadgeCheck, FileText,
   Camera, Save, Lock, CheckCircle, AlertCircle, Loader2,
+  Target, Users, Ticket,
 } from 'lucide-react';
 import { PageSkeleton } from '../components/Skeleton';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 const API = window.location.pathname.startsWith('/projects/eventsphere') ? '/projects/eventsphere/api' : '/api';
 const roleColors = { Organizer: '#f59e0b', Exhibitor: '#06b6d4', Attendee: '#a855f7' };
-const roleEmojis = { Organizer: '🎯', Exhibitor: '🏢', Attendee: '🎟️' };
+const RoleIcon = ({ role, size = 14 }) => {
+  if (role === 'Organizer') return <Target size={size} />;
+  if (role === 'Exhibitor') return <Building2 size={size} />;
+  return <Ticket size={size} />; // Attendee
+};
 
 const inputStyle = {
   width: '100%', padding: '12px 16px',
@@ -289,7 +294,7 @@ export default function Profile() {
             padding: '4px 14px', borderRadius: '20px',
             fontSize: '0.8rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px',
           }}>
-            {roleEmojis[user?.role]} {user?.role}
+            <RoleIcon role={user?.role} size={14} /> {user?.role}
           </span>
           {form.isVerified && (
             <span style={{ marginLeft: '10px', display: 'inline-flex', alignItems: 'center', gap: '4px', color: '#10b981', fontSize: '0.8rem', fontWeight: 700, background: 'rgba(16,185,129,0.1)', padding: '4px 10px', borderRadius: '20px', border: '1px solid rgba(16,185,129,0.3)' }}>

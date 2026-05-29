@@ -3,7 +3,7 @@ import { AuthContext } from '../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
-import { User, Mail, Lock, Building, Layers, ArrowRight, Loader2, CheckCircle, XCircle, Eye, EyeOff } from 'lucide-react';
+import { User, Mail, Lock, Building, Layers, ArrowRight, Loader2, CheckCircle, XCircle, Eye, EyeOff, ChevronDown } from 'lucide-react';
 import { toast } from 'react-toastify';
 
 // Password strength algorithm
@@ -65,187 +65,200 @@ const Register = () => {
   };
 
   return (
-    <div style={styles.container}>
+    <div className="auth-container">
       {/* Decorative blurred background shapes */}
-      <div style={{ ...styles.blurShape, ...styles.shape1 }}></div>
-      <div style={{ ...styles.blurShape, ...styles.shape2 }}></div>
+      <div className="auth-blur-shape auth-shape-1"></div>
+      <div className="auth-blur-shape auth-shape-2"></div>
 
       <motion.div 
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
-        style={styles.card}
+        className="auth-card"
       >
-        <div style={styles.logoContainer}>
+        <div className="auth-logo-container">
           <motion.div 
             whileHover={{ rotate: 10, scale: 1.05 }}
-            style={styles.logoCircle}
+            className="auth-logo-circle"
           >
             ES
           </motion.div>
-          <h2 style={styles.brandTitle}>Join EventSphere</h2>
-          <p style={styles.brandSubtitle}>Create your account to get started.</p>
+          <h2 className="auth-brand-title">Join EventSphere</h2>
+          <p className="auth-brand-subtitle">Create your account to get started.</p>
         </div>
 
-        <form onSubmit={handleSubmit} style={styles.form}>
-          <div style={styles.inputGroup}>
-            <label style={styles.label}>Full Name</label>
-            <div style={styles.inputWrapper}>
-              <User style={styles.inputIcon} size={20} />
-              <input 
-                type="text" 
-                name="name" 
-                style={styles.input} 
-                placeholder="Ex: John Doe"
-                onChange={handleChange} 
-                required 
-              />
+        <form onSubmit={handleSubmit} className="auth-form">
+          <div className="auth-grid-row">
+            <div className="auth-input-group">
+              <div className="auth-input-wrapper">
+                <input 
+                  type="text" 
+                  name="name" 
+                  className="auth-input"
+                  placeholder="Ex: John Doe"
+                  value={formData.name}
+                  onChange={handleChange} 
+                  required 
+                />
+                <User className="auth-input-icon" size={20} />
+                <label className="auth-floating-label">Full Name</label>
+              </div>
+            </div>
+
+            <div className="auth-input-group">
+              <div className="auth-input-wrapper">
+                <input 
+                  type="email" 
+                  name="email" 
+                  className="auth-input"
+                  placeholder="Ex: john@example.com"
+                  value={formData.email}
+                  onChange={handleChange} 
+                  required 
+                />
+                <Mail className="auth-input-icon" size={20} />
+                <label className="auth-floating-label">Email Address</label>
+              </div>
             </div>
           </div>
 
-          <div style={styles.inputGroup}>
-            <label style={styles.label}>Email Address</label>
-            <div style={styles.inputWrapper}>
-              <Mail style={styles.inputIcon} size={20} />
-              <input 
-                type="email" 
-                name="email" 
-                style={styles.input} 
-                placeholder="Ex: john@example.com"
-                onChange={handleChange} 
-                required 
-              />
+          <div className="auth-grid-row">
+            <div className="auth-input-group">
+              <div className="auth-input-wrapper">
+                <input 
+                  type={showPassword ? "text" : "password"} 
+                  name="password" 
+                  className="auth-input"
+                  style={{ paddingRight: '40px' }} 
+                  placeholder="Create password"
+                  value={formData.password}
+                  onChange={(e) => { handleChange(e); setShowStrength(true); }}
+                  onFocus={() => setShowStrength(true)}
+                  required 
+                />
+                <Lock className="auth-input-icon" size={20} />
+                <label className="auth-floating-label">Password</label>
+                <button 
+                  type="button" 
+                  onClick={() => setShowPassword(!showPassword)}
+                  style={{ position: 'absolute', right: '15px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: 0 }}
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+            </div>
+
+            <div className="auth-input-group">
+              <div className="auth-input-wrapper">
+                <input 
+                  type={showConfirmPassword ? "text" : "password"} 
+                  className="auth-input"
+                  style={{ paddingRight: '40px' }} 
+                  placeholder="Re-enter password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)} 
+                  required 
+                />
+                <Lock className="auth-input-icon" size={20} />
+                <label className="auth-floating-label">Confirm Password</label>
+                <button 
+                  type="button" 
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  style={{ position: 'absolute', right: '15px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: 0 }}
+                >
+                  {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
             </div>
           </div>
 
-          <div style={styles.inputGroup}>
-            <label style={styles.label}>Password</label>
-            <div style={{...styles.inputWrapper, position: 'relative'}}>
-              <Lock style={styles.inputIcon} size={20} />
-              <input 
-                type={showPassword ? "text" : "password"} 
-                name="password" 
-                style={{...styles.input, paddingRight: '40px'}} 
-                placeholder="Create a secure password"
-                onChange={(e) => { handleChange(e); setShowStrength(true); }}
-                onFocus={() => setShowStrength(true)}
-                required 
-              />
-              <button 
-                type="button" 
-                onClick={() => setShowPassword(!showPassword)}
-                style={{ position: 'absolute', right: '15px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: 0 }}
-              >
-                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-              </button>
-            </div>
-            {/* Password Strength Meter */}
-            {showStrength && formData.password.length > 0 && (() => {
-              const s = getPasswordStrength(formData.password);
-              return (
-                <div style={{ marginTop: '0.5rem' }}>
-                  {/* Bar */}
-                  <div style={{ display: 'flex', gap: '4px', marginBottom: '6px' }}>
-                    {[1,2,3,4,5].map(i => (
-                      <div key={i} style={{
-                        flex: 1, height: '5px', borderRadius: '3px',
-                        backgroundColor: i <= s.score ? s.color : '#e2e8f0',
-                        transition: 'background-color 0.3s'
-                      }} />
-                    ))}
-                  </div>
-                  <div style={{ fontSize: '0.8rem', fontWeight: 700, color: s.color, marginBottom: '6px' }}>
-                    Password Strength: {s.label}
-                  </div>
-                  {/* Checklist */}
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px' }}>
-                    {[
-                      ['8+ characters', s.checks.length],
-                      ['Uppercase letter', s.checks.upper],
-                      ['Lowercase letter', s.checks.lower],
-                      ['Number (0-9)', s.checks.number],
-                      ['Special character (!@#...)', s.checks.special],
-                    ].map(([label, passed]) => (
-                      <div key={label} style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.75rem', color: passed ? '#10b981' : '#94a3b8' }}>
-                        {passed ? <CheckCircle size={12} /> : <XCircle size={12} />} {label}
-                      </div>
-                    ))}
-                  </div>
+          {/* Password Strength Meter */}
+          {showStrength && formData.password.length > 0 && (() => {
+            const s = getPasswordStrength(formData.password);
+            return (
+              <div className="auth-strength-container" style={{ marginTop: '-0.25rem', background: 'rgba(15, 23, 42, 0.35)', padding: '10px', borderRadius: '12px', border: '1px solid rgba(255, 255, 255, 0.05)' }}>
+                <div style={{ display: 'flex', gap: '4px', marginBottom: '6px' }}>
+                  {[1,2,3,4,5].map(i => (
+                    <div key={i} style={{
+                      flex: 1, height: '4px', borderRadius: '3px',
+                      backgroundColor: i <= s.score ? s.color : 'rgba(255,255,255,0.15)',
+                      transition: 'background-color 0.3s'
+                    }} />
+                  ))}
                 </div>
-              );
-            })()}
-          </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                  <span style={{ fontSize: '0.78rem', fontWeight: 700, color: s.color }}>
+                    Strength: {s.label}
+                  </span>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px 12px' }}>
+                  {[
+                    ['8+ chars', s.checks.length],
+                    ['Uppercase', s.checks.upper],
+                    ['Lowercase', s.checks.lower],
+                    ['Number (0-9)', s.checks.number],
+                    ['Special char', s.checks.special],
+                  ].map(([label, passed]) => (
+                    <div key={label} style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.72rem', color: passed ? '#10b981' : '#94a3b8' }}>
+                      {passed ? <CheckCircle size={10} style={{ color: '#10b981' }} /> : <XCircle size={10} style={{ color: '#ef4444' }} />} {label}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })()}
 
-          <div style={styles.inputGroup}>
-            <label style={styles.label}>Confirm Password</label>
-            <div style={{...styles.inputWrapper, position: 'relative'}}>
-              <Lock style={styles.inputIcon} size={20} />
-              <input 
-                type={showConfirmPassword ? "text" : "password"} 
-                style={{...styles.input, paddingRight: '40px'}} 
-                placeholder="Re-enter your password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)} 
-                required 
-              />
-              <button 
-                type="button" 
-                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                style={{ position: 'absolute', right: '15px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: 0 }}
-              >
-                {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-              </button>
+          <div className={formData.role === 'Exhibitor' ? "auth-grid-row" : "auth-form-full-width"}>
+            <div className="auth-input-group">
+              <div className="auth-input-wrapper">
+                <Layers className="auth-input-icon" size={20} />
+                <select 
+                  name="role" 
+                  className="auth-input auth-select" 
+                  value={formData.role} 
+                  onChange={handleChange}
+                >
+                  <option value="Attendee">Attendee</option>
+                  <option value="Exhibitor">Exhibitor</option>
+                  <option value="Organizer">Organizer</option>
+                </select>
+                <ChevronDown className="auth-select-icon" size={16} />
+                <label className="auth-floating-label">I am joining as</label>
+              </div>
             </div>
-          </div>
 
-          <div style={styles.inputGroup}>
-            <label style={styles.label}>I am joining as an</label>
-            <div style={styles.inputWrapper}>
-              <Layers style={styles.inputIcon} size={20} />
-              <select 
-                name="role" 
-                style={styles.select} 
-                value={formData.role} 
-                onChange={handleChange}
-              >
-                <option value="Attendee">Attendee</option>
-                <option value="Exhibitor">Exhibitor</option>
-                <option value="Organizer">Organizer</option>
-              </select>
-            </div>
-          </div>
-
-          <AnimatePresence>
-            {formData.role === 'Exhibitor' && (
-              <motion.div 
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                style={{ overflow: 'hidden' }}
-              >
-                <div style={{...styles.inputGroup, marginTop: '8px'}}>
-                  <label style={styles.label}>Company Name</label>
-                  <div style={styles.inputWrapper}>
-                    <Building style={styles.inputIcon} size={20} />
+            <AnimatePresence>
+              {formData.role === 'Exhibitor' && (
+                <motion.div 
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  transition={{ duration: 0.2 }}
+                  className="auth-input-group"
+                >
+                  <div className="auth-input-wrapper">
                     <input 
                       type="text" 
                       name="companyName" 
-                      style={styles.input} 
-                      placeholder="Your Company Ltd."
+                      className="auth-input" 
+                      placeholder="Company Name"
+                      value={formData.companyName}
                       onChange={handleChange} 
                       required 
                     />
+                    <Building className="auth-input-icon" size={20} />
+                    <label className="auth-floating-label">Company Name</label>
                   </div>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
 
           <motion.button 
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             type="submit" 
-            style={styles.submitBtn}
+            className="auth-submit-btn"
             disabled={loading}
           >
             {loading ? <Loader2 className="animate-spin" size={20} /> : 'Create Account'}
@@ -253,205 +266,326 @@ const Register = () => {
           </motion.button>
         </form>
 
-        <p style={styles.footerText}>
+        <p className="auth-footer-text">
           Already have an account?{' '}
-          <Link to="/login" style={styles.link}>
+          <Link to="/login" className="auth-link">
             Sign in instead
           </Link>
         </p>
       </motion.div>
+
+      {/* Global CSS Styles for auth pages */}
+      <style>{`
+        .auth-container {
+          min-height: 100dvh;
+          width: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: radial-gradient(circle at 80% 20%, #1e1b4b 0%, #0F172A 50%, #020617 100%);
+          position: relative;
+          overflow: hidden;
+          padding: 1rem;
+          box-sizing: border-box;
+        }
+
+        .auth-blur-shape {
+          position: absolute;
+          border-radius: 50%;
+          filter: blur(100px);
+          z-index: 0;
+          opacity: 0.35;
+          pointer-events: none;
+        }
+
+        .auth-shape-1 {
+          width: min(40vw, 400px);
+          height: min(40vw, 400px);
+          background-color: #7c3aed;
+          top: -5%;
+          left: -5%;
+        }
+
+        .auth-shape-2 {
+          width: min(50vw, 500px);
+          height: min(50vw, 500px);
+          background-color: #FF2A5F;
+          bottom: -10%;
+          right: -10%;
+        }
+
+        .auth-card {
+          background: rgba(15, 23, 42, 0.45);
+          backdrop-filter: blur(20px);
+          -webkit-backdrop-filter: blur(20px);
+          padding: 2.25rem;
+          border-radius: 24px;
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+          width: 100%;
+          max-width: 540px;
+          max-height: 98dvh;
+          z-index: 1;
+          color: #f8fafc;
+          display: flex;
+          flex-direction: column;
+          box-sizing: border-box;
+          overflow-y: auto;
+          scrollbar-width: none; /* Firefox */
+        }
+        .auth-card::-webkit-scrollbar {
+          display: none; /* Safari and Chrome */
+        }
+
+        .auth-logo-container {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          margin-bottom: 1.25rem;
+          text-align: center;
+        }
+
+        .auth-logo-circle {
+          width: 50px;
+          height: 50px;
+          border-radius: 14px;
+          background: linear-gradient(135deg, #FF2A5F, #8b5cf6);
+          color: #fff;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: 900;
+          font-size: 1.5rem;
+          margin-bottom: 0.5rem;
+          box-shadow: 0 8px 20px rgba(255, 42, 95, 0.3);
+        }
+
+        .auth-brand-title {
+          font-size: 1.5rem;
+          font-weight: 800;
+          color: #ffffff;
+          margin: 0 0 0.2rem;
+          letter-spacing: -0.5px;
+        }
+
+        .auth-brand-subtitle {
+          font-size: 0.85rem;
+          color: #94a3b8;
+          margin: 0;
+        }
+
+        .auth-form {
+          display: flex;
+          flex-direction: column;
+          gap: 1rem;
+        }
+
+        .auth-grid-row {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 1rem;
+        }
+
+        .auth-form-full-width {
+          width: 100%;
+        }
+
+        .auth-input-group {
+          display: flex;
+          flex-direction: column;
+          gap: 0.4rem;
+        }
+
+        .auth-label {
+          font-size: 0.8rem;
+          font-weight: 600;
+          color: #cbd5e1;
+          margin-left: 2px;
+        }
+
+        .auth-input-wrapper {
+          position: relative;
+          display: flex;
+          align-items: center;
+          width: 100%;
+        }
+
+        .auth-input-icon {
+          position: absolute;
+          left: 14px;
+          color: #94a3b8;
+          pointer-events: none;
+        }
+
+        .auth-input {
+          width: 100%;
+          padding: 11px 14px 11px 42px;
+          border-radius: 12px;
+          border: 1px solid rgba(255, 255, 255, 0.12);
+          background: rgba(15, 23, 42, 0.6);
+          color: #ffffff;
+          font-size: 0.92rem;
+          transition: all 0.25s ease;
+          outline: none;
+          box-sizing: border-box;
+        }
+
+        .auth-select {
+          appearance: none;
+          -webkit-appearance: none;
+          background-image: none !important;  /* suppress global SVG arrow */
+          padding-right: 42px !important;
+          cursor: pointer;
+        }
+
+        .auth-select option {
+          background-color: #0f172a;
+          color: #ffffff;
+        }
+
+        .auth-input:-webkit-autofill {
+          -webkit-box-shadow: 0 0 0 1000px #0f172a inset !important;
+          -webkit-text-fill-color: #ffffff !important;
+          transition: background-color 5000s ease-in-out 0s;
+        }
+
+        .auth-input:focus {
+          border-color: #FF2A5F !important;
+          box-shadow: 0 0 0 3px rgba(255, 42, 95, 0.25) !important;
+          background: rgba(15, 23, 42, 0.85);
+        }
+
+        .auth-submit-btn {
+          margin-top: 0.4rem;
+          padding: 13px;
+          border-radius: 12px;
+          background: linear-gradient(135deg, #FF2A5F, #8b5cf6);
+          color: #fff;
+          font-size: 0.92rem;
+          font-weight: 700;
+          border: none;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: 0 8px 25px rgba(255, 42, 95, 0.25);
+          transition: all 0.25s ease;
+        }
+
+        .auth-submit-btn:hover {
+          transform: translateY(-1px);
+          box-shadow: 0 10px 30px rgba(255, 42, 95, 0.4);
+          filter: brightness(1.1);
+        }
+
+        .auth-submit-btn:active {
+          transform: translateY(1px);
+        }
+
+        .auth-footer-text {
+          margin-top: 1.25rem;
+          text-align: center;
+          color: #94a3b8;
+          font-size: 0.85rem;
+        }
+
+        .auth-link {
+          color: #FF2A5F;
+          font-weight: 600;
+          text-decoration: none;
+          transition: color 0.2s;
+        }
+
+        .auth-link:hover {
+          color: #ff5e85;
+        }
+
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+        .animate-spin {
+          animation: spin 1s linear infinite;
+        }
+
+        @media (max-width: 640px) {
+          .auth-grid-row {
+            grid-template-columns: 1fr;
+            gap: 0.85rem;
+          }
+        }
+
+        @media (max-width: 480px), (max-height: 720px) {
+          .auth-container {
+            padding: 0.4rem;
+          }
+          
+          .auth-card {
+            padding: 1.15rem;
+            border-radius: 16px;
+            max-height: 99dvh;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+          }
+          
+          .auth-logo-container {
+            margin-bottom: 0.75rem;
+          }
+          
+          .auth-logo-circle {
+            width: 36px;
+            height: 36px;
+            font-size: 1.1rem;
+            margin-bottom: 0.35rem;
+            border-radius: 10px;
+          }
+          
+          .auth-brand-title {
+            font-size: 1.2rem;
+          }
+          
+          .auth-brand-subtitle {
+            font-size: 0.75rem;
+            display: none;
+          }
+          
+          .auth-form {
+            gap: 0.65rem;
+          }
+          
+          .auth-input-group {
+            gap: 0.2rem;
+          }
+          
+          .auth-label {
+            font-size: 0.75rem;
+          }
+          
+          .auth-input {
+            padding: 9px 12px 9px 36px;
+            font-size: 0.85rem;
+            border-radius: 10px;
+          }
+          
+          .auth-input-icon {
+            left: 12px;
+            width: 16px;
+            height: 16px;
+          }
+          
+          .auth-submit-btn {
+            padding: 11px;
+            font-size: 0.88rem;
+            border-radius: 10px;
+            margin-top: 0.2rem;
+          }
+          
+          .auth-footer-text {
+            margin-top: 0.85rem;
+            font-size: 0.78rem;
+          }
+        }
+      `}</style>
     </div>
   );
 };
-
-const styles = {
-  container: {
-    minHeight: '100vh',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#F8FAFC', 
-    padding: '2rem 1rem',
-    position: 'relative',
-    overflow: 'hidden'
-  },
-  blurShape: {
-    position: 'absolute',
-    borderRadius: '50%',
-    filter: 'blur(80px)',
-    zIndex: 0,
-    opacity: 0.4
-  },
-  shape1: {
-    width: '400px',
-    height: '400px',
-    backgroundColor: '#bae6fd',
-    top: '10%',
-    right: '-10%'
-  },
-  shape2: {
-    width: '500px',
-    height: '500px',
-    backgroundColor: '#d1fae5',
-    bottom: '-10%',
-    left: '-10%'
-  },
-  card: {
-    backgroundColor: '#ffffff',
-    padding: '3rem 2.5rem',
-    borderRadius: '24px',
-    boxShadow: '0 10px 40px rgba(15, 23, 42, 0.08)',
-    width: '100%',
-    maxWidth: '480px',
-    border: '1px solid #e2e8f0',
-    zIndex: 1,
-    color: '#0F172A'
-  },
-  logoContainer: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    marginBottom: '2rem'
-  },
-  logoCircle: {
-    width: '60px',
-    height: '60px',
-    borderRadius: '16px',
-    backgroundColor: '#1E3A8A',
-    color: '#fff',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontWeight: 'bold',
-    fontSize: '1.8rem',
-    marginBottom: '1rem',
-    boxShadow: '0 8px 16px rgba(30, 58, 138, 0.3)'
-  },
-  brandTitle: {
-    fontSize: '1.8rem',
-    fontWeight: '800',
-    color: '#0F172A',
-    marginBottom: '0.5rem',
-    letterSpacing: '-0.5px'
-  },
-  brandSubtitle: {
-    fontSize: '0.95rem',
-    color: '#475569',
-    textAlign: 'center'
-  },
-  form: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '1.2rem'
-  },
-  inputGroup: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '0.5rem'
-  },
-  label: {
-    fontSize: '0.9rem',
-    fontWeight: '600',
-    color: '#0F172A',
-    marginLeft: '4px'
-  },
-  inputWrapper: {
-    position: 'relative',
-    display: 'flex',
-    alignItems: 'center'
-  },
-  inputIcon: {
-    position: 'absolute',
-    left: '16px',
-    color: '#64748b'
-  },
-  input: {
-    width: '100%',
-    padding: '14px 14px 14px 48px',
-    borderRadius: '12px',
-    border: '1px solid #cbd5e1',
-    backgroundColor: '#f8fafc',
-    color: '#0F172A',
-    fontSize: '1rem',
-    transition: 'all 0.3s ease',
-    outline: 'none'
-  },
-  select: {
-    width: '100%',
-    padding: '14px 14px 14px 48px',
-    borderRadius: '12px',
-    border: '1px solid #cbd5e1',
-    backgroundColor: '#f8fafc',
-    color: '#0F172A',
-    fontSize: '1rem',
-    transition: 'all 0.3s ease',
-    appearance: 'none',
-    outline: 'none',
-    cursor: 'pointer'
-  },
-  submitBtn: {
-    marginTop: '0.8rem',
-    padding: '16px',
-    borderRadius: '12px',
-    backgroundColor: '#1E3A8A',
-    color: '#fff',
-    fontSize: '1.05rem',
-    fontWeight: '600',
-    border: 'none',
-    cursor: 'pointer',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    boxShadow: '0 8px 16px rgba(30, 58, 138, 0.2)'
-  },
-  errorAlert: {
-    padding: '12px 16px',
-    backgroundColor: '#fff1f2',
-    borderLeft: '4px solid #F43F5E',
-    color: '#be123c',
-    borderRadius: '8px',
-    marginBottom: '1rem',
-    fontSize: '0.9rem'
-  },
-  footerText: {
-    marginTop: '1.5rem',
-    textAlign: 'center',
-    color: '#475569',
-    fontSize: '0.95rem'
-  },
-  link: {
-    color: '#3b82f6',
-    fontWeight: '600',
-    textDecoration: 'none',
-    transition: 'color 0.2s'
-  }
-};
-
-// Insert basic styles snippet into document head via code
-const styleEl = document.createElement('style');
-styleEl.innerHTML = `
-  select option {
-    background-color: #fff;
-    color: #0F172A;
-  }
-  input:-webkit-autofill {
-    -webkit-box-shadow: 0 0 0 1000px #f8fafc inset !important;
-    -webkit-text-fill-color: #0F172A !important;
-    transition: background-color 5000s ease-in-out 0s;
-  }
-  input:focus, select:focus {
-    border-color: #1E3A8A !important;
-    box-shadow: 0 0 0 2px rgba(30, 58, 138, 0.2) !important;
-  }
-  @keyframes spin {
-    to { transform: rotate(360deg); }
-  }
-  .animate-spin {
-    animation: spin 1s linear infinite;
-  }
-`;
-if (typeof document !== 'undefined') {
-  document.head.appendChild(styleEl);
-}
 
 export default Register;

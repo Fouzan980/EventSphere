@@ -5,10 +5,64 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const sendEmail = require('../utils/sendEmail');
-const { welcomeEmail, passwordResetEmail } = require('../utils/emailTemplates');
+const { welcomeEmail, passwordResetEmail, verificationEmail } = require('../utils/emailTemplates');
 
 const MAX_ATTEMPTS = 5;
 
+const DISPOSABLE_DOMAINS = [
+  'mailinator.com', 'yopmail.com', 'tempmail.com', 'temp-mail.org', 
+  'getnada.com', 'guerrillamail.com', 'sharklasers.com', 'dispostable.com', 
+  '10minutemail.com', 'boun.cr', 'trashmail.com', 'yopmail.fr', 'yopmail.net'
+];
+
+const validateRegisterInput = (data) => {
+  const { name, email, password, role, companyName } = data;
+  
+  if (!name || typeof name !== 'string' || name.trim().length < 2 || name.trim().length > 50) {
+    return 'Name must be between 2 and 50 characters.';
+  }
+  // Allow letters, spaces, hyphens, apostrophes
+  const nameRegex = /^[a-zA-Z\s'-]+$/;
+  if (!nameRegex.test(name.trim())) {
+    return 'Name contains invalid characters. Only letters, spaces, hyphens, and apostrophes are allowed.';
+  }
+
+  if (!email || typeof email !== 'string') {
+    return 'Email is required.';
+  }
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  if (!emailRegex.test(email.trim())) {
+    return 'Please enter a valid email address.';
+  }
+  
+  const domain = email.trim().split('@')[1]?.toLowerCase();
+  if (DISPOSABLE_DOMAINS.includes(domain)) {
+    return 'Disposable email addresses are not allowed. Please use a valid personal or corporate email.';
+  }
+
+  if (!role || !['Organizer', 'Exhibitor', 'Attendee'].includes(role)) {
+    return 'Invalid role specified.';
+  }
+
+  if (role === 'Exhibitor' && (!companyName || typeof companyName !== 'string' || companyName.trim().length < 2 || companyName.trim().length > 100)) {
+    return 'Company Name is required for exhibitors and must be between 2 and 100 characters.';
+  }
+
+  // Password validation
+  if (!password || typeof password !== 'string' || password.length < 8) {
+    return 'Password must be at least 8 characters long.';
+  }
+  const hasUpper = /[A-Z]/.test(password);
+  const hasLower = /[a-z]/.test(password);
+  const hasNumber = /[0-9]/.test(password);
+  const hasSpecial = /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password);
+  const strengthCount = [hasUpper, hasLower, hasNumber, hasSpecial].filter(Boolean).length;
+  if (strengthCount < 3) {
+    return 'Password must contain at least three of the following: uppercase, lowercase, numbers, or special characters.';
+  }
+
+  return null;
+};
 
 const generateToken = (id, role) => {
   return jwt.sign({ id, role }, process.env.JWT_SECRET, { expiresIn: '30d' });
@@ -17,56 +71,126 @@ const generateToken = (id, role) => {
 // ─── REGISTER ────────────────────────────────────────────────────────────────
 router.post('/register', async (req, res) => {
   try {
+    // 1. Enterprise validation
+    const validationError = validateRegisterInput(req.body);
+    if (validationError) {
+      return res.status(400).json({ message: validationError });
+    }
+
     const { name, email, password, role, companyName } = req.body;
 
-    // 1. Duplicate email check
+    // 2. Duplicate email check
     const userExists = await User.findOne({ email: email.toLowerCase() });
     if (userExists) {
       return res.status(400).json({ message: 'An account with this email already exists. Please log in instead.' });
     }
 
-    // 2. Server-side password strength check
-    if (password.length < 8) {
-      return res.status(400).json({ message: 'Password must be at least 8 characters.' });
-    }
-    const hasUpper = /[A-Z]/.test(password);
-    const hasLower = /[a-z]/.test(password);
-    const hasNumber = /[0-9]/.test(password);
-    const hasSpecial = /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password);
-    const strength = [hasUpper, hasLower, hasNumber, hasSpecial].filter(Boolean).length;
-    if (strength < 2) {
-      return res.status(400).json({ message: 'Password is too weak. Include uppercase, lowercase, numbers, or special characters.' });
-    }
-
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
+    // 3. Verification token generation
+    const verificationToken = crypto.randomBytes(32).toString('hex');
+    const hashedVerificationToken = crypto.createHash('sha256').update(verificationToken).digest('hex');
+    const verificationTokenExpire = Date.now() + 24 * 60 * 60 * 1000; // 24 hours
+
     const user = await User.create({
-      name,
-      email: email.toLowerCase(),
+      name: name.trim(),
+      email: email.toLowerCase().trim(),
       password: hashedPassword,
       role: role || 'Attendee',
-      companyName
+      companyName: role === 'Exhibitor' ? companyName.trim() : undefined,
+      isVerified: false,
+      verificationToken: hashedVerificationToken,
+      verificationTokenExpire
     });
 
-    // Send welcome email (non-blocking)
+    // 4. Send verification email (non-blocking)
+    const origin = req.headers.origin || process.env.FRONTEND_URL || 'http://localhost:5173';
+    const verificationUrl = `${origin}/verify-email/${verificationToken}`;
+
     sendEmail({
       email: user.email,
-      subject: '🎪 Welcome to EventSphere — Account Created!',
-      message: `Hi ${user.name}, welcome to EventSphere! Your account has been successfully created.`,
-      htmlMessage: welcomeEmail(user.name, user.role)
+      subject: '✉️ Verify your EventSphere Account',
+      message: `Hi ${user.name}, please verify your account by visiting: ${verificationUrl}`,
+      htmlMessage: verificationEmail(user.name, verificationUrl)
     }).catch((err) => {
-      console.warn('⚠️  Welcome email failed to send:', err.message);
+      console.warn('⚠️ Verification email failed to send:', err.message);
     });
 
     res.status(201).json({
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-      avatar: user.avatar,
-      token: generateToken(user._id, user.role)
+      message: 'Registration successful! Please check your email inbox to verify your account.'
     });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// ─── VERIFY EMAIL ────────────────────────────────────────────────────────────
+router.post('/verify-email/:token', async (req, res) => {
+  try {
+    const hashedToken = crypto.createHash('sha256').update(req.params.token).digest('hex');
+
+    const user = await User.findOne({
+      verificationToken: hashedToken,
+      verificationTokenExpire: { $gt: Date.now() }
+    });
+
+    if (!user) {
+      return res.status(400).json({ message: 'Invalid or expired verification token.' });
+    }
+
+    user.isVerified = true;
+    user.verificationStatus = 'Verified';
+    user.verificationToken = undefined;
+    user.verificationTokenExpire = undefined;
+    await user.save();
+
+    res.json({ message: 'Your email has been successfully verified! You can now log in.' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// ─── RESEND VERIFICATION EMAIL ────────────────────────────────────────────────
+router.post('/resend-verification', async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      return res.status(400).json({ message: 'Email address is required.' });
+    }
+
+    const user = await User.findOne({ email: email.toLowerCase().trim() });
+    if (!user) {
+      // Return 200 for security to prevent user enumeration, but with a friendly message
+      return res.json({ message: 'If an account exists with this email, a new verification link has been sent.' });
+    }
+
+    if (user.isVerified) {
+      return res.status(400).json({ message: 'This email is already verified. Please log in.' });
+    }
+
+    // Generate new token
+    const verificationToken = crypto.randomBytes(32).toString('hex');
+    const hashedVerificationToken = crypto.createHash('sha256').update(verificationToken).digest('hex');
+    const verificationTokenExpire = Date.now() + 24 * 60 * 60 * 1000; // 24 hours
+
+    user.verificationToken = hashedVerificationToken;
+    user.verificationTokenExpire = verificationTokenExpire;
+    await user.save();
+
+    const origin = req.headers.origin || process.env.FRONTEND_URL || 'http://localhost:5173';
+    const verificationUrl = `${origin}/verify-email/${verificationToken}`;
+
+    sendEmail({
+      email: user.email,
+      subject: '✉️ Verify your EventSphere Account',
+      message: `Hi ${user.name}, please verify your account by visiting: ${verificationUrl}`,
+      htmlMessage: verificationEmail(user.name, verificationUrl)
+    }).catch((err) => {
+      console.warn('⚠️ Verification email failed to send:', err.message);
+    });
+
+    res.json({ message: 'A new verification link has been sent to your email.' });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -124,6 +248,15 @@ router.post('/login', async (req, res) => {
     // Success – reset attempts
     await User.findByIdAndUpdate(user._id, { loginAttempts: 0, lockUntil: null });
 
+    // Check verification status before logging in
+    if (!user.isVerified) {
+      return res.status(403).json({
+        message: 'Your email address is not verified. Please verify your email to log in.',
+        isVerified: false,
+        email: user.email
+      });
+    }
+
     res.json({
       _id: user._id,
       name: user.name,
@@ -150,7 +283,8 @@ router.post('/forgot-password', async (req, res) => {
     user.resetPasswordExpire = Date.now() + 15 * 60 * 1000; // 15 mins
     await user.save();
 
-    const resetUrl = `http://localhost:5173/reset-password/${resetToken}`;
+    const origin = req.headers.origin || process.env.FRONTEND_URL || 'http://localhost:5173';
+    const resetUrl = `${origin}/reset-password/${resetToken}`;
 
     await sendEmail({
       email: user.email,

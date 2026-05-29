@@ -16,6 +16,8 @@ const userSchema = new mongoose.Schema({
   isVerified:           { type: Boolean, default: false },
   verificationStatus:   { type: String, enum: ['None', 'Pending', 'Verified', 'Rejected'], default: 'None' },
   verificationDocument: { type: String },
+  verificationToken:    { type: String },
+  verificationTokenExpire: { type: Date },
   // Security
   loginAttempts: { type: Number, default: 0 },
   lockUntil:    { type: Date },

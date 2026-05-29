@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import api from '../utils/api';
-import { Calendar, MapPin, Clock, Ticket, Info, X, Music } from 'lucide-react';
+import { Calendar, MapPin, Clock, Ticket, Info, X, Music, Download } from 'lucide-react';
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
+import { downloadTicketPDF } from '../utils/downloadTicket';
 
 const getCity = (location = '') => {
   const parts = location.split(',');
@@ -47,6 +48,26 @@ const Orders = () => {
         .orders-row { transition: background 0.18s; cursor: pointer; }
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-thumb { background: rgba(139,92,246,0.35); border-radius: 6px; }
+        .download-btn {
+          background: rgba(139,92,246,0.08);
+          color: #8b5cf6;
+          border: 1px solid rgba(139,92,246,0.2);
+          padding: 6px 12px;
+          border-radius: 8px;
+          font-size: 0.8rem;
+          font-weight: 600;
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+        .download-btn:hover {
+          background: #8b5cf6;
+          color: #ffffff;
+          border-color: #8b5cf6;
+          box-shadow: 0 4px 12px rgba(139, 92, 246, 0.25);
+        }
       `}</style>
 
       {/* Header */}
@@ -79,6 +100,7 @@ const Orders = () => {
                   <th style={th}>Ticket</th>
                   <th style={th}>Price</th>
                   <th style={th}>Status</th>
+                  <th style={th}>Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -132,13 +154,40 @@ const Orders = () => {
                             {ticket.status || 'Booked'}
                           </span>
                         </td>
+                        <td style={td}>
+                          {ticket.status === 'Booked' ? (
+                            <button
+                              className="download-btn"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                downloadTicketPDF({
+                                  ticketId: ticket._id,
+                                  ticketType: ticket.ticketType,
+                                  price: ticket.price,
+                                  eventTitle: ev.title,
+                                  eventDate: ev.date,
+                                  eventTime: ev.time,
+                                  eventLocation: ev.location,
+                                  buyerName: user ? (user.name || user.username) : 'Attendee',
+                                  buyerEmail: user ? user.email : '',
+                                  category: ev.category,
+                                  poster: ev.poster
+                                });
+                              }}
+                            >
+                              <Download size={14} /> Download
+                            </button>
+                          ) : (
+                            <span style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>—</span>
+                          )}
+                        </td>
                       </tr>
 
                       {/* Expanded schedule row */}
                       <AnimatePresence>
                         {isSelected && (
                           <tr>
-                            <td colSpan={7} style={{ padding: 0, borderBottom: '1px solid var(--border-color)' }}>
+                            <td colSpan={8} style={{ padding: 0, borderBottom: '1px solid var(--border-color)' }}>
                               <motion.div
                                 initial={{ height: 0, opacity: 0 }}
                                 animate={{ height: 'auto', opacity: 1 }}
@@ -182,10 +231,34 @@ const Orders = () => {
                                   )}
 
                                   {/* Extra event details */}
-                                  <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem', flexWrap: 'wrap' }}>
+                                  <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem', flexWrap: 'wrap', alignItems: 'center' }}>
                                     {ev.dressCode && <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', background: 'var(--bg-color)', padding: '4px 12px', borderRadius: 20, border: '1px solid var(--border-color)' }}>👔 {ev.dressCode}</span>}
                                     {ev.websiteLink && <a href={ev.websiteLink} target="_blank" rel="noreferrer" style={{ fontSize: '0.8rem', color: '#3b82f6', textDecoration: 'none', background: 'rgba(59,130,246,0.08)', padding: '4px 12px', borderRadius: 20, border: '1px solid rgba(59,130,246,0.2)' }}>🌐 Event Website</a>}
                                     <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', background: 'var(--bg-color)', padding: '4px 12px', borderRadius: 20, border: '1px solid var(--border-color)' }}>📅 Booked: {new Date(ticket.purchaseDate || ticket.createdAt).toLocaleDateString()}</span>
+                                    {ticket.status === 'Booked' && (
+                                      <button
+                                        className="download-btn"
+                                        style={{ marginLeft: 'auto' }}
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          downloadTicketPDF({
+                                            ticketId: ticket._id,
+                                            ticketType: ticket.ticketType,
+                                            price: ticket.price,
+                                            eventTitle: ev.title,
+                                            eventDate: ev.date,
+                                            eventTime: ev.time,
+                                            eventLocation: ev.location,
+                                            buyerName: user ? (user.name || user.username) : 'Attendee',
+                                            buyerEmail: user ? user.email : '',
+                                            category: ev.category,
+                                            poster: ev.poster
+                                          });
+                                        }}
+                                      >
+                                        <Download size={14} /> Download Ticket PDF
+                                      </button>
+                                    )}
                                   </div>
                                 </div>
                               </motion.div>

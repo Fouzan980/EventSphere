@@ -68,7 +68,7 @@ router.post('/book/:eventId', protect, async (req, res) => {
       email: user.email,
       subject: `🎉 Ticket Confirmed — ${event.title}`,
       message: `Hi ${user.name}, your ${ticketType} ticket for ${event.title} is confirmed!`,
-      htmlMessage: ticketConfirmEmail(user.name, event),
+      htmlMessage: ticketConfirmEmail(user.name, event, ticket),
     }).catch(err => console.warn('⚠️ Ticket-confirm email failed:', err.message));
 
     res.status(201).json({ message: 'Ticket booked successfully', ticket });

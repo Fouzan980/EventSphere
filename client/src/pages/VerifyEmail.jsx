@@ -1,26 +1,54 @@
-import React, { useState } from 'react';
-import { Link, useParams, useNavigate } from 'react-router-dom';
-import { Lock, ArrowRight, CheckCircle, Loader2 } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { Mail, CheckCircle, XCircle, Loader2, ArrowRight } from 'lucide-react';
+import { toast } from 'react-toastify';
 import api from '../utils/api';
 
-const ResetPassword = () => {
+const VerifyEmail = () => {
   const { token } = useParams();
-  const navigate = useNavigate();
-  const [password, setPassword] = useState('');
-  const [status, setStatus] = useState('idle'); // idle, loading, success, error
-  const [msg, setMsg] = useState('');
+  const [status, setStatus] = useState(token ? 'verifying' : 'resend_only'); // verifying, success, error, resend_only, resending
+  const [email, setEmail] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
 
-  const handleSubmit = async (e) => {
+  useEffect(() => {
+    if (!token) return;
+
+    const verifyToken = async () => {
+      try {
+        const { data } = await api.post(`/auth/verify-email/${token}`);
+        setSuccessMessage(data.message || 'Email successfully verified!');
+        setStatus('success');
+        toast.success(data.message || 'Email successfully verified!');
+      } catch (error) {
+        const msg = error.response?.data?.message || 'Verification link is invalid or has expired.';
+        setErrorMessage(msg);
+        setStatus('error');
+        toast.error(msg);
+      }
+    };
+
+    verifyToken();
+  }, [token]);
+
+  const handleResend = async (e) => {
     e.preventDefault();
-    setStatus('loading');
+    if (!email) {
+      toast.error('Please enter your email address.');
+      return;
+    }
+
+    setStatus('resending');
     try {
-      const { data } = await api.post(`/auth/reset-password/${token}`, { password });
-      setMsg(data.message || 'Password reset successfully.');
-      setStatus('success');
-      setTimeout(() => navigate('/login'), 4000);
+      const { data } = await api.post('/auth/resend-verification', { email });
+      toast.success(data.message || 'Verification email sent!');
+      setSuccessMessage(data.message || 'If an account exists with this email, a verification link has been sent.');
+      setStatus('resend_success');
     } catch (error) {
-      setMsg(error.response?.data?.message || 'Failed to reset password');
+      const msg = error.response?.data?.message || 'Failed to resend verification email.';
+      toast.error(msg);
+      setErrorMessage(msg);
       setStatus('error');
     }
   };
@@ -44,58 +72,114 @@ const ResetPassword = () => {
           >
             ES
           </motion.div>
-          <h2 className="auth-brand-title">Set New Password</h2>
-          <p className="auth-brand-subtitle">Please enter your new strong password below.</p>
+          <h2 className="auth-brand-title">EventSphere</h2>
+          <p className="auth-brand-subtitle">Email Verification Workflow</p>
         </div>
 
-        {status === 'success' ? (
+        {status === 'verifying' && (
+          <div className="auth-status-container">
+            <Loader2 className="animate-spin auth-status-icon text-indigo" size={48} />
+            <h3 className="auth-status-title">Verifying your email...</h3>
+            <p className="auth-status-text">Please wait while we confirm your email address.</p>
+          </div>
+        )}
+
+        {status === 'success' && (
           <div className="auth-status-container">
             <CheckCircle className="auth-status-icon text-success animate-bounce" size={48} />
-            <h3 className="auth-status-title">Password Reset Successful!</h3>
-            <p className="auth-status-text">{msg}</p>
-            <p style={{ margin: '1rem 0 0 0', color: '#94a3b8', fontSize: '0.85rem' }}>Redirecting to login...</p>
+            <h3 className="auth-status-title">Verification Successful!</h3>
+            <p className="auth-status-text">{successMessage}</p>
+            <Link to="/login" className="auth-submit-btn" style={{ textDecoration: 'none', marginTop: '1.5rem', width: '100%' }}>
+              Proceed to Sign In <ArrowRight size={20} style={{ marginLeft: '8px' }} />
+            </Link>
           </div>
-        ) : (
-          <form onSubmit={handleSubmit} className="auth-form">
-            {status === 'error' && (
-              <div className="auth-error-alert">
-                {msg}
-              </div>
-            )}
-            
-            <div className="auth-input-group">
-              <div className="auth-input-wrapper">
-                <input 
-                  type="password" 
-                  className="auth-input" 
-                  placeholder="Min. 8 characters + symbols" 
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
-                <Lock className="auth-input-icon" size={20} />
-                <label className="auth-floating-label">New Password</label>
-              </div>
-            </div>
+        )}
 
-            <button type="submit" disabled={status === 'loading'} className="auth-submit-btn">
-              {status === 'loading' ? (
-                <Loader2 className="animate-spin" size={20} />
-              ) : (
-                <>
-                  Reset Password <ArrowRight size={20} style={{ marginLeft: '8px' }} />
-                </>
-              )}
-            </button>
+        {status === 'error' && (
+          <div className="auth-status-container">
+            <XCircle className="auth-status-icon text-danger" size={48} />
+            <h3 className="auth-status-title">Verification Failed</h3>
+            <p className="auth-status-text">{errorMessage}</p>
             
-            <p className="auth-footer-text">
-              Return to <Link to="/login" className="auth-link">Sign In</Link>
+            <div className="auth-divider"></div>
+            
+            <h4 className="auth-resend-heading">Need a new link?</h4>
+            <form onSubmit={handleResend} className="auth-form" style={{ width: '100%', marginTop: '0.5rem' }}>
+              <div className="auth-input-group">
+                <div className="auth-input-wrapper">
+                  <input 
+                    type="email" 
+                    className="auth-input" 
+                    placeholder="john@example.com"
+                    value={email} 
+                    onChange={(e) => setEmail(e.target.value)} 
+                    required 
+                  />
+                  <Mail className="auth-input-icon" size={20} />
+                  <label className="auth-floating-label">Email Address</label>
+                </div>
+              </div>
+              <button type="submit" className="auth-submit-btn" style={{ width: '100%' }}>
+                Request New Link
+              </button>
+            </form>
+            <p className="auth-footer-text" style={{ marginTop: '1.25rem' }}>
+              Back to <Link to="/login" className="auth-link">Sign In</Link>
             </p>
-          </form>
+          </div>
+        )}
+
+        {status === 'resend_only' && (
+          <div>
+            <p className="auth-status-text" style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
+              Enter your email below and we'll send you a verification link to activate your account.
+            </p>
+            <form onSubmit={handleResend} className="auth-form">
+              <div className="auth-input-group">
+                <div className="auth-input-wrapper">
+                  <input 
+                    type="email" 
+                    className="auth-input" 
+                    placeholder="john@example.com"
+                    value={email} 
+                    onChange={(e) => setEmail(e.target.value)} 
+                    required 
+                  />
+                  <Mail className="auth-input-icon" size={20} />
+                  <label className="auth-floating-label">Email Address</label>
+                </div>
+              </div>
+              <button type="submit" className="auth-submit-btn">
+                Send Verification Link <ArrowRight size={20} style={{ marginLeft: '8px' }} />
+              </button>
+            </form>
+            <p className="auth-footer-text">
+              Already verified? <Link to="/login" className="auth-link">Sign In</Link>
+            </p>
+          </div>
+        )}
+
+        {status === 'resending' && (
+          <div className="auth-status-container">
+            <Loader2 className="animate-spin auth-status-icon text-indigo" size={48} />
+            <h3 className="auth-status-title">Sending verification link...</h3>
+            <p className="auth-status-text">Please hold on while we process your request.</p>
+          </div>
+        )}
+
+        {status === 'resend_success' && (
+          <div className="auth-status-container">
+            <CheckCircle className="auth-status-icon text-success" size={48} />
+            <h3 className="auth-status-title">Email Sent!</h3>
+            <p className="auth-status-text">{successMessage}</p>
+            <Link to="/login" className="auth-submit-btn" style={{ textDecoration: 'none', marginTop: '1.5rem', width: '100%' }}>
+              Return to Login
+            </Link>
+          </div>
         )}
       </motion.div>
 
-      {/* Embedded CSS for styling this layout */}
+      {/* Embedded CSS for styling this layout in case global stylesheet isn't fully set up */}
       <style>{`
         .auth-container {
           min-height: 100dvh;
@@ -202,8 +286,16 @@ const ResetPassword = () => {
           margin-bottom: 1.25rem;
         }
 
+        .text-indigo {
+          color: #8b5cf6;
+        }
+
         .text-success {
           color: #10b981;
+        }
+
+        .text-danger {
+          color: #f43f5e;
         }
 
         .auth-status-title {
@@ -218,6 +310,21 @@ const ResetPassword = () => {
           color: #94a3b8;
           line-height: 1.5;
           margin: 0;
+        }
+
+        .auth-divider {
+          width: 100%;
+          height: 1px;
+          background: rgba(255, 255, 255, 0.08);
+          margin: 1.5rem 0;
+        }
+
+        .auth-resend-heading {
+          font-size: 0.95rem;
+          font-weight: 600;
+          color: #ffffff;
+          margin-bottom: 0.75rem;
+          align-self: flex-start;
         }
 
         .auth-form {
@@ -266,12 +373,6 @@ const ResetPassword = () => {
           box-sizing: border-box;
         }
 
-        .auth-input:-webkit-autofill {
-          -webkit-box-shadow: 0 0 0 1000px #0f172a inset !important;
-          -webkit-text-fill-color: #ffffff !important;
-          transition: background-color 5000s ease-in-out 0s;
-        }
-
         .auth-input:focus {
           border-color: #FF2A5F !important;
           box-shadow: 0 0 0 3px rgba(255, 42, 95, 0.25) !important;
@@ -303,16 +404,6 @@ const ResetPassword = () => {
 
         .auth-submit-btn:active {
           transform: translateY(1px);
-        }
-
-        .auth-error-alert {
-          padding: 10px 14px;
-          background-color: rgba(244, 63, 94, 0.1);
-          border-left: 3px solid #F43F5E;
-          color: #fda4af;
-          border-radius: 8px;
-          margin-bottom: 1rem;
-          font-size: 0.82rem;
         }
 
         .auth-footer-text {
@@ -414,4 +505,4 @@ const ResetPassword = () => {
   );
 };
 
-export default ResetPassword;
+export default VerifyEmail;
