@@ -1115,60 +1115,61 @@ const Home = () => {
         @media(max-width:768px){
           .filter-toggle-btn{display:flex !important;}
           .hero-section {
-            padding: 6rem 5% 2rem !important;
+            padding: 5rem 5% 1rem !important;
             min-height: 100dvh !important;
           }
           .hero-title {
-            font-size: clamp(2rem, 7vw, 3rem) !important;
-            margin-bottom: 0.75rem !important;
-          }
-          .hero-subtitle {
-            font-size: 0.95rem !important;
-            max-width: 500px !important;
-          }
-          .hero-badge {
-            font-size: 0.8rem !important;
-            padding: 6px 14px !important;
-            margin-bottom: 0.75rem !important;
-          }
-          .hero-search-wrap {
-            margin-top: 1.5rem !important;
-          }
-        }
-        @media(max-width:640px){
-          .hero-section {
-            padding: 5rem 4% 1.5rem !important;
-          }
-          .hero-title {
-            font-size: clamp(1.5rem, 5.5vw, 2.2rem) !important;
+            font-size: clamp(1.8rem, 6vw, 2.5rem) !important;
             margin-bottom: 0.5rem !important;
-            line-height: 1.25 !important;
           }
           .hero-subtitle {
-            font-size: 0.85rem !important;
+            font-size: 0.88rem !important;
+            max-width: 450px !important;
             line-height: 1.4 !important;
           }
           .hero-badge {
-            font-size: 0.72rem !important;
-            padding: 4px 10px !important;
+            font-size: 0.75rem !important;
+            padding: 5px 12px !important;
             margin-bottom: 0.5rem !important;
           }
           .hero-search-wrap {
             margin-top: 1rem !important;
+          }
+        }
+        @media(max-width:480px){
+          .hero-section {
+            padding: 4.5rem 4% 1rem !important;
+          }
+          .hero-title {
+            font-size: clamp(1.4rem, 5.5vw, 1.85rem) !important;
+            margin-bottom: 0.5rem !important;
+            line-height: 1.25 !important;
+          }
+          .hero-subtitle {
+            font-size: 0.8rem !important;
+            line-height: 1.4 !important;
+          }
+          .hero-badge {
+            font-size: 0.7rem !important;
+            padding: 4px 10px !important;
+            margin-bottom: 0.5rem !important;
+          }
+          .hero-search-wrap {
+            margin-top: 0.75rem !important;
             width: 100% !important;
           }
           .hero-search-bar {
-            padding: 0.5rem !important;
-            border-radius: 14px !important;
+            padding: 0.4rem !important;
+            border-radius: 12px !important;
             gap: 0.25rem !important;
           }
           .hero-search-bar button {
-            padding: 0.75rem 1.5rem !important;
-            font-size: 0.95rem !important;
-            border-radius: 10px !important;
+            padding: 0.65rem 1.25rem !important;
+            font-size: 0.9rem !important;
+            border-radius: 8px !important;
           }
           .hero-search-bar input {
-            font-size: 0.95rem !important;
+            font-size: 0.9rem !important;
           }
           .search-grp-city,.search-grp-cat,.search-divider-hide{display:none !important;}
         }
