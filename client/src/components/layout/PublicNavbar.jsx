@@ -159,10 +159,10 @@ const PublicNavbar = () => {
         </div>
       )}
 
-      <nav style={{ ...styles.navbar, top: hasBanner ? '32px' : 0 }}>
+      <nav className="public-navbar" style={{ ...styles.navbar, top: hasBanner ? '32px' : 0 }}>
         <div style={styles.logo} onClick={() => { window.scrollTo({ top: 0, behavior: 'smooth' }); navigate('/'); }} role="button">
-          <Ticket size={28} color="#FF2A5F" />
-          <h2 style={styles.brandTitle}>EVENTSPHERE</h2>
+          <Ticket className="public-navbar-logo-icon" size={34} color="#FF2A5F" />
+          <h2 className="brand-title" style={styles.brandTitle}>EVENTSPHERE</h2>
         </div>
 
         {/* Desktop Links */}
@@ -173,7 +173,7 @@ const PublicNavbar = () => {
           <Link to="/exhibitors" style={styles.link}>Exhibitors</Link>
           <div style={styles.navDivider}></div>
           {user ? (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
               {user.role !== 'Attendee' && (
                 <Link to="/dashboard" style={styles.link}>Dashboard</Link>
               )}
@@ -181,35 +181,35 @@ const PublicNavbar = () => {
               {user.role === 'Attendee' && (
                 <button
                   onClick={() => setTicketsOpen(true)}
-                  style={{ display:'flex', alignItems:'center', gap:6, background:'#FF2A5F', border:'none', color:'#fff', padding:'7px 14px', borderRadius:20, fontWeight:600, fontSize:'0.85rem', cursor:'pointer', boxShadow:'0 3px 10px rgba(255,42,95,0.4)' }}
+                  style={{ display:'flex', alignItems:'center', gap:6, background:'#FF2A5F', border:'none', color:'#fff', padding:'9px 18px', borderRadius:24, fontWeight:600, fontSize:'0.95rem', cursor:'pointer', boxShadow:'0 3px 10px rgba(255,42,95,0.4)' }}
                 >
-                  <Ticket size={15}/> My Tickets
+                  <Ticket size={17}/> My Tickets
                 </button>
               )}
               <button onClick={toggleTheme} style={styles.btnLogout}>
-                {theme === 'light' ? <Moon size={16} /> : <Sun size={16} />}
+                {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
               </button>
               {user.role === 'Attendee' ? (
                 <button onClick={() => setProfileOpen(true)} style={styles.avatarBtn} title="My Profile">
                   <div style={styles.avatarCircle}>
-                    {user.avatar ? <img src={user.avatar} alt="av" style={{width:'100%',height:'100%',objectFit:'cover'}}/> : <span style={{color:'#fff',fontWeight:700,fontSize:'0.85rem'}}>{initials}</span>}
+                    {user.avatar ? <img src={user.avatar} alt="av" style={{width:'100%',height:'100%',objectFit:'cover'}}/> : <span style={{color:'#fff',fontWeight:700,fontSize:'1rem'}}>{initials}</span>}
                   </div>
-                  <span style={{fontWeight:600,color:'#fff',fontSize:'0.95rem'}}>{user.name}</span>
+                  <span style={{fontWeight:600,color:'#fff',fontSize:'1.05rem'}}>{user.name}</span>
                 </button>
               ) : (
                 <Link to="/dashboard/profile" style={{display:'flex',alignItems:'center',gap:'8px',textDecoration:'none'}}>
                   <div style={styles.avatarCircle}>
-                    {user.avatar ? <img src={user.avatar} alt="av" style={{width:'100%',height:'100%',objectFit:'cover'}}/> : <span style={{color:'#fff',fontWeight:700,fontSize:'0.85rem'}}>{initials}</span>}
+                    {user.avatar ? <img src={user.avatar} alt="av" style={{width:'100%',height:'100%',objectFit:'cover'}}/> : <span style={{color:'#fff',fontWeight:700,fontSize:'1rem'}}>{initials}</span>}
                   </div>
-                  <span style={{fontWeight:600,color:'#fff',fontSize:'0.95rem'}}>{user.name}</span>
+                  <span style={{fontWeight:600,color:'#fff',fontSize:'1.05rem'}}>{user.name}</span>
                 </Link>
               )}
-              <button onClick={logout} style={styles.btnLogout} title="Logout"><LogOut size={16}/></button>
+              <button onClick={logout} style={styles.btnLogout} title="Logout"><LogOut size={20}/></button>
             </div>
           ) : (
-            <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+            <div style={{ display: 'flex', gap: '1.25rem', alignItems: 'center' }}>
               <button onClick={toggleTheme} style={styles.btnLogout}>
-                {theme === 'light' ? <Moon size={16} /> : <Sun size={16} />}
+                {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
               </button>
               <Link to="/login" style={styles.link}>Sign In</Link>
               <Link to="/register" style={styles.btnPrimary}>Sign Up</Link>
@@ -221,104 +221,160 @@ const PublicNavbar = () => {
         <button
           className="hamburger-btn"
           onClick={() => setIsMenuOpen(true)}
-          style={{ background: 'transparent', border: 'none', color: '#fff', cursor: 'pointer' }}
+          style={{ background: 'transparent', border: 'none', color: '#fff', cursor: 'pointer', padding: '8px' }}
         >
-          <Menu size={28} />
+          <Menu size={36} />
         </button>
       </nav>
 
       {/* pill removed — now inside navbar */}
 
       <AnimatePresence>
-        {isMenuOpen && (
-          <motion.div
-            className="mobile-menu-overlay"
-            initial={{ opacity: 0, y: -24 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -24 }}
-            transition={{ duration: 0.28, ease: 'easeOut' }}
-            style={{ top: hasBanner ? '32px' : 0, height: hasBanner ? 'calc(100dvh - 32px)' : '100dvh' }}
-          >
-            <button className="close-btn" onClick={() => setIsMenuOpen(false)}><X size={32} /></button>
+        {isMenuOpen && (() => {
+          const menuItems = [
+            { label: 'Home', path: '/' },
+            { label: 'Events', path: '#events', isHash: true },
+            { label: 'Categories', path: '#categories', isHash: true },
+            { label: 'Exhibitors', path: '/exhibitors' }
+          ];
 
-            {user && (
-              <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.05 }}
-                style={{ textAlign: 'center', marginBottom: '1rem', width: '100%' }}
-              >
-                <div style={{ fontSize: '0.72rem', fontWeight: 700, color: '#a855f7', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: 4 }}>Logged in as</div>
-                <div style={{ fontWeight: 800, color: '#fff', fontSize: '1.2rem' }}>{user.name}</div>
-                <div style={{ fontSize: '0.78rem', color: '#64748b', marginTop: 2 }}>{user.email}</div>
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, marginTop: 8, background: 'rgba(168,85,247,0.15)', color: '#a855f7', border: '1px solid rgba(168,85,247,0.3)', padding: '2px 12px', borderRadius: 20, fontSize: '0.72rem', fontWeight: 700 }}>
-                  <Ticket size={11} /> {user.role?.toUpperCase()}
-                </span>
-              </motion.div>
-            )}
+          if (user) {
+            if (user.role === 'Attendee') {
+              menuItems.push({ label: 'Profile', onClick: () => { setIsMenuOpen(false); setProfileOpen(true); } });
+              menuItems.push({ label: 'My Tickets', onClick: () => { setIsMenuOpen(false); setTicketsOpen(true); } });
+            } else {
+              menuItems.push({ label: 'Dashboard', path: '/dashboard' });
+            }
+            menuItems.push({ label: 'Logout', onClick: () => { setIsMenuOpen(false); logout(); }, isSpecial: true });
+          } else {
+            menuItems.push({ label: 'Sign In', path: '/login' });
+            menuItems.push({ label: 'Sign Up', path: '/register', isPrimary: true });
+          }
 
-            <div style={{ height: '1px', width: '100%', maxWidth: 300, background: 'linear-gradient(to right, transparent, #334155, transparent)', marginBottom: '1rem' }} />
+          // Add Day/Night Toggle Switch directly to the main menu items list
+          menuItems.push({ isThemeToggle: true });
 
-            <div className="mobile-menu-links" style={{ marginBottom: '0.75rem' }}>
-              {[['Home', '/'], ['Events', '#events'], ['Categories', '#categories'], ['Exhibitors', '/exhibitors']].map(([label, path], i) => {
-                const isHash = path.startsWith('#');
-                return (
-                  <motion.div key={label}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.08 + i * 0.05 }}
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    {isHash ? (
-                      <a href={`${import.meta.env.BASE_URL}${path}`} className="mobile-link" style={{ textDecoration: 'none', display: 'block' }}>{label}</a>
-                    ) : (
-                      <Link to={path} className="mobile-link" style={{ textDecoration: 'none', display: 'block' }}>{label}</Link>
-                    )}
-                  </motion.div>
-                );
-              })}
-            </div>
+          return (
+            <motion.div
+              className="mobile-menu-overlay"
+              initial={{ opacity: 0, y: -24 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -24 }}
+              transition={{ duration: 0.28, ease: 'easeOut' }}
+              style={{ top: hasBanner ? '32px' : 0, height: hasBanner ? 'calc(100dvh - 32px)' : '100dvh' }}
+            >
+              <button className="close-btn" onClick={() => setIsMenuOpen(false)}><X size={32} /></button>
 
-            <div style={{ height: '1px', width: '100%', maxWidth: 300, background: 'linear-gradient(to right, transparent, #334155, transparent)', marginBottom: '0.75rem' }} />
+              {user && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.05 }}
+                  style={{ textAlign: 'center', marginBottom: '0.75rem', width: '100%' }}
+                >
+                  <div style={{ fontSize: '0.72rem', fontWeight: 700, color: '#a855f7', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: 2 }}>Logged in as</div>
+                  <div style={{ fontWeight: 800, color: '#fff', fontSize: '1.2rem' }}>{user.name}</div>
+                  <div style={{ fontSize: '0.78rem', color: '#64748b', marginTop: 2 }}>{user.email}</div>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, marginTop: 6, background: 'rgba(168,85,247,0.15)', color: '#a855f7', border: '1px solid rgba(168,85,247,0.3)', padding: '2px 12px', borderRadius: 20, fontSize: '0.72rem', fontWeight: 700 }}>
+                    <Ticket size={11} /> {user.role?.toUpperCase()}
+                  </span>
+                </motion.div>
+              )}
 
-            {user ? (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.28 }}
-                style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}
-              >
-                {user.role === 'Attendee' ? (
-                  <div className="mobile-menu-links" style={{ marginBottom: '1rem' }}>
-                    <button onClick={() => { setIsMenuOpen(false); setProfileOpen(true); }} className="mobile-link" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontFamily: 'inherit' }}>Profile</button>
-                    <button onClick={() => { setIsMenuOpen(false); setTicketsOpen(true); }} className="mobile-link" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontFamily: 'inherit' }}>My Tickets</button>
-                  </div>
-                ) : (
-                  <Link to="/dashboard" className="mobile-link" onClick={() => setIsMenuOpen(false)} style={{ marginBottom: '1rem' }}>Dashboard</Link>
-                )}
-                <div style={{ display: 'flex', gap: '1.5rem' }}>
-                  <button onClick={toggleTheme} style={styles.btnLogout}>
-                    {theme === 'light' ? <Moon size={22} /> : <Sun size={22} />}
-                  </button>
-                  <button onClick={logout} style={{ ...styles.btnLogout, color: '#FF2A5F' }}><LogOut size={22} /></button>
+              <div className="mobile-menu-inner">
+                <div className="mobile-menu-links">
+                  {menuItems.map((item, i) => {
+                    if (item.isThemeToggle) {
+                      return (
+                        <motion.div
+                          key="theme-toggle"
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 0.05 + i * 0.04 }}
+                          style={{ width: '100%', display: 'flex', justifyContent: 'center' }}
+                        >
+                          <div 
+                            onClick={toggleTheme}
+                            style={{
+                              width: '76px',
+                              height: '40px',
+                              borderRadius: '20px',
+                              backgroundColor: theme === 'light' ? 'rgba(255,255,255,0.15)' : '#FF2A5F',
+                              position: 'relative',
+                              cursor: 'pointer',
+                              transition: 'background-color 0.3s ease',
+                              display: 'flex',
+                              alignItems: 'center',
+                              padding: '2px 6px',
+                              boxSizing: 'border-box',
+                              border: '1.5px solid rgba(255,255,255,0.2)',
+                              boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+                            }}
+                          >
+                            <div
+                              style={{
+                                width: '30px',
+                                height: '30px',
+                                borderRadius: '50%',
+                                backgroundColor: '#fff',
+                                position: 'absolute',
+                                left: theme === 'light' ? '6px' : '38px',
+                                transition: 'left 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                boxShadow: '0 2px 5px rgba(0,0,0,0.3)'
+                              }}
+                            >
+                              {theme === 'light' ? <Sun size={17} color="#F59E0B" /> : <Moon size={17} color="#6366F1" />}
+                            </div>
+                          </div>
+                        </motion.div>
+                      );
+                    }
+
+                    if (item.onClick) {
+                      return (
+                        <motion.div
+                          key={item.label}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 0.05 + i * 0.04 }}
+                          style={{ width: '100%', display: 'flex', justifyContent: 'center' }}
+                        >
+                          <button
+                            onClick={item.onClick}
+                            className={item.isSpecial ? "mobile-link mobile-link-special" : "mobile-link"}
+                            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontFamily: 'inherit' }}
+                          >
+                            {item.label}
+                          </button>
+                        </motion.div>
+                      );
+                    }
+
+                    const isHash = item.isHash;
+                    return (
+                      <motion.div
+                        key={item.label}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.05 + i * 0.04 }}
+                        style={{ width: '100%', display: 'flex', justifyContent: 'center' }}
+                      >
+                        {isHash ? (
+                          <a href={`${import.meta.env.BASE_URL}${item.path}`} className="mobile-link" onClick={() => setIsMenuOpen(false)} style={{ textDecoration: 'none' }}>{item.label}</a>
+                        ) : (
+                          <Link to={item.path} className={item.isPrimary ? "mobile-link mobile-link-primary" : "mobile-link"} onClick={() => setIsMenuOpen(false)} style={{ textDecoration: 'none' }}>{item.label}</Link>
+                        )}
+                      </motion.div>
+                    );
+                  })}
                 </div>
-              </motion.div>
-            ) : (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.28 }}
-                style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.85rem', width: '100%' }}
-              >
-                <button onClick={toggleTheme} style={styles.btnLogout}>
-                  {theme === 'light' ? <Moon size={22} /> : <Sun size={22} />}
-                </button>
-                <Link to="/login" className="mobile-link" onClick={() => setIsMenuOpen(false)}>Sign In</Link>
-                <Link to="/register" style={{ ...styles.btnPrimary, width: '100%', textAlign: 'center', maxWidth: '200px' }} onClick={() => setIsMenuOpen(false)}>Sign Up</Link>
-              </motion.div>
-            )}
-          </motion.div>
-        )}
+              </div>
+            </motion.div>
+          );
+        })()}
       </AnimatePresence>
 
       {/* ─── Attendee Profile Sidebar ──────────────────────────────────────── */}

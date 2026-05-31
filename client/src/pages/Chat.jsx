@@ -107,7 +107,7 @@ export default function Chat() {
     const sock = io(window.location.origin, {
       path: window.location.pathname.startsWith('/projects/eventsphere') ? '/projects/eventsphere/socket.io' : '/socket.io',
       auth: { token: user.token },
-      transports: ['websocket','polling'],
+      transports: ['polling', 'websocket'],
       reconnection: true,
       reconnectionAttempts: Infinity,
       reconnectionDelay: 1000,

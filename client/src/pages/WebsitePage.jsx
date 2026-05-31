@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Ticket, Mail, ArrowRight, CheckCircle, Loader2, Send, MapPin, Globe, Rocket, Search, Wrench, Zap, BarChart2, CreditCard } from 'lucide-react';
+import { Ticket, Mail, ArrowRight, CheckCircle, Loader2, Send, MapPin, Globe, Rocket, Search, Wrench, Zap, BarChart2, CreditCard, Phone } from 'lucide-react';
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../utils/api';
@@ -110,9 +110,9 @@ const PageEventsCategory = ({ category }) => {
 
   useEffect(() => {
     api.get('/events').then(res => {
-      // Filter dynamically or show random if category missing to ensure UI isn't empty
-      let filtered = res.data.filter(e => e.category && (e.category.toLowerCase().includes(category.toLowerCase()) || category.toLowerCase().includes(e.category.toLowerCase())));
-      if (filtered.length === 0) filtered = res.data.slice(0, 3); // fallback
+      // Normalize category (e.g. "Expos" -> "expo", "Workshops" -> "workshop", "Concerts" -> "concert")
+      const normalizedCategory = category.endsWith('s') ? category.slice(0, -1).toLowerCase() : category.toLowerCase();
+      const filtered = res.data.filter(e => e.category && (e.category.toLowerCase().includes(normalizedCategory) || normalizedCategory.includes(e.category.toLowerCase())));
       setEvents(filtered);
       setLoading(false);
     });
@@ -121,7 +121,9 @@ const PageEventsCategory = ({ category }) => {
   const images = {
     Concerts: 'https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=800&q=80',
     Comedy: 'https://images.unsplash.com/photo-1585699324551-f6c309eedeca?w=800&q=80',
-    Theater: 'https://images.unsplash.com/photo-1460881680858-30d872d5b530?w=800&q=80'
+    Theater: 'https://images.unsplash.com/photo-1460881680858-30d872d5b530?w=800&q=80',
+    Expos: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&q=80',
+    Workshops: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?w=800&q=80'
   };
 
   return (
@@ -136,6 +138,19 @@ const PageEventsCategory = ({ category }) => {
         <h3 style={{ fontSize: '1.4rem', fontWeight: 800, marginBottom: '1.25rem', color: 'var(--text-primary)' }}>Upcoming {category} Events</h3>
         {loading ? (
           <div style={{ textAlign: 'center', padding: '2rem' }}><Loader2 className="animate-spin" size={36} color="#FF2A5F" /></div>
+        ) : events.length === 0 ? (
+          <div style={{ 
+            textAlign: 'center', 
+            padding: '3rem 2rem', 
+            background: 'var(--bg-surface)', 
+            borderRadius: '16px', 
+            border: '1px dashed var(--border-color)',
+            color: 'var(--text-secondary)'
+          }}>
+            <Ticket size={48} style={{ margin: '0 auto 1rem', opacity: 0.5, color: '#FF2A5F' }} />
+            <p style={{ margin: 0, fontWeight: 600, fontSize: '1.1rem' }}>No upcoming {category} events found</p>
+            <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.9rem', opacity: 0.8 }}>Please check back later or explore other categories!</p>
+          </div>
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem' }}>
             {events.map((ev, i) => (
@@ -408,7 +423,7 @@ const WebsitePage = ({ title, subtitle }) => {
   const renderContent = () => {
     switch (title) {
       case 'Contact Us': return <PageContact />;
-      case 'Concerts': case 'Comedy': case 'Theater': return <PageEventsCategory category={title} />;
+      case 'Concerts': case 'Comedy': case 'Theater': case 'Expos': case 'Workshops': return <PageEventsCategory category={title} />;
       case 'Pricing': return <PagePricing />;
       case 'Careers': return <PageCareers />;
       case 'List Your Event': return <PageListEvent />;
@@ -462,20 +477,36 @@ const WebsitePage = ({ title, subtitle }) => {
           <div style={shellStyles.footerLinksGrid}>
              <div style={shellStyles.fCol}>
                <h4>Company</h4>
-               <Link to="/about" style={shellStyles.footerLink}>About Us</Link>
-               <Link to="/careers" style={shellStyles.footerLink}>Careers</Link>
-               <Link to="/contact" style={shellStyles.footerLink}>Contact Us</Link>
+               <Link to="/about" className="footer-slide-link">About Us</Link>
+               <Link to="/careers" className="footer-slide-link">Careers</Link>
+               <Link to="/contact" className="footer-slide-link">Contact Us</Link>
              </div>
-             <div style={shellStyles.fCol}>
-               <h4>Discover</h4>
-               <Link to="/concerts" style={shellStyles.footerLink}>Concerts</Link>
-               <Link to="/comedy" style={shellStyles.footerLink}>Comedy</Link>
-               <Link to="/theater" style={shellStyles.footerLink}>Theater</Link>
-             </div>
+              <div style={shellStyles.fCol}>
+                <h4>Discover</h4>
+                <Link to="/concerts" className="footer-slide-link">Concerts</Link>
+                <Link to="/expos" className="footer-slide-link">Expos</Link>
+                <Link to="/workshops" className="footer-slide-link">Workshops</Link>
+                <Link to="/comedy" className="footer-slide-link">Comedy</Link>
+                <Link to="/theater" className="footer-slide-link">Theater</Link>
+              </div>
              <div style={shellStyles.fCol}>
                <h4>Host Events</h4>
-               <Link to="/list-event" style={shellStyles.footerLink}>List your event</Link>
-               <Link to="/services" style={shellStyles.footerLink}>Ticketing Services</Link>
+               <Link to="/list-event" className="footer-slide-link">List your event</Link>
+               <Link to="/services" className="footer-slide-link">Ticketing Services</Link>
+               <div style={{ marginTop: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.6rem', borderTop: '1px solid rgba(255,255,255,0.07)', paddingTop: '0.75rem' }}>
+                 <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem', color: '#94a3b8', fontSize: '0.82rem', lineHeight: '1.25rem' }}>
+                   <MapPin size={14} style={{ color: '#FF2A5F', flexShrink: 0, marginTop: '2px' }} />
+                   <span>FTC Building, Block B, Shahrah-e-Faisal, Karachi, Pakistan</span>
+                 </div>
+                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#94a3b8', fontSize: '0.82rem' }}>
+                   <Phone size={14} style={{ color: '#FF2A5F', flexShrink: 0 }} />
+                   <a href="tel:+923442872364" style={{ color: 'inherit', textDecoration: 'none', transition: '0.2s' }} onMouseOver={e => e.currentTarget.style.color='#FF2A5F'} onMouseOut={e => e.currentTarget.style.color='#94a3b8'}>+92 344 2872364</a>
+                 </div>
+                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#94a3b8', fontSize: '0.82rem' }}>
+                   <Mail size={14} style={{ color: '#FF2A5F', flexShrink: 0 }} />
+                   <a href="mailto:eventsphere@fouzan.me" style={{ color: 'inherit', textDecoration: 'none', transition: '0.2s' }} onMouseOver={e => e.currentTarget.style.color='#FF2A5F'} onMouseOut={e => e.currentTarget.style.color='#94a3b8'}>eventsphere@fouzan.me</a>
+                 </div>
+               </div>
              </div>
           </div>
         </div>

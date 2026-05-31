@@ -916,3 +916,22 @@ tr:hover td { background: rgba(0,0,0,0.02); }
   }
 }
 
+/* Footer link sliding color hover effect */
+.footer-slide-link {
+  color: #ffffff;
+  text-decoration: none;
+  font-size: 0.87rem;
+  font-weight: 500;
+  background-image: linear-gradient(to right, #FF2A5F 50%, #ffffff 50%);
+  background-size: 200% 100%;
+  background-position: 100% 0;
+  transition: background-position 0.3s ease-out;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+}
+
+.footer-slide-link:hover {
+  background-position: 0 0;
+}
+

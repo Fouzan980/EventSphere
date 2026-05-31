@@ -57,6 +57,8 @@ function App() {
         <Route path="/careers" element={<WebsitePage title="Careers" subtitle="Join our team and help shape the future of live events." />} />
         <Route path="/contact" element={<WebsitePage title="Contact Us" subtitle="We're here to help. Reach out with any questions or support requests." />} />
         <Route path="/concerts" element={<WebsitePage title="Concerts" subtitle="Experience the best live music events taking place near you." />} />
+        <Route path="/expos" element={<WebsitePage title="Expos" subtitle="Explore leading trade shows, business exhibitions, and technology expos." />} />
+        <Route path="/workshops" element={<WebsitePage title="Workshops" subtitle="Learn new skills and connect with industry experts in our interactive workshops." />} />
         <Route path="/comedy" element={<WebsitePage title="Comedy" subtitle="Find top comedy shows and laugh out loud with your favorite comedians." />} />
         <Route path="/theater" element={<WebsitePage title="Theater" subtitle="Discover breathtaking plays, musicals, and artistic performances." />} />
         <Route path="/list-event" element={<WebsitePage title="List Your Event" subtitle="Get your event in front of thousands of potential attendees today." />} />

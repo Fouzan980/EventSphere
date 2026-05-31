@@ -4,7 +4,7 @@ import api from '../utils/api';
 import { AuthContext } from '../context/AuthContext';
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Calendar, MapPin, Ticket, X, ChevronLeft, ChevronRight, Mic, Download, Users, Building2, Globe, Clock, DollarSign, Ban, PartyPopper, Zap, CheckCircle, ExternalLink, Music, Star } from 'lucide-react';
+import { Search, Calendar, MapPin, Ticket, X, ChevronLeft, ChevronRight, Mic, Download, Users, Building2, Globe, Clock, DollarSign, Ban, PartyPopper, Zap, CheckCircle, ExternalLink, Music, Star, Phone, Mail, Laugh, Theater } from 'lucide-react';
 import { toast } from 'react-toastify';
 import PublicNavbar from '../components/layout/PublicNavbar';
 import { PageSkeleton } from '../components/Skeleton';
@@ -294,6 +294,8 @@ const Home = () => {
     { label: 'All',         IconEl: null,       cat: '' },
     { label: 'Concerts',    IconEl: Music,       cat: 'Concert' },
     { label: 'Expos',       IconEl: Building2,   cat: 'Expo' },
+    { label: 'Comedy',      IconEl: Laugh,       cat: 'Comedy' },
+    { label: 'Theater',     IconEl: Theater,     cat: 'Theater' },
     { label: 'Workshops',   IconEl: Users,       cat: 'Workshop' },
     { label: 'Conferences', IconEl: Mic,         cat: 'Conference' },
     { label: 'Jobs',        IconEl: Ticket,      cat: 'Recruitment Drive' },
@@ -306,9 +308,9 @@ const Home = () => {
 
       {/* ─── Hero ──────────────────────────────────────────────────────── */}
       <header style={S.hero}>
-        <div style={{ maxWidth: '800px', width: '100%', textAlign: 'center' }}>
+        <div style={{ maxWidth: '1100px', width: '100%', textAlign: 'center' }}>
           <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} style={S.heroBadge}>
-            <span style={{display:'inline-flex',alignItems:'center',gap:4}}><PartyPopper size={14}/></span> Pakistan's #1 Event Discovery Platform
+            <span style={{display:'inline-flex',alignItems:'center',gap:4}}><PartyPopper size={16}/></span> Pakistan's #1 Event Discovery Platform
           </motion.div>
           <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} style={S.heroTitle}>
             Find your next<br /><span style={{ color: '#FF2A5F' }}>Live Experience</span>
@@ -320,7 +322,7 @@ const Home = () => {
         <motion.div initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.4 }} style={S.searchWrap}>
           <div style={S.searchBar}>
             <div style={{ ...S.searchGrp, position: 'relative', flex: '2 1 200px' }}>
-              <Search size={18} color="#64748b" style={{ flexShrink: 0 }} />
+              <Search size={22} color="#64748b" style={{ flexShrink: 0 }} />
               <input type="text" placeholder="Search events or artists..." style={S.searchInput} value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)} onKeyDown={e => e.key === 'Enter' && scrollToEvents()} />
               {searchQuery && speakerSuggestions.length > 0 && (
@@ -338,7 +340,7 @@ const Home = () => {
             </div>
             <div style={S.searchDivider} />
             <div style={S.searchGrp}>
-              <MapPin size={18} color="#64748b" style={{ flexShrink: 0 }} />
+              <MapPin size={22} color="#64748b" style={{ flexShrink: 0 }} />
               <select style={S.selectInput} value={selectedCity} onChange={e => setSelectedCity(e.target.value)}>
                 <option value="">Any City</option>
                 {cities.map(c => <option key={c} value={c}>{c}</option>)}
@@ -346,11 +348,13 @@ const Home = () => {
             </div>
             <div style={S.searchDivider} />
             <div style={S.searchGrp}>
-              <Calendar size={18} color="#64748b" style={{ flexShrink: 0 }} />
+              <Calendar size={22} color="#64748b" style={{ flexShrink: 0 }} />
               <select style={S.selectInput} value={selectedCategory} onChange={e => setSelectedCategory(e.target.value)}>
                 <option value="">Any Category</option>
                 <option value="Concert">Concert</option>
                 <option value="Expo">Expo</option>
+                <option value="Comedy">Comedy</option>
+                <option value="Theater">Theater</option>
                 <option value="Workshop">Workshop</option>
                 <option value="Conference">Conference</option>
                 <option value="Recruitment Drive">Recruitment Drive</option>
@@ -915,15 +919,29 @@ const Home = () => {
           <div style={{ flex: '2 1 380px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(120px,1fr))', gap: '2rem' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
               <h4 style={{ color: '#fff', margin: 0, fontSize: '0.9rem' }}>Company</h4>
-              {[['About Us','/about'],['Careers','/careers'],['Contact','/contact']].map(([l,h]) => <Link key={l} to={h} style={{ color: '#ffffff', textDecoration: 'none', fontSize: '0.87rem', transition: '0.2s' }} onMouseOver={e => e.currentTarget.style.color='#FF2A5F'} onMouseOut={e => e.currentTarget.style.color='#ffffff'}>{l}</Link>)}
+              {[['About Us','/about'],['Careers','/careers'],['Contact','/contact']].map(([l,h]) => <Link key={l} to={h} className="footer-slide-link">{l}</Link>)}
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
               <h4 style={{ color: '#fff', margin: 0, fontSize: '0.9rem' }}>Discover</h4>
-              {[['Concerts','/concerts'],['Expos','/'],['Workshops','/']].map(([l,h]) => <Link key={l} to={h} style={{ color: '#ffffff', textDecoration: 'none', fontSize: '0.87rem', transition: '0.2s' }} onMouseOver={e => e.currentTarget.style.color='#FF2A5F'} onMouseOut={e => e.currentTarget.style.color='#ffffff'}>{l}</Link>)}
+              {[['Concerts','/concerts'],['Expos','/expos'],['Workshops','/workshops'],['Comedy','/comedy'],['Theater','/theater']].map(([l,h]) => <Link key={l} to={h} className="footer-slide-link">{l}</Link>)}
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
               <h4 style={{ color: '#fff', margin: 0, fontSize: '0.9rem' }}>Host Events</h4>
-              {[['List Your Event','/register'],['Ticketing','/services']].map(([l,h]) => <Link key={l} to={h} style={{ color: '#ffffff', textDecoration: 'none', fontSize: '0.87rem', transition: '0.2s' }} onMouseOver={e => e.currentTarget.style.color='#FF2A5F'} onMouseOut={e => e.currentTarget.style.color='#ffffff'}>{l}</Link>)}
+              {[['List Your Event','/register'],['Ticketing','/services']].map(([l,h]) => <Link key={l} to={h} className="footer-slide-link">{l}</Link>)}
+              <div style={{ marginTop: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.6rem', borderTop: '1px solid rgba(255,255,255,0.07)', paddingTop: '0.75rem' }}>
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem', color: '#94a3b8', fontSize: '0.82rem', lineHeight: '1.25rem' }}>
+                  <MapPin size={14} style={{ color: '#FF2A5F', flexShrink: 0, marginTop: '2px' }} />
+                  <span>FTC Building, Block B, Shahrah-e-Faisal, Karachi, Pakistan</span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#94a3b8', fontSize: '0.82rem' }}>
+                  <Phone size={14} style={{ color: '#FF2A5F', flexShrink: 0 }} />
+                  <a href="tel:+923442872364" style={{ color: 'inherit', textDecoration: 'none', transition: '0.2s' }} onMouseOver={e => e.currentTarget.style.color='#FF2A5F'} onMouseOut={e => e.currentTarget.style.color='#94a3b8'}>+92 344 2872364</a>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#94a3b8', fontSize: '0.82rem' }}>
+                  <Mail size={14} style={{ color: '#FF2A5F', flexShrink: 0 }} />
+                  <a href="mailto:eventsphere@fouzan.me" style={{ color: 'inherit', textDecoration: 'none', transition: '0.2s' }} onMouseOver={e => e.currentTarget.style.color='#FF2A5F'} onMouseOut={e => e.currentTarget.style.color='#94a3b8'}>eventsphere@fouzan.me</a>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -1113,18 +1131,18 @@ const S = {
   palScroll: { overflow: 'hidden', flex: 1 },
   palText: { display: 'inline-block', whiteSpace: 'nowrap', animation: 'palScroll 25s linear infinite', color: '#fff', fontSize: '0.82rem', fontWeight: 600, letterSpacing: '0.5px' },
 
-  hero: { backgroundColor: 'var(--nav-bg,#0F172A)', backgroundImage: 'radial-gradient(circle at 80% 20%,#1e1b4b 0%,transparent 40%),radial-gradient(circle at 20% 80%,#2e1065 0%,transparent 40%)', minHeight: '30vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 'clamp(7rem,12vw,8rem) 5% 3rem', position: 'relative', textAlign: 'center' },
-  heroBadge: { display: 'inline-flex', alignItems: 'center', gap: '6px', backgroundColor: 'rgba(255,42,95,0.15)', color: '#FF2A5F', border: '1px solid rgba(255,42,95,0.3)', borderRadius: '20px', padding: '6px 16px', fontSize: '0.82rem', fontWeight: 700, marginBottom: '1rem' },
-  heroTitle: { fontSize: 'clamp(2rem,7vw,4rem)', fontWeight: 900, color: '#fff', lineHeight: 1.1, marginBottom: '1rem', letterSpacing: '-1px' },
-  heroSub: { fontSize: 'clamp(0.9rem,2vw,1.1rem)', color: '#94a3b8', maxWidth: '500px', margin: '0 auto', lineHeight: '1.5' },
+  hero: { backgroundColor: 'var(--nav-bg,#0F172A)', backgroundImage: 'radial-gradient(circle at 80% 20%, rgba(255, 42, 95, 0.15) 0%, transparent 50%), radial-gradient(circle at 20% 80%, rgba(139, 92, 246, 0.2) 0%, transparent 60%)', minHeight: '100dvh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 'clamp(8rem,14vw,10rem) 5% 4rem', position: 'relative', textAlign: 'center' },
+  heroBadge: { display: 'inline-flex', alignItems: 'center', gap: '8px', backgroundColor: 'rgba(255,42,95,0.15)', color: '#FF2A5F', border: '1px solid rgba(255,42,95,0.3)', borderRadius: '24px', padding: '8px 20px', fontSize: '0.92rem', fontWeight: 700, marginBottom: '1.25rem' },
+  heroTitle: { fontSize: 'clamp(2.8rem, 8.5vw, 5.5rem)', fontWeight: 900, color: '#fff', lineHeight: 1.15, marginBottom: '1.25rem', letterSpacing: '-1.5px' },
+  heroSub: { fontSize: 'clamp(1.1rem, 2.5vw, 1.4rem)', color: '#94a3b8', maxWidth: '750px', margin: '0 auto', lineHeight: '1.6' },
 
-  searchWrap: { width: '100%', display: 'flex', justifyContent: 'center', marginTop: '1.75rem', zIndex: 20 },
-  searchBar: { backgroundColor: 'var(--bg-surface,#fff)', borderRadius: '16px', padding: '0.7rem', display: 'flex', alignItems: 'center', boxShadow: '0 20px 40px rgba(15,23,42,0.18)', width: '100%', maxWidth: '950px', gap: '0.4rem', flexWrap: 'wrap' },
-  searchGrp: { display: 'flex', alignItems: 'center', gap: '0.5rem', flex: '1 1 160px', minWidth: '140px', padding: '0.35rem 0.75rem' },
-  searchDivider: { width: '1px', height: '32px', backgroundColor: 'var(--border-color,#e2e8f0)', flexShrink: 0 },
-  searchInput: { border: 'none', outline: 'none', fontSize: '0.93rem', color: 'var(--text-primary)', width: '100%', backgroundColor: 'transparent' },
-  selectInput: { border: 'none', outline: 'none', fontSize: '0.93rem', color: 'var(--text-primary)', width: '100%', backgroundColor: 'transparent', cursor: 'pointer' },
-  btnSearch: { backgroundColor: '#FF2A5F', color: '#fff', border: 'none', padding: '0.85rem 1.75rem', borderRadius: '12px', fontWeight: 700, fontSize: '0.93rem', cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0 },
+  searchWrap: { width: '100%', display: 'flex', justifyContent: 'center', marginTop: '2.5rem', zIndex: 20 },
+  searchBar: { backgroundColor: 'var(--bg-surface,#fff)', borderRadius: '20px', padding: '0.9rem', display: 'flex', alignItems: 'center', boxShadow: '0 25px 50px rgba(15,23,42,0.22)', width: '100%', maxWidth: '1050px', gap: '0.5rem', flexWrap: 'wrap' },
+  searchGrp: { display: 'flex', alignItems: 'center', gap: '0.75rem', flex: '1 1 180px', minWidth: '160px', padding: '0.4rem 0.9rem' },
+  searchDivider: { width: '1px', height: '36px', backgroundColor: 'var(--border-color,#e2e8f0)', flexShrink: 0 },
+  searchInput: { border: 'none', outline: 'none', fontSize: '1.05rem', color: 'var(--text-primary)', width: '100%', backgroundColor: 'transparent' },
+  selectInput: { border: 'none', outline: 'none', fontSize: '1.05rem', color: 'var(--text-primary)', width: '100%', backgroundColor: 'transparent', cursor: 'pointer' },
+  btnSearch: { backgroundColor: '#FF2A5F', color: '#fff', border: 'none', padding: '0.95rem 2rem', borderRadius: '14px', fontWeight: 700, fontSize: '1.05rem', cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0, transition: 'background-color 0.2s' },
 
   sectionTitle: { fontSize: 'clamp(1.4rem,4vw,2rem)', fontWeight: 800, color: 'var(--text-primary)', margin: 0 },
   sectionSub: { color: '#64748b', fontSize: '0.92rem', marginTop: '0.3rem' },

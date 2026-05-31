@@ -672,6 +672,8 @@ const Events = () => {
                         <select style={styles.input} value={formData.category} onChange={e => setFormData({ ...formData, category: e.target.value })}>
                           <option value="Expo">Expo</option>
                           <option value="Concert">Concert</option>
+                          <option value="Comedy">Comedy</option>
+                          <option value="Theater">Theater</option>
                           <option value="Recruitment Drive">Recruitment Drive</option>
                           <option value="Workshop">Workshop</option>
                           <option value="Conference">Conference</option>
