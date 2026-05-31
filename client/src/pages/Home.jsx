@@ -1135,12 +1135,12 @@ const Home = () => {
             margin-top: 1.5rem !important;
           }
         }
-        @media(max-width:480px){
+        @media(max-width:640px){
           .hero-section {
             padding: 5rem 4% 1.5rem !important;
           }
           .hero-title {
-            font-size: 1.85rem !important;
+            font-size: clamp(1.5rem, 5.5vw, 2.2rem) !important;
             margin-bottom: 0.5rem !important;
             line-height: 1.25 !important;
           }
