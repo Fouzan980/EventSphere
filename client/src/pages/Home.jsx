@@ -307,20 +307,20 @@ const Home = () => {
       <PublicNavbar />
 
       {/* ─── Hero ──────────────────────────────────────────────────────── */}
-      <header style={S.hero}>
-        <div style={{ maxWidth: '1100px', width: '100%', textAlign: 'center' }}>
-          <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} style={S.heroBadge}>
+      <header className="hero-section" style={S.hero}>
+        <div className="hero-content" style={{ maxWidth: '1100px', width: '100%', textAlign: 'center' }}>
+          <motion.div className="hero-badge" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} style={S.heroBadge}>
             <span style={{display:'inline-flex',alignItems:'center',gap:4}}><PartyPopper size={16}/></span> Pakistan's #1 Event Discovery Platform
           </motion.div>
-          <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} style={S.heroTitle}>
+          <motion.h1 className="hero-title" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} style={S.heroTitle}>
             Find your next<br /><span style={{ color: '#FF2A5F' }}>Live Experience</span>
           </motion.h1>
-          <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.2 }} style={S.heroSub}>
+          <motion.p className="hero-subtitle" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.2 }} style={S.heroSub}>
             Discover concerts, expos, workshops, and corporate events near you. Book in seconds.
           </motion.p>
         </div>
-        <motion.div initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.4 }} style={S.searchWrap}>
-          <div style={S.searchBar}>
+        <motion.div className="hero-search-wrap" initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.4 }} style={S.searchWrap}>
+          <div className="hero-search-bar" style={S.searchBar}>
             <div style={{ ...S.searchGrp, position: 'relative', flex: '2 1 200px' }}>
               <Search size={22} color="#64748b" style={{ flexShrink: 0 }} />
               <input type="text" placeholder="Search events or artists..." style={S.searchInput} value={searchQuery}
@@ -1112,10 +1112,64 @@ const Home = () => {
         @keyframes palScroll{0%{transform:translateX(0);}100%{transform:translateX(-50%);}}
         html{scroll-behavior:smooth;}
         /* Responsive */
-        @media(max-width:680px){
+        @media(max-width:768px){
           .filter-toggle-btn{display:flex !important;}
+          .hero-section {
+            padding: 6rem 5% 2rem !important;
+            min-height: 100dvh !important;
+          }
+          .hero-title {
+            font-size: clamp(2rem, 7vw, 3rem) !important;
+            margin-bottom: 0.75rem !important;
+          }
+          .hero-subtitle {
+            font-size: 0.95rem !important;
+            max-width: 500px !important;
+          }
+          .hero-badge {
+            font-size: 0.8rem !important;
+            padding: 6px 14px !important;
+            margin-bottom: 0.75rem !important;
+          }
+          .hero-search-wrap {
+            margin-top: 1.5rem !important;
+          }
         }
         @media(max-width:480px){
+          .hero-section {
+            padding: 5rem 4% 1.5rem !important;
+          }
+          .hero-title {
+            font-size: 1.85rem !important;
+            margin-bottom: 0.5rem !important;
+            line-height: 1.25 !important;
+          }
+          .hero-subtitle {
+            font-size: 0.85rem !important;
+            line-height: 1.4 !important;
+          }
+          .hero-badge {
+            font-size: 0.72rem !important;
+            padding: 4px 10px !important;
+            margin-bottom: 0.5rem !important;
+          }
+          .hero-search-wrap {
+            margin-top: 1rem !important;
+            width: 100% !important;
+          }
+          .hero-search-bar {
+            padding: 0.5rem !important;
+            border-radius: 14px !important;
+            gap: 0.25rem !important;
+          }
+          .hero-search-bar button {
+            padding: 0.75rem 1.5rem !important;
+            font-size: 0.95rem !important;
+            border-radius: 10px !important;
+          }
+          .hero-search-bar input {
+            font-size: 0.95rem !important;
+          }
           .search-grp-city,.search-grp-cat,.search-divider-hide{display:none !important;}
         }
       `}</style>
