@@ -338,16 +338,16 @@ const Home = () => {
                 </div>
               )}
             </div>
-            <div style={S.searchDivider} />
-            <div style={S.searchGrp}>
+            <div className="search-divider-hide" style={S.searchDivider} />
+            <div className="search-grp-city" style={S.searchGrp}>
               <MapPin size={22} color="#64748b" style={{ flexShrink: 0 }} />
               <select style={S.selectInput} value={selectedCity} onChange={e => setSelectedCity(e.target.value)}>
                 <option value="">Any City</option>
                 {cities.map(c => <option key={c} value={c}>{c}</option>)}
               </select>
             </div>
-            <div style={S.searchDivider} />
-            <div style={S.searchGrp}>
+            <div className="search-divider-hide" style={S.searchDivider} />
+            <div className="search-grp-cat" style={S.searchGrp}>
               <Calendar size={22} color="#64748b" style={{ flexShrink: 0 }} />
               <select style={S.selectInput} value={selectedCategory} onChange={e => setSelectedCategory(e.target.value)}>
                 <option value="">Any Category</option>
