@@ -112,7 +112,11 @@ const PageEventsCategory = ({ category }) => {
     api.get('/events').then(res => {
       // Normalize category (e.g. "Expos" -> "expo", "Workshops" -> "workshop", "Concerts" -> "concert")
       const normalizedCategory = category.endsWith('s') ? category.slice(0, -1).toLowerCase() : category.toLowerCase();
-      const filtered = res.data.filter(e => e.category && (e.category.toLowerCase().includes(normalizedCategory) || normalizedCategory.includes(e.category.toLowerCase())));
+      const filtered = res.data.filter(e => {
+        if (!e.category) return false;
+        const eventCat = e.category.endsWith('s') ? e.category.slice(0, -1).toLowerCase() : e.category.toLowerCase();
+        return eventCat === normalizedCategory;
+      });
       setEvents(filtered);
       setLoading(false);
     });
@@ -438,28 +442,28 @@ const WebsitePage = ({ title, subtitle }) => {
       <PublicNavbar />
 
       {/* Hero Section */}
-      <header style={shellStyles.heroSection}>
+      <header className="ws-hero" style={shellStyles.heroSection}>
         <div style={shellStyles.heroContent}>
-          <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} style={shellStyles.heroTitle}>
+          <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="ws-hero-title" style={shellStyles.heroTitle}>
             {title}
           </motion.h1>
-          <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.2 }} style={shellStyles.heroSubtitle}>
+          <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.2 }} className="ws-hero-subtitle" style={shellStyles.heroSubtitle}>
             {subtitle}
           </motion.p>
         </div>
       </header>
 
       {/* Main Dynamically Rendered Domain */}
-      <main style={{ backgroundColor: 'var(--bg-color)', color: 'var(--text-primary)', padding: '6rem 5%', flexGrow: 1 }}>
+      <main className="ws-main" style={{ backgroundColor: 'var(--bg-color)', color: 'var(--text-primary)', padding: '6rem 5%', flexGrow: 1 }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
           {renderContent()}
         </div>
       </main>
 
       {/* Footer */}
-      <footer style={shellStyles.footer}>
-        <div style={shellStyles.footerInner}>
-          <div style={shellStyles.footerCol}>
+      <footer className="ws-footer" style={shellStyles.footer}>
+        <div className="ws-footer-inner" style={shellStyles.footerInner}>
+          <div className="ws-footer-brand" style={shellStyles.footerCol}>
             <div style={shellStyles.logo} onClick={() => { window.scrollTo({ top: 0, behavior: 'smooth' }); navigate('/'); }}>
               <Ticket size={24} color="#FF2A5F" />
               <h2 style={{...shellStyles.brandTitle, fontSize: '1.2rem', color: '#fff'}}>EVENTSPHERE</h2>
@@ -474,7 +478,7 @@ const WebsitePage = ({ title, subtitle }) => {
               <a href='https://linkedin.com' target='_blank' rel='noreferrer' style={{...shellStyles.iconCircle,textDecoration:'none'}} onMouseOver={e=>e.currentTarget.style.backgroundColor='#0A66C2'} onMouseOut={e=>e.currentTarget.style.backgroundColor='rgba(255,255,255,0.1)'}><svg viewBox='0 0 24 24' width='17' height='17' fill='currentColor'><path d='M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z'/></svg></a>
             </div>
           </div>
-          <div style={shellStyles.footerLinksGrid}>
+          <div className="ws-footer-links" style={shellStyles.footerLinksGrid}>
              <div style={shellStyles.fCol}>
                <h4>Company</h4>
                <Link to="/about" className="footer-slide-link">About Us</Link>
@@ -514,6 +518,32 @@ const WebsitePage = ({ title, subtitle }) => {
            <p>&copy; {new Date().getFullYear()} EventSphere. Revolutionizing live experiences.</p>
         </div>
       </footer>
+
+      {/* WebsitePage responsive styles */}
+      <style>{`
+        /* ── Hero ── */
+        @media(max-width:768px){
+          .ws-hero { padding: 6rem 5% 2.5rem !important; min-height: 25vh !important; }
+          .ws-hero-title { font-size: clamp(1.9rem, 7vw, 2.8rem) !important; }
+          .ws-hero-subtitle { font-size: clamp(0.9rem, 2.5vw, 1.05rem) !important; }
+          .ws-main { padding: 3rem 5% !important; }
+          .ws-footer { padding: 3rem 5% 1.5rem !important; }
+          .ws-footer-inner { flex-direction: column !important; gap: 2.5rem !important; }
+          .ws-footer-links { grid-template-columns: 1fr 1fr !important; gap: 1.5rem !important; }
+        }
+        @media(max-width:480px){
+          .ws-hero { padding: 5rem 4% 2rem !important; }
+          .ws-hero-title { font-size: clamp(1.5rem, 6.5vw, 1.9rem) !important; }
+          .ws-hero-subtitle { font-size: 0.88rem !important; }
+          .ws-main { padding: 2rem 4% !important; }
+          .ws-footer { padding: 2.5rem 4% 1.5rem !important; }
+          .ws-footer-links { grid-template-columns: 1fr !important; gap: 1.75rem !important; }
+        }
+        @media(max-width:380px){
+          .ws-hero-title { font-size: 1.35rem !important; }
+          .ws-hero-subtitle { font-size: 0.82rem !important; }
+        }
+      `}</style>
     </div>
   );
 };

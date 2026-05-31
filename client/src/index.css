@@ -935,3 +935,177 @@ tr:hover td { background: rgba(0,0,0,0.02); }
   background-position: 0 0;
 }
 
+/* ════════════════════════════════════════════════════════════════════════
+   COMPREHENSIVE RESPONSIVE RULES — Global Site Layout
+   ════════════════════════════════════════════════════════════════════════ */
+
+/* ── All sections: prevent overflow ── */
+section, main, footer, header, .main-content {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+/* ── Footer responsive ── */
+@media (max-width: 768px) {
+  footer > div:first-child {
+    flex-direction: column !important;
+    gap: 2rem !important;
+  }
+  footer > div:first-child > div:last-child {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 1.5rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  footer {
+    padding-left: 5% !important;
+    padding-right: 5% !important;
+  }
+  footer > div:first-child > div:last-child {
+    grid-template-columns: 1fr !important;
+    gap: 1.75rem !important;
+  }
+}
+
+/* ── WebsitePage hero responsive ── */
+@media (max-width: 768px) {
+  header[style*="minHeight"] h1,
+  .ws-hero-title {
+    font-size: clamp(1.8rem, 7vw, 2.8rem) !important;
+  }
+  header[style*="minHeight"] p,
+  .ws-hero-subtitle {
+    font-size: clamp(0.88rem, 2.5vw, 1.05rem) !important;
+  }
+}
+
+@media (max-width: 480px) {
+  header[style*="minHeight"] {
+    padding-top: 6rem !important;
+    padding-bottom: 2rem !important;
+  }
+  header[style*="minHeight"] h1 {
+    font-size: clamp(1.4rem, 6vw, 1.8rem) !important;
+  }
+}
+
+/* ── Event cards grid ── */
+@media (max-width: 600px) {
+  div[style*="grid-template-columns: repeat(auto-fill"] {
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+  }
+}
+
+/* ── Event detail modal ── */
+@media (max-width: 600px) {
+  .modal-box,
+  div[style*="maxWidth: '620px'"],
+  div[style*="maxWidth: '460px'"] {
+    max-width: 100% !important;
+    border-radius: 16px !important;
+  }
+}
+
+/* ── Stats section ── */
+@media (max-width: 600px) {
+  div[style*="gridTemplateColumns: 'repeat(auto-fit, minmax(160px"] {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+@media (max-width: 380px) {
+  div[style*="gridTemplateColumns: 'repeat(auto-fit, minmax(160px"] {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ── Category pills scroll ── */
+@media (max-width: 480px) {
+  div[style*="overflowX: 'auto'"][style*="gap: '0.75rem'"] {
+    gap: 0.5rem !important;
+  }
+}
+
+/* ── Contact page / PageSplit ── */
+@media (max-width: 768px) {
+  div[style*="flex-direction: row-reverse"],
+  div[style*="flexDirection: 'row-reverse'"],
+  div[style*="flex-direction: row"],
+  div[style*="flexDirection: 'row'"] {
+    flex-direction: column !important;
+  }
+}
+
+/* ── Feature cards ── */
+@media (max-width: 600px) {
+  div[style*="gridTemplateColumns: 'repeat(auto-fit, minmax(min(280px"] {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ── Partners marquee – slow down on small screens ── */
+@media (max-width: 600px) {
+  div[style*="animation: 'marquee"] {
+    animation-duration: 60s !important;
+  }
+}
+
+/* ── Curved image card – shorter on mobile ── */
+@media (max-width: 768px) {
+  div[style*="height: '400px'"] {
+    height: 260px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  div[style*="height: '400px'"] {
+    height: 200px !important;
+  }
+}
+
+/* ── WebsitePage main content padding ── */
+@media (max-width: 768px) {
+  main[style*="padding: '6rem 5%'"],
+  main[style*="padding: 6rem 5%"] {
+    padding: 3rem 5% !important;
+  }
+}
+
+@media (max-width: 480px) {
+  main[style*="padding: '6rem 5%'"],
+  main[style*="padding: 6rem 5%"] {
+    padding: 2rem 4% !important;
+  }
+}
+
+/* ── Trending horizontal carousel – smaller cards on mobile ── */
+@media (max-width: 480px) {
+  div[style*="minWidth: 'clamp(180px"] {
+    min-width: 160px !important;
+    height: 220px !important;
+  }
+}
+
+/* ── Pricing cards ── */
+@media (max-width: 600px) {
+  div[style*="gridTemplateColumns: 'repeat(auto-fit, minmax(250px"] {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ── Auth responsive already handled above ── */
+
+/* ── General text wrapping safety ── */
+h1, h2, h3, h4, h5, h6, p, span, a, li {
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+/* ── Horizontal scroll prevention ── */
+html, body {
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+

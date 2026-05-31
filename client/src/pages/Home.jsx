@@ -890,9 +890,9 @@ const Home = () => {
       )}
 
       {/* ─── Footer ───────────────────────────────────────────────────────── */}
-      <footer style={{ backgroundColor: '#0F172A', padding: 'clamp(3rem,6vw,5rem) 5% 0', marginTop: 'auto' }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', flexWrap: 'wrap', gap: '3rem', justifyContent: 'space-between', paddingBottom: '3rem' }}>
-          <div style={{ flex: '1 1 240px' }}>
+      <footer className="home-footer" style={{ backgroundColor: '#0F172A', padding: 'clamp(3rem,6vw,5rem) 5% 0', marginTop: 'auto' }}>
+        <div className="home-footer-inner" style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', flexWrap: 'wrap', gap: '3rem', justifyContent: 'space-between', paddingBottom: '3rem' }}>
+          <div className="home-footer-brand" style={{ flex: '1 1 240px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', marginBottom: '1rem' }} onClick={() => { window.scrollTo({ top: 0, behavior: 'smooth' }); navigate('/'); }}>
               <Ticket size={22} color="#FF2A5F" />
               <h2 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 900, letterSpacing: '1px', background: 'linear-gradient(45deg,#FF2A5F,#FF7B9B)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>EVENTSPHERE</h2>
@@ -916,7 +916,7 @@ const Home = () => {
               ))}
             </div>
           </div>
-          <div style={{ flex: '2 1 380px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(120px,1fr))', gap: '2rem' }}>
+          <div className="home-footer-links" style={{ flex: '2 1 380px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(120px,1fr))', gap: '2rem' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
               <h4 style={{ color: '#fff', margin: 0, fontSize: '0.9rem' }}>Company</h4>
               {[['About Us','/about'],['Careers','/careers'],['Contact','/contact']].map(([l,h]) => <Link key={l} to={h} className="footer-slide-link">{l}</Link>)}
@@ -1110,68 +1110,134 @@ const Home = () => {
         @keyframes spin{to{transform:rotate(360deg);}}
         @keyframes marquee{0%{transform:translateX(0);}100%{transform:translateX(-50%);}}
         @keyframes palScroll{0%{transform:translateX(0);}100%{transform:translateX(-50%);}}
-        html{scroll-behavior:smooth;}
-        /* Responsive */
+
+        /* ========== RESPONSIVE — progressive breakpoints ========== */
+
+        /* ── Tablet landscape & smaller (≤1024px) ── */
+        @media(max-width:1024px){
+          .hero-section {
+            padding: 7rem 5% 3rem !important;
+          }
+          .hero-title {
+            font-size: clamp(2.4rem, 7vw, 3.8rem) !important;
+          }
+        }
+
+        /* ── Tablet portrait & smaller (≤768px) ── */
         @media(max-width:768px){
           .filter-toggle-btn{display:flex !important;}
           .hero-section {
-            padding: 5rem 5% 1rem !important;
-            min-height: 100dvh !important;
+            padding: 6rem 5% 2rem !important;
+            min-height: auto !important;
           }
           .hero-title {
-            font-size: clamp(1.8rem, 6vw, 2.5rem) !important;
-            margin-bottom: 0.5rem !important;
+            font-size: clamp(1.9rem, 6.5vw, 2.8rem) !important;
+            margin-bottom: 0.75rem !important;
+            letter-spacing: -0.5px !important;
           }
           .hero-subtitle {
-            font-size: 0.88rem !important;
-            max-width: 450px !important;
-            line-height: 1.4 !important;
+            font-size: clamp(0.88rem, 2.5vw, 1.05rem) !important;
+            max-width: 500px !important;
+            line-height: 1.55 !important;
           }
           .hero-badge {
-            font-size: 0.75rem !important;
-            padding: 5px 12px !important;
+            font-size: 0.78rem !important;
+            padding: 6px 14px !important;
+            margin-bottom: 0.75rem !important;
+          }
+          .hero-search-wrap {
+            margin-top: 1.5rem !important;
+          }
+          .hero-search-bar {
+            flex-direction: column !important;
+            border-radius: 16px !important;
+            padding: 0.75rem !important;
+            gap: 0.5rem !important;
+          }
+          .hero-search-bar button {
+            width: 100% !important;
+            border-radius: 12px !important;
+            padding: 0.85rem !important;
+          }
+          .search-divider-hide { display: none !important; }
+        }
+
+        /* ── Large phones (≤600px) ── */
+        @media(max-width:600px){
+          .search-grp-city,.search-grp-cat,.search-divider-hide{display:none !important;}
+          .hero-section {
+            padding: 5.5rem 4% 1.5rem !important;
+          }
+          .hero-title {
+            font-size: clamp(1.7rem, 7vw, 2.2rem) !important;
+            line-height: 1.2 !important;
+          }
+          .hero-subtitle {
+            font-size: 0.9rem !important;
+          }
+        }
+
+        /* ── Standard phones (≤480px) ── */
+        @media(max-width:480px){
+          .hero-section {
+            padding: 5rem 4% 1.25rem !important;
+          }
+          .hero-title {
+            font-size: clamp(1.5rem, 6.5vw, 1.9rem) !important;
             margin-bottom: 0.5rem !important;
+            line-height: 1.2 !important;
+          }
+          .hero-subtitle {
+            font-size: 0.85rem !important;
+            line-height: 1.45 !important;
+          }
+          .hero-badge {
+            font-size: 0.72rem !important;
+            padding: 5px 12px !important;
           }
           .hero-search-wrap {
             margin-top: 1rem !important;
-          }
-        }
-        @media(max-width:480px){
-          .hero-section {
-            padding: 4.5rem 4% 1rem !important;
-          }
-          .hero-title {
-            font-size: clamp(1.4rem, 5.5vw, 1.85rem) !important;
-            margin-bottom: 0.5rem !important;
-            line-height: 1.25 !important;
-          }
-          .hero-subtitle {
-            font-size: 0.8rem !important;
-            line-height: 1.4 !important;
-          }
-          .hero-badge {
-            font-size: 0.7rem !important;
-            padding: 4px 10px !important;
-            margin-bottom: 0.5rem !important;
-          }
-          .hero-search-wrap {
-            margin-top: 0.75rem !important;
             width: 100% !important;
           }
           .hero-search-bar {
-            padding: 0.4rem !important;
-            border-radius: 12px !important;
-            gap: 0.25rem !important;
+            padding: 0.5rem !important;
+            border-radius: 14px !important;
           }
           .hero-search-bar button {
-            padding: 0.65rem 1.25rem !important;
-            font-size: 0.9rem !important;
-            border-radius: 8px !important;
+            padding: 0.75rem 1.25rem !important;
+            font-size: 0.92rem !important;
           }
           .hero-search-bar input {
-            font-size: 0.9rem !important;
+            font-size: 0.92rem !important;
           }
-          .search-grp-city,.search-grp-cat,.search-divider-hide{display:none !important;}
+        }
+
+        /* ── Small phones (≤380px) ── */
+        @media(max-width:380px){
+          .hero-section {
+            padding: 4.5rem 3.5% 1rem !important;
+          }
+          .hero-title {
+            font-size: 1.35rem !important;
+          }
+          .hero-subtitle {
+            font-size: 0.8rem !important;
+          }
+          .hero-badge {
+            font-size: 0.68rem !important;
+            padding: 4px 10px !important;
+          }
+        }
+
+        /* ── Home Footer Responsive ── */
+        @media(max-width:768px){
+          .home-footer { padding-left: 5% !important; padding-right: 5% !important; }
+          .home-footer-inner { flex-direction: column !important; gap: 2rem !important; }
+          .home-footer-links { grid-template-columns: 1fr 1fr !important; gap: 1.5rem !important; }
+        }
+        @media(max-width:480px){
+          .home-footer { padding-left: 4% !important; padding-right: 4% !important; }
+          .home-footer-links { grid-template-columns: 1fr !important; gap: 1.5rem !important; }
         }
       `}</style>
     </div>
