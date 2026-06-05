@@ -20,23 +20,49 @@
 }
 
 .public-navbar {
-  padding: 1.35rem 6% !important;
+  padding: 0.6rem 5% !important;
   transition: all 0.3s ease;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 56px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  overflow-x: hidden;
 }
 
 @media (max-width: 900px) {
   .public-navbar {
-    padding: 1.1rem 5% !important;
+    padding: 0.45rem 4% !important;
+    min-height: 52px;
+  }
+}
+
+@media (max-width: 480px) {
+  .public-navbar {
+    padding: 0.35rem 3% !important;
+    min-height: 50px;
   }
 }
 
 .brand-title {
-  font-size: 1.75rem !important;
+  font-size: 1.3rem !important;
 }
 
 @media (max-width: 900px) {
   .brand-title {
-    font-size: 1.5rem !important;
+    font-size: 1.1rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .brand-title {
+    font-size: 0.95rem !important;
   }
 }
 
@@ -80,7 +106,7 @@
 .mobile-link {
   color: #fff;
   text-decoration: none;
-  font-size: 1.75rem;
+  font-size: 1.5rem;
   font-weight: 700;
   transition: all 0.25s ease;
   text-align: center;
@@ -98,7 +124,7 @@
   background: linear-gradient(135deg, #FF2A5F, #FF5E84) !important;
   color: #fff !important;
   padding: 0.65rem 2.2rem !important;
-  font-size: 1.45rem !important;
+  font-size: 1.3rem !important;
   border-radius: 30px !important;
   font-weight: 700 !important;
   box-shadow: 0 6px 22px rgba(255, 42, 95, 0.45);
@@ -153,5 +179,18 @@
   transform: scale(1.15);
   color: #FF2A5F !important;
   background: rgba(255, 42, 95, 0.1);
+}
+
+/* Compact username/avatar behavior on small screens */
+.nav-username { display: inline-block; }
+
+@media (max-width: 900px) {
+  .nav-username { display: none !important; }
+  .avatar-circle { width: 40px !important; height: 40px !important; border-radius: 50% !important; overflow: hidden !important; }
+  .public-navbar .brand-title { font-size: 1.05rem !important; }
+}
+
+@media (max-width: 480px) {
+  .avatar-circle { width: 36px !important; height: 36px !important; }
 }
 

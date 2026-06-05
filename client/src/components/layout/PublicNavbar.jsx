@@ -191,17 +191,17 @@ const PublicNavbar = () => {
               </button>
               {user.role === 'Attendee' ? (
                 <button onClick={() => setProfileOpen(true)} style={styles.avatarBtn} title="My Profile">
-                  <div style={styles.avatarCircle}>
+                  <div className="avatar-circle" style={styles.avatarCircle}>
                     {user.avatar ? <img src={user.avatar} alt="av" style={{width:'100%',height:'100%',objectFit:'cover'}}/> : <span style={{color:'#fff',fontWeight:700,fontSize:'1rem'}}>{initials}</span>}
                   </div>
-                  <span style={{fontWeight:600,color:'#fff',fontSize:'1.05rem'}}>{user.name}</span>
+                  <span className="nav-username" style={{fontWeight:600,color:'#fff',fontSize:'1.05rem'}}>{user.name}</span>
                 </button>
               ) : (
                 <Link to="/dashboard/profile" style={{display:'flex',alignItems:'center',gap:'8px',textDecoration:'none'}}>
-                  <div style={styles.avatarCircle}>
+                  <div className="avatar-circle" style={styles.avatarCircle}>
                     {user.avatar ? <img src={user.avatar} alt="av" style={{width:'100%',height:'100%',objectFit:'cover'}}/> : <span style={{color:'#fff',fontWeight:700,fontSize:'1rem'}}>{initials}</span>}
                   </div>
-                  <span style={{fontWeight:600,color:'#fff',fontSize:'1.05rem'}}>{user.name}</span>
+                  <span className="nav-username" style={{fontWeight:600,color:'#fff',fontSize:'1.05rem'}}>{user.name}</span>
                 </Link>
               )}
               <button onClick={logout} style={styles.btnLogout} title="Logout"><LogOut size={20}/></button>

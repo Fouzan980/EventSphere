@@ -165,14 +165,14 @@ const Dashboard = () => {
       {!loading && user.role === 'Organizer' && analytics && (
         <>
           {/* Overview stat cards */}
-          <div style={S.grid4}>
+          <div className={S.grid4}>
             <StatCard icon={Calendar}    iconColor="var(--primary-color)" borderColor="var(--primary-color)" title="Total Events"       value={ov.totalEvents ?? 0}        sub={`${ov.upcomingEvents ?? 0} upcoming · ${ov.pastEvents ?? 0} past`} />
             <StatCard icon={Ticket}      iconColor="#8b5cf6"              borderColor="#8b5cf6"              title="Tickets Sold"       value={(ov.totalTickets ?? 0).toLocaleString()}   sub="Active bookings" />
             <StatCard icon={DollarSign}  iconColor="#10b981"              borderColor="#10b981"              title="Total Revenue"      value={`Rs. ${(ov.totalRevenue ?? 0).toLocaleString()}`}  sub="Across all events" />
             <StatCard icon={Users}       iconColor="#f59e0b"              borderColor="#f59e0b"              title="Unique Attendees"   value={(ov.uniqueAttendees ?? 0).toLocaleString()}  sub="Distinct ticket holders" />
           </div>
 
-          <div style={S.grid4}>
+          <div className={S.grid4}>
             <StatCard icon={Target}      iconColor="#ec4899"              borderColor="#ec4899"              title="Sell-Through Rate"  value={`${ov.sellThroughRate ?? 0}%`}  sub="Tickets sold vs capacity" />
             <StatCard icon={FileText}    iconColor="#3b82f6"              borderColor="#3b82f6"              title="Applications"       value={ov.totalApplications ?? 0}      sub="Booth applications received" />
             <StatCard icon={Bookmark}    iconColor="#f59e0b"              borderColor="#f59e0b"              title="Bookmarks"          value={ov.totalBookmarks ?? 0}         sub="Users saved your events" />
@@ -287,7 +287,7 @@ const Dashboard = () => {
 
       {/* ── Non-organizer basic overview ── */}
       {!loading && user.role !== 'Organizer' && (
-        <div style={S.grid4}>
+        <div className={S.grid4}>
           <StatCard icon={Bookmark} iconColor="#f59e0b" borderColor="#f59e0b" title="My Bookmarks" value={bookmarks} sub="Events saved to your list" />
         </div>
       )}
@@ -339,11 +339,11 @@ const EmptyChart = ({ label }) => (
 );
 
 const S = {
-  grid4: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(200px,1fr))', gap: '1.25rem' },
-  twoCol: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(300px,1fr))', gap: '1.25rem' },
+  grid4: 'resp-grid-4',
+  twoCol: 'resp-grid-2',
   card: {
     background: 'var(--bg-surface)', borderRadius: 14, border: '1px solid var(--border-color)',
-    padding: '1.4rem', boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+    padding: 'clamp(1rem, 3vw, 1.4rem)', boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
   },
   empty: {
     padding: '2rem', textAlign: 'center', background: 'var(--bg-color)',

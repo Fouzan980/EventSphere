@@ -31,10 +31,12 @@ const Layout = () => {
     <div style={{
       display: 'flex',
       height: '100dvh',
-      width: '100vw',
+      width: '100%',
+      maxWidth: '100%',
       overflow: 'hidden',
       background: 'var(--bg-color)',
       position: 'relative',
+      boxSizing: 'border-box',
     }}>
 
       {/* ── Backdrop (mobile only) ─────────────────────────────── */}

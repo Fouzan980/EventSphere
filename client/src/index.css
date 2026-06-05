@@ -54,9 +54,31 @@
   padding: 0;
 }
 
+#root {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
 html {
   overflow-x: hidden;
   -webkit-text-size-adjust: 100%; /* prevent iOS font size inflation */
+  scroll-behavior: smooth;
+  scroll-padding-top: 70px;
+  width: 100%;
+}
+
+/* Adjust scroll padding for smaller screens */
+@media (max-width: 768px) {
+  html {
+    scroll-padding-top: 65px;
+  }
+}
+
+@media (max-width: 480px) {
+  html {
+    scroll-padding-top: 60px;
+  }
 }
 
 body {
@@ -67,6 +89,11 @@ body {
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
   min-height: 100dvh;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 img, video, svg {
@@ -945,6 +972,80 @@ section, main, footer, header, .main-content {
   overflow-x: hidden;
 }
 
+/* ── Responsive dashboard grid utilities ─────────────────────────────── */
+/* Safe auto-fill grid that never overflows on small screens */
+.resp-grid-4 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr));
+  gap: clamp(0.75rem, 2vw, 1.25rem);
+}
+
+.resp-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
+  gap: clamp(0.75rem, 2vw, 1.25rem);
+}
+
+.resp-grid-events {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
+  gap: clamp(1rem, 2vw, 1.5rem);
+}
+
+/* ── Responsive card with fluid padding ────────────────────────────── */
+.resp-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: clamp(1rem, 3vw, 1.75rem);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+/* ── Orders table: mobile card layout ──────────────────────────────── */
+.orders-table-wrap {
+  border-radius: 14px;
+  border: 1px solid var(--border-color);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* On mobile, hide table header and convert rows to cards */
+@media (max-width: 768px) {
+  .orders-table thead {
+    display: none;
+  }
+  .orders-table,
+  .orders-table tbody,
+  .orders-table tr,
+  .orders-table td {
+    display: block;
+    width: 100%;
+  }
+  .orders-table tr {
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-color);
+    position: relative;
+  }
+  .orders-table td {
+    padding: 4px 0;
+    border: none;
+    text-align: left;
+  }
+  .orders-table td::before {
+    content: attr(data-label);
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-secondary);
+    display: block;
+    margin-bottom: 2px;
+  }
+  .orders-table td[data-label=""]::before {
+    display: none;
+  }
+}
+
 /* ── Footer responsive ── */
 @media (max-width: 768px) {
   footer > div:first-child {
@@ -990,14 +1091,6 @@ section, main, footer, header, .main-content {
   }
 }
 
-/* ── Event cards grid ── */
-@media (max-width: 600px) {
-  div[style*="grid-template-columns: repeat(auto-fill"] {
-    grid-template-columns: 1fr !important;
-    gap: 1rem !important;
-  }
-}
-
 /* ── Event detail modal ── */
 @media (max-width: 600px) {
   .modal-box,
@@ -1008,26 +1101,6 @@ section, main, footer, header, .main-content {
   }
 }
 
-/* ── Stats section ── */
-@media (max-width: 600px) {
-  div[style*="gridTemplateColumns: 'repeat(auto-fit, minmax(160px"] {
-    grid-template-columns: repeat(2, 1fr) !important;
-  }
-}
-
-@media (max-width: 380px) {
-  div[style*="gridTemplateColumns: 'repeat(auto-fit, minmax(160px"] {
-    grid-template-columns: 1fr !important;
-  }
-}
-
-/* ── Category pills scroll ── */
-@media (max-width: 480px) {
-  div[style*="overflowX: 'auto'"][style*="gap: '0.75rem'"] {
-    gap: 0.5rem !important;
-  }
-}
-
 /* ── Contact page / PageSplit ── */
 @media (max-width: 768px) {
   div[style*="flex-direction: row-reverse"],
@@ -1035,20 +1108,6 @@ section, main, footer, header, .main-content {
   div[style*="flex-direction: row"],
   div[style*="flexDirection: 'row'"] {
     flex-direction: column !important;
-  }
-}
-
-/* ── Feature cards ── */
-@media (max-width: 600px) {
-  div[style*="gridTemplateColumns: 'repeat(auto-fit, minmax(min(280px"] {
-    grid-template-columns: 1fr !important;
-  }
-}
-
-/* ── Partners marquee – slow down on small screens ── */
-@media (max-width: 600px) {
-  div[style*="animation: 'marquee"] {
-    animation-duration: 60s !important;
   }
 }
 
@@ -1080,18 +1139,72 @@ section, main, footer, header, .main-content {
   }
 }
 
-/* ── Trending horizontal carousel – smaller cards on mobile ── */
-@media (max-width: 480px) {
-  div[style*="minWidth: 'clamp(180px"] {
-    min-width: 160px !important;
-    height: 220px !important;
+/* ── Dashboard-specific responsive ─────────────────────────────────── */
+@media (max-width: 600px) {
+  /* Stat cards: 2-column on small phones */
+  .resp-grid-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* Event cards: single column */
+  .resp-grid-events {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  /* Activity log items: tighter padding */
+  .resp-card {
+    padding: clamp(0.75rem, 3vw, 1rem);
   }
 }
 
-/* ── Pricing cards ── */
+@media (max-width: 380px) {
+  /* Tiny phones: single column stat cards */
+  .resp-grid-4 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Chat page responsive ──────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .chat-page-wrap {
+    margin: 0 !important;
+    height: calc(100dvh - 56px) !important;
+  }
+}
+
+/* ── Profile page responsive ───────────────────────────────────────── */
 @media (max-width: 600px) {
-  div[style*="gridTemplateColumns: 'repeat(auto-fit, minmax(250px"] {
-    grid-template-columns: 1fr !important;
+  .profile-card {
+    padding: clamp(1rem, 4vw, 1.5rem) !important;
+    border-radius: 12px !important;
+    margin-bottom: 1rem !important;
+  }
+  .profile-avatar-section {
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center;
+  }
+}
+
+/* ── Navbar responsive ── */
+@media (max-width: 768px) {
+  .public-navbar {
+    padding: 0.4rem 5% !important;
+    min-height: auto !important;
+  }
+  .public-navbar-logo-icon {
+    width: 28px !important;
+    height: 28px !important;
+  }
+  .brand-title {
+    font-size: 1.1rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .public-navbar {
+    padding: 0.3rem 4% !important;
   }
 }
 

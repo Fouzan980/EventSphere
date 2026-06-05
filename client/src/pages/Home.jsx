@@ -4,7 +4,7 @@ import api from '../utils/api';
 import { AuthContext } from '../context/AuthContext';
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Calendar, MapPin, Ticket, X, ChevronLeft, ChevronRight, Mic, Download, Users, Building2, Globe, Clock, DollarSign, Ban, PartyPopper, Zap, CheckCircle, ExternalLink, Music, Star, Phone, Mail, Laugh, Theater } from 'lucide-react';
+import { Search, Calendar, MapPin, Ticket, X, ChevronLeft, ChevronRight, Mic, Download, Users, Building2, Globe, Clock, DollarSign, Ban, PartyPopper, Zap, CheckCircle, ExternalLink, Music, Star, Phone, Mail, Laugh, Theater, Shield, HeartHandshake } from 'lucide-react';
 import { toast } from 'react-toastify';
 import PublicNavbar from '../components/layout/PublicNavbar';
 import { PageSkeleton } from '../components/Skeleton';
@@ -121,6 +121,14 @@ const FEATURES = [
   },
 ];
 
+const CATEGORY_CARDS = [
+  { label: 'Concerts', path: '/concerts', img: 'https://picsum.photos/id/117/800/600' },
+  { label: 'Expos', path: '/expos', img: 'https://picsum.photos/id/160/800/600' },
+  { label: 'Workshops', path: '/workshops', img: 'https://picsum.photos/id/119/800/600' },
+  { label: 'Comedy', path: '/comedy', img: 'https://picsum.photos/id/338/800/600' },
+  { label: 'Theater', path: '/theater', img: 'https://picsum.photos/id/450/800/600' }
+];
+
 const Home = () => {
   const { user } = React.useContext(AuthContext);
   const navigate = useNavigate();
@@ -131,7 +139,6 @@ const Home = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCity, setSelectedCity] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
-  const [showFilters, setShowFilters] = useState(false);
 
   const [bookingState, setBookingState] = useState({});
   const [successMsg, setSuccessMsg] = useState(null);
@@ -309,8 +316,10 @@ const Home = () => {
       {/* ─── Hero ──────────────────────────────────────────────────────── */}
       <header className="hero-section" style={S.hero}>
         <div className="hero-content" style={{ maxWidth: '1100px', width: '100%', textAlign: 'center' }}>
-          <motion.div className="hero-badge" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} style={S.heroBadge}>
-            <span style={{display:'inline-flex',alignItems:'center',gap:4}}><PartyPopper size={16}/></span> Pakistan's #1 Event Discovery Platform
+          <motion.div className="hero-badge" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} style={{ ...S.heroBadge, whiteSpace: 'nowrap' }}>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+              <PartyPopper size={14}/> Pakistan's #1 Event Discovery Platform
+            </span>
           </motion.div>
           <motion.h1 className="hero-title" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} style={S.heroTitle}>
             Find your next<br /><span style={{ color: '#FF2A5F' }}>Live Experience</span>
@@ -321,7 +330,7 @@ const Home = () => {
         </div>
         <motion.div className="hero-search-wrap" initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.4 }} style={S.searchWrap}>
           <div className="hero-search-bar" style={S.searchBar}>
-            <div style={{ ...S.searchGrp, position: 'relative', flex: '2 1 200px' }}>
+            <div style={{ ...S.searchGrp, position: 'relative', flex: '2 1 auto' }}>
               <Search size={22} color="#64748b" style={{ flexShrink: 0 }} />
               <input type="text" placeholder="Search events or artists..." style={S.searchInput} value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)} onKeyDown={e => e.key === 'Enter' && scrollToEvents()} />
@@ -367,13 +376,25 @@ const Home = () => {
 
       <main style={{ backgroundColor: 'var(--bg-color)' }}>
 
-        {/* ─── Animated Stats ─────────────────────────────────────────────── */}
-        <section style={{ backgroundColor: 'var(--bg-surface)', borderBottom: '1px solid var(--border-color)', padding: 'clamp(2rem,5vw,3.5rem) 5%' }}>
-          <div style={{ maxWidth: '1000px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '1rem' }}>
-            <StatCounter icon={<Calendar size={36} color="#FF2A5F" />} target={1200} suffix="+" label="Events Hosted" />
-            <StatCounter icon={<Users size={36} color="#8b5cf6" />} target={85000} suffix="+" label="Happy Attendees" />
-            <StatCounter icon={<Globe size={36} color="#06b6d4" />} target={12} suffix="+" label="Cities Covered" />
-            <StatCounter icon={<Building2 size={36} color="#f59e0b" />} target={50} suffix="+" label="Partner Companies" />
+        {/* ─── Quick Stats Banner ─────────────────────────────────────────────── */}
+        <section style={{ backgroundColor: 'var(--bg-surface)', borderBottom: '1px solid var(--border-color)', padding: 'clamp(1.5rem,4vw,2.5rem) 5%' }}>
+          <div style={{ maxWidth: '1100px', margin: '0 auto', display: 'flex', flexWrap: 'wrap', justifyContent: 'space-around', gap: '2rem', alignItems: 'center' }}>
+            <div style={{ textAlign: 'center', minWidth: '140px' }}>
+              <div style={{ fontSize: 'clamp(2rem, 5vw, 3rem)', fontWeight: 900, background: 'linear-gradient(135deg, #FF2A5F, #FF6B9D)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', lineHeight: 1 }}>1200+</div>
+              <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '0.5rem', fontWeight: 600 }}>Events Hosted</div>
+            </div>
+            <div style={{ textAlign: 'center', minWidth: '140px' }}>
+              <div style={{ fontSize: 'clamp(2rem, 5vw, 3rem)', fontWeight: 900, background: 'linear-gradient(135deg, #8b5cf6, #a78bfa)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', lineHeight: 1 }}>85K+</div>
+              <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '0.5rem', fontWeight: 600 }}>Happy Attendees</div>
+            </div>
+            <div style={{ textAlign: 'center', minWidth: '140px' }}>
+              <div style={{ fontSize: 'clamp(2rem, 5vw, 3rem)', fontWeight: 900, background: 'linear-gradient(135deg, #06b6d4, #67e8f9)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', lineHeight: 1 }}>12+</div>
+              <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '0.5rem', fontWeight: 600 }}>Cities Covered</div>
+            </div>
+            <div style={{ textAlign: 'center', minWidth: '140px' }}>
+              <div style={{ fontSize: 'clamp(2rem, 5vw, 3rem)', fontWeight: 900, background: 'linear-gradient(135deg, #f59e0b, #fbbf24)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', lineHeight: 1 }}>50+</div>
+              <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '0.5rem', fontWeight: 600 }}>Partner Companies</div>
+            </div>
           </div>
         </section>
 
@@ -435,23 +456,23 @@ const Home = () => {
         )}
 
 
-        {/* ─── Category Filter Pills ─────────────────────────────────────── */}
-        <section id="categories" style={{ padding: 'clamp(1.5rem,4vw,2.5rem) 5% 1rem', backgroundColor: 'var(--bg-color)' }}>
+        {/* ─── Category Filter Cards ─────────────────────────────────────── */}
+        <section id="categories" style={{ padding: 'clamp(3rem,5vw,5rem) 5%', backgroundColor: 'var(--bg-color)' }}>
           <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-            {/* Mobile filter toggle */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
-              <h3 style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Browse by Category</h3>
-              <button onClick={() => setShowFilters(f => !f)} style={{ ...S.btnSearch, padding: '6px 14px', fontSize: '0.8rem', display: 'none' }} className="filter-toggle-btn">
-                {showFilters ? 'Hide' : 'Filters ▾'}
-              </button>
+            <div style={{ textAlign: 'center', marginBottom: 'clamp(2rem,4vw,3.5rem)' }}>
+              <h2 style={S.sectionTitle}>Browse by Category</h2>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', marginTop: '0.5rem' }}>Find the perfect experience for your next outing.</p>
             </div>
-            <div style={{ display: 'flex', gap: '0.75rem', overflowX: 'auto', paddingBottom: '0.5rem', scrollbarWidth: 'none' }}>
-              {CATS.map(c => (
-                <button key={c.label}
-                  onClick={() => { setSelectedCategory(c.cat); setTimeout(scrollToEvents, 80); }}
-                  style={{ ...S.catPill, background: selectedCategory === c.cat ? '#FF2A5F' : 'var(--bg-surface)', color: selectedCategory === c.cat ? '#fff' : 'var(--text-primary)', border: selectedCategory === c.cat ? 'none' : '1px solid var(--border-color)' }}>
-                  {c.IconEl ? <c.IconEl size={14}/> : null} {c.label}
-                </button>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1.25rem' }}>
+              {CATEGORY_CARDS.map(c => (
+                <Link key={c.label} to={c.path} style={{ textDecoration: 'none', borderRadius: '16px', overflow: 'hidden', position: 'relative', height: '220px', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 15px rgba(0,0,0,0.1)', transition: 'transform 0.3s' }} onMouseOver={e => e.currentTarget.style.transform='translateY(-6px)'} onMouseOut={e => e.currentTarget.style.transform='translateY(0)'}>
+                  <img src={c.img} alt={c.label} style={{ position: 'absolute', width: '100%', height: '100%', objectFit: 'cover' }} onError={(e) => { e.target.style.display='none'; e.target.nextSibling.style.display='flex'; }} />
+                  <div style={{ display: 'none', width: '100%', height: '100%', background: 'linear-gradient(135deg, #7c3aed, #a855f7)', alignItems: 'center', justifyContent: 'center' }}><span style={{ color: '#fff', fontSize: '3rem' }}>{c.label.charAt(0)}</span></div>
+                  <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(107, 33, 168, 0.85) 0%, rgba(107, 33, 168, 0.3) 60%, transparent 100%)' }} />
+                  <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '1.25rem 0.5rem', textAlign: 'center' }}>
+                    <h3 style={{ color: '#fff', margin: 0, fontSize: '1.15rem', fontWeight: 800, letterSpacing: '0.3px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{c.label}</h3>
+                  </div>
+                </Link>
               ))}
             </div>
           </div>
@@ -939,7 +960,7 @@ const Home = () => {
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#94a3b8', fontSize: '0.82rem' }}>
                   <Mail size={14} style={{ color: '#FF2A5F', flexShrink: 0 }} />
-                  <a href="mailto:eventsphere@fouzan.me" style={{ color: 'inherit', textDecoration: 'none', transition: '0.2s' }} onMouseOver={e => e.currentTarget.style.color='#FF2A5F'} onMouseOut={e => e.currentTarget.style.color='#94a3b8'}>eventsphere@fouzan.me</a>
+                  <a href="mailto:es@fouzan.me" style={{ color: 'inherit', textDecoration: 'none', transition: '0.2s' }} onMouseOver={e => e.currentTarget.style.color='#FF2A5F'} onMouseOut={e => e.currentTarget.style.color='#94a3b8'}>es@fouzan.me</a>
                 </div>
               </div>
             </div>
@@ -1127,117 +1148,192 @@ const Home = () => {
         @media(max-width:768px){
           .filter-toggle-btn{display:flex !important;}
           .hero-section {
-            padding: 6rem 5% 2rem !important;
-            min-height: auto !important;
+            padding: 6rem 5% 3rem !important;
+            min-height: calc(100dvh - 65px) !important;
           }
           .hero-title {
-            font-size: clamp(1.9rem, 6.5vw, 2.8rem) !important;
-            margin-bottom: 0.75rem !important;
+            font-size: clamp(2.2rem, 7vw, 3.5rem) !important;
+            margin-bottom: 1rem !important;
             letter-spacing: -0.5px !important;
           }
           .hero-subtitle {
-            font-size: clamp(0.88rem, 2.5vw, 1.05rem) !important;
+            font-size: clamp(1rem, 3vw, 1.25rem) !important;
             max-width: 500px !important;
-            line-height: 1.55 !important;
+            line-height: 1.6 !important;
+            margin-bottom: 1.5rem !important;
           }
           .hero-badge {
-            font-size: 0.78rem !important;
-            padding: 6px 14px !important;
-            margin-bottom: 0.75rem !important;
+            font-size: 0.9rem !important;
+            padding: 8px 18px !important;
+            margin-bottom: 1rem !important;
           }
           .hero-search-wrap {
             margin-top: 1.5rem !important;
+            margin-bottom: 2rem !important;
+            padding: 0 3% !important;
           }
           .hero-search-bar {
             flex-direction: column !important;
             border-radius: 16px !important;
-            padding: 0.75rem !important;
+            padding: 0.6rem !important;
             gap: 0.5rem !important;
+            max-width: 100% !important;
+            width: 100% !important;
           }
           .hero-search-bar button {
             width: 100% !important;
             border-radius: 12px !important;
-            padding: 0.85rem !important;
+            padding: 0.75rem !important;
+            font-size: 1rem !important;
+            margin-top: 0.5rem !important;
+          }
+          .hero-search-bar > div {
+            width: 100% !important;
+            min-width: 0 !important;
           }
           .search-divider-hide { display: none !important; }
         }
 
         /* ── Large phones (≤600px) ── */
         @media(max-width:600px){
-          .search-grp-city,.search-grp-cat,.search-divider-hide{display:none !important;}
+          .search-divider-hide{display:none !important;}
           .hero-section {
-            padding: 5.5rem 4% 1.5rem !important;
+            padding: 5.5rem 4% 3rem !important;
+            min-height: calc(100dvh - 65px) !important;
           }
           .hero-title {
-            font-size: clamp(1.7rem, 7vw, 2.2rem) !important;
-            line-height: 1.2 !important;
+            font-size: clamp(2rem, 7.5vw, 2.4rem) !important;
+            line-height: 1.15 !important;
+            margin-bottom: 0.8rem !important;
           }
           .hero-subtitle {
-            font-size: 0.9rem !important;
+            font-size: 0.95rem !important;
+            line-height: 1.5 !important;
+            margin-bottom: 1.2rem !important;
+          }
+          .hero-badge {
+            font-size: 0.8rem !important;
+            padding: 6px 14px !important;
+            margin-bottom: 1rem !important;
+            flex-direction: row !important;
+            text-align: center !important;
+            gap: 4px !important;
+            white-space: nowrap !important;
+          }
+          .hero-search-wrap {
+            padding: 0 2% !important;
+            margin-bottom: 2rem !important;
+          }
+          .hero-search-bar {
+            max-width: 100% !important;
+            width: 100% !important;
+            flex-direction: column !important;
+            align-items: stretch !important;
+          }
+          .hero-search-bar button {
+            width: 100% !important;
+            display: flex !important;
+            font-size: 0.95rem !important;
+            padding: 0.75rem 1.25rem !important;
+            margin-top: 0.5rem !important;
+            box-sizing: border-box !important;
+          }
+          .hero-search-bar > div { 
+            flex-basis: auto !important; 
+            height: auto !important;
+            width: 100% !important;
+            min-width: 0 !important;
           }
         }
 
         /* ── Standard phones (≤480px) ── */
         @media(max-width:480px){
           .hero-section {
-            padding: 5rem 4% 1.25rem !important;
+            padding: 5rem 4% 2.5rem !important;
+            min-height: calc(100dvh - 65px) !important;
           }
           .hero-title {
-            font-size: clamp(1.5rem, 6.5vw, 1.9rem) !important;
-            margin-bottom: 0.5rem !important;
+            font-size: clamp(1.8rem, 8vw, 2.3rem) !important;
+            margin-bottom: 0.8rem !important;
             line-height: 1.2 !important;
           }
           .hero-subtitle {
-            font-size: 0.85rem !important;
-            line-height: 1.45 !important;
+            font-size: 0.9rem !important;
+            line-height: 1.5 !important;
+            margin-bottom: 1.2rem !important;
           }
           .hero-badge {
-            font-size: 0.72rem !important;
-            padding: 5px 12px !important;
+            font-size: 0.75rem !important;
+            padding: 6px 12px !important;
+            margin-bottom: 0.8rem !important;
           }
           .hero-search-wrap {
             margin-top: 1rem !important;
+            margin-bottom: 1.5rem !important;
             width: 100% !important;
+            padding: 0 2% !important;
           }
           .hero-search-bar {
             padding: 0.5rem !important;
             border-radius: 14px !important;
+            max-width: 100% !important;
+            width: 100% !important;
+            flex-direction: column !important;
+            align-items: stretch !important;
           }
           .hero-search-bar button {
             padding: 0.75rem 1.25rem !important;
-            font-size: 0.92rem !important;
+            font-size: 0.95rem !important;
+            width: 100% !important;
+            display: flex !important;
+            box-sizing: border-box !important;
           }
           .hero-search-bar input {
-            font-size: 0.92rem !important;
+            font-size: 0.95rem !important;
+          }
+          .hero-search-bar > div {
+            width: 100% !important;
+            min-width: 0 !important;
           }
         }
 
         /* ── Small phones (≤380px) ── */
         @media(max-width:380px){
           .hero-section {
-            padding: 4.5rem 3.5% 1rem !important;
+            padding: 4.5rem 3.5% 2.5rem !important;
+            min-height: 100dvh !important;
           }
           .hero-title {
-            font-size: 1.35rem !important;
+            font-size: 1.6rem !important;
+            margin-bottom: 0.6rem !important;
           }
           .hero-subtitle {
-            font-size: 0.8rem !important;
+            font-size: 0.85rem !important;
+            margin-bottom: 1rem !important;
           }
           .hero-badge {
-            font-size: 0.68rem !important;
-            padding: 4px 10px !important;
+            font-size: 0.7rem !important;
+            padding: 5px 10px !important;
+            margin-bottom: 0.8rem !important;
+          }
+          .hero-search-bar button {
+            padding: 0.7rem 1.1rem !important;
+            font-size: 0.9rem !important;
+            width: 100% !important;
+            display: flex !important;
+            box-sizing: border-box !important;
           }
         }
 
         /* ── Home Footer Responsive ── */
         @media(max-width:768px){
           .home-footer { padding-left: 5% !important; padding-right: 5% !important; }
-          .home-footer-inner { flex-direction: column !important; gap: 2rem !important; }
-          .home-footer-links { grid-template-columns: 1fr 1fr !important; gap: 1.5rem !important; }
+          .home-footer-inner { flex-direction: column !important; gap: 2.5rem !important; }
+          .home-footer-links { grid-template-columns: 1fr 1fr !important; gap: 2rem !important; }
         }
         @media(max-width:480px){
-          .home-footer { padding-left: 4% !important; padding-right: 4% !important; }
-          .home-footer-links { grid-template-columns: 1fr !important; gap: 1.5rem !important; }
+          .home-footer { padding-left: 6% !important; padding-right: 6% !important; }
+          .home-footer-links { grid-template-columns: 1fr !important; gap: 2rem !important; }
         }
       `}</style>
     </div>
@@ -1252,18 +1348,18 @@ const S = {
   palScroll: { overflow: 'hidden', flex: 1 },
   palText: { display: 'inline-block', whiteSpace: 'nowrap', animation: 'palScroll 25s linear infinite', color: '#fff', fontSize: '0.82rem', fontWeight: 600, letterSpacing: '0.5px' },
 
-  hero: { backgroundColor: 'var(--nav-bg,#0F172A)', backgroundImage: 'radial-gradient(circle at 80% 20%, rgba(255, 42, 95, 0.15) 0%, transparent 50%), radial-gradient(circle at 20% 80%, rgba(139, 92, 246, 0.2) 0%, transparent 60%)', minHeight: '100dvh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 'clamp(8rem,14vw,10rem) 5% 4rem', position: 'relative', textAlign: 'center' },
-  heroBadge: { display: 'inline-flex', alignItems: 'center', gap: '8px', backgroundColor: 'rgba(255,42,95,0.15)', color: '#FF2A5F', border: '1px solid rgba(255,42,95,0.3)', borderRadius: '24px', padding: '8px 20px', fontSize: '0.92rem', fontWeight: 700, marginBottom: '1.25rem' },
-  heroTitle: { fontSize: 'clamp(2.8rem, 8.5vw, 5.5rem)', fontWeight: 900, color: '#fff', lineHeight: 1.15, marginBottom: '1.25rem', letterSpacing: '-1.5px' },
-  heroSub: { fontSize: 'clamp(1.1rem, 2.5vw, 1.4rem)', color: '#94a3b8', maxWidth: '750px', margin: '0 auto', lineHeight: '1.6' },
+  hero: { backgroundColor: '#1a0a2e', backgroundImage: 'radial-gradient(ellipse at 70% 20%, rgba(255, 42, 95, 0.25) 0%, transparent 50%), radial-gradient(ellipse at 30% 70%, rgba(168, 85, 247, 0.3) 0%, transparent 55%), radial-gradient(ellipse at 50% 50%, rgba(139, 92, 246, 0.15) 0%, transparent 70%), linear-gradient(180deg, #1e0836 0%, #2d1054 30%, #1a0a2e 70%, #12072b 100%)', minHeight: '100dvh', height: '100dvh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 'clamp(4rem,8vw,6rem) 5%', position: 'relative', textAlign: 'center' },
+  heroBadge: { display: 'inline-flex', alignItems: 'center', gap: '8px', backgroundColor: 'rgba(255,42,95,0.15)', color: '#FF2A5F', border: '1px solid rgba(255,42,95,0.3)', borderRadius: '24px', padding: '6px 16px', fontSize: '0.85rem', fontWeight: 700, marginBottom: '1rem' },
+  heroTitle: { fontSize: 'clamp(2.2rem, 6vw, 4rem)', fontWeight: 900, color: '#fff', lineHeight: 1.15, marginBottom: '1rem', letterSpacing: '-1px' },
+  heroSub: { fontSize: 'clamp(0.95rem, 2vw, 1.15rem)', color: '#94a3b8', maxWidth: '650px', margin: '0 auto', lineHeight: '1.5' },
 
-  searchWrap: { width: '100%', display: 'flex', justifyContent: 'center', marginTop: '2.5rem', zIndex: 20 },
-  searchBar: { backgroundColor: 'var(--bg-surface,#fff)', borderRadius: '20px', padding: '0.9rem', display: 'flex', alignItems: 'center', boxShadow: '0 25px 50px rgba(15,23,42,0.22)', width: '100%', maxWidth: '1050px', gap: '0.5rem', flexWrap: 'wrap' },
-  searchGrp: { display: 'flex', alignItems: 'center', gap: '0.75rem', flex: '1 1 180px', minWidth: '160px', padding: '0.4rem 0.9rem' },
+  searchWrap: { width: '100%', maxWidth: '100vw', overflowX: 'hidden', display: 'flex', justifyContent: 'center', marginTop: '2rem', marginBottom: '0', zIndex: 20, padding: '0 5%', boxSizing: 'border-box' },
+  searchBar: { backgroundColor: 'var(--bg-surface,#fff)', borderRadius: '20px', padding: '0.7rem', display: 'flex', alignItems: 'center', boxShadow: '0 25px 50px rgba(15,23,42,0.22)', width: '100%', maxWidth: '95%', gap: '0.4rem', flexWrap: 'wrap', boxSizing: 'border-box' },
+  searchGrp: { display: 'flex', alignItems: 'center', gap: '0.5rem', flex: '1 1 100px', minWidth: '80px', padding: '0.25rem 0.5rem', boxSizing: 'border-box' },
   searchDivider: { width: '1px', height: '36px', backgroundColor: 'var(--border-color,#e2e8f0)', flexShrink: 0 },
-  searchInput: { border: 'none', outline: 'none', fontSize: '1.05rem', color: 'var(--text-primary)', width: '100%', backgroundColor: 'transparent' },
-  selectInput: { border: 'none', outline: 'none', fontSize: '1.05rem', color: 'var(--text-primary)', width: '100%', backgroundColor: 'transparent', cursor: 'pointer' },
-  btnSearch: { backgroundColor: '#FF2A5F', color: '#fff', border: 'none', padding: '0.95rem 2rem', borderRadius: '14px', fontWeight: 700, fontSize: '1.05rem', cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0, transition: 'background-color 0.2s' },
+  searchInput: { border: 'none', outline: 'none', fontSize: '1rem', color: 'var(--text-primary)', width: '100%', maxWidth: '100%', backgroundColor: 'transparent', boxSizing: 'border-box' },
+  selectInput: { border: 'none', outline: 'none', fontSize: '1rem', color: 'var(--text-primary)', width: '100%', maxWidth: '100%', backgroundColor: 'transparent', cursor: 'pointer', boxSizing: 'border-box' },
+  btnSearch: { backgroundColor: '#FF2A5F', color: '#fff', border: 'none', padding: '0.8rem 1.5rem', borderRadius: '12px', fontWeight: 700, fontSize: '1rem', cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0, transition: 'background-color 0.2s', minWidth: '100px', display: 'flex', alignItems: 'center', justifyContent: 'center', boxSizing: 'border-box' },
 
   sectionTitle: { fontSize: 'clamp(1.4rem,4vw,2rem)', fontWeight: 800, color: 'var(--text-primary)', margin: 0 },
   sectionSub: { color: '#64748b', fontSize: '0.92rem', marginTop: '0.3rem' },

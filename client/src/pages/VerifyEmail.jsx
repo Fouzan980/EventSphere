@@ -44,7 +44,7 @@ const VerifyEmail = () => {
     };
 
     verifyToken();
-  }, [token]);
+  }, [token, searchParams]);
 
   const handleResend = async (e) => {
     e.preventDefault();
